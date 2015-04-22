@@ -15,7 +15,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-    'docopt', 'yarg'
+
 ]
 
 test_requirements = [
@@ -39,11 +39,11 @@ setup(
     install_requires=requirements,
     license="Apache License 2.0",
     zip_safe=False,
-    keywords='pipreqs',
+    keywords='pip requirements imports',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License 2.0',
+        'License :: OSI Approved :: Apache License',
         'Natural Language :: English',
         "Programming Language :: Python :: 2",
         'Programming Language :: Python :: 2.6',
