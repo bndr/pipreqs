@@ -1,5 +1,5 @@
 ===============================
-pipreqs
+``pipreqs`` - Generate requirements.txt file for any project based on imports
 ===============================
 
 .. image:: https://img.shields.io/travis/bndr/pipreqs.svg
@@ -8,15 +8,33 @@ pipreqs
 .. image:: https://img.shields.io/pypi/v/pipreqs.svg
         :target: https://pypi.python.org/pypi/pipreqs
 
-Work In Progress
+Installation
+------------
 
-Pip Requirements generator
+::
 
-* Free software: Apache license
-* Documentation: https://pipreqs.readthedocs.org.
+    pip install pipreqs
 
-Features
---------
+Usage
+-----
 
+::
+
+    Usage:
+        pipreqs <path> [options]
+
+    Options:
+    	--savepath Supply custom path for requirements.txt
+        --debug  See debug output
+
+Example
+-------
+
+::
+
+    $ pipreqs /home/project/location
+    Successfuly saved requirements file in: /home/project/location/requirements.txt
+ 
+ 
 Why not pip freeze?
 --------
