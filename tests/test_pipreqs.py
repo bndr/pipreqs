@@ -22,7 +22,8 @@ class TestPipreqs(unittest.TestCase):
     	path = os.path.join(os.path.dirname(__file__),"_data")
     	imports = pipreqs.get_all_imports(path)
     	self.assertEqual(len(imports),4, "Incorrect Imports array length")
-    	self.assertEqual(imports, self.modules, "Imports array is wrong")
+    	for item in imports:
+    		self.assertTrue(item in self.modules, "Import is missing")
 
     def test_get_imports_info(self):
     	path = os.path.join(os.path.dirname(__file__),"_data")
