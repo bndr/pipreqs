@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='pipreqs',
-    version='0.1.1',
+    version='0.1.4',
     description="Pip requirements.txt generator based on imports in project",
     long_description=readme + '\n\n' + history,
     author="Vadim Kravcenko",
@@ -36,8 +36,9 @@ setup(
     package_dir={'pipreqs':
                  'pipreqs'},
     include_package_data=True,
+    package_data={'': ['stdlib']},
     install_requires=requirements,
-    license="Apache License 2.0",
+    license="Apache License",
     zip_safe=False,
     keywords='pip requirements imports',
     classifiers=[
