@@ -11,7 +11,7 @@ pipreqs
 
 Pip Requirements generator
 
-* Free software: BSD license
+* Free software: Apache license
 * Documentation: https://pipreqs.readthedocs.org.
 
 Features
