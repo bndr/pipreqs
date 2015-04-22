@@ -3,6 +3,12 @@
 History
 -------
 
+0.1.5 (2015-04-22)
+---------------------
+
+* Add Readme, Add Examples
+* Add Stdlib into package
+
 0.1.1 (2015-04-22)
 ---------------------
 
