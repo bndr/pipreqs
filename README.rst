@@ -36,5 +36,3 @@ Example
     Successfuly saved requirements file in: /home/project/location/requirements.txt
  
 
-Why not pip freeze?
---------
