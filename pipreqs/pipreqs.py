@@ -10,6 +10,7 @@ Options:
     --debug  prints debug information.
     --savepath path to requirements.txt (Optional)
 """
+from __future__ import print_function
 import os, re, logging
 from docopt import docopt
 import yarg
@@ -80,7 +81,7 @@ def init(args):
 	imports_with_info = get_imports_info(imports)
 	path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'],"requirements.txt")
 	generate_requirements_file(path, imports_with_info)
-	print "Successfuly saved requirements file in: " + path
+	print ("Successfuly saved requirements file in: " + path)
 
 def main():
     args = docopt(__doc__, version='xstat 0.1')
