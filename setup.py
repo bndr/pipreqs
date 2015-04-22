@@ -15,7 +15,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-
+    'docopt', 'yarg'
 ]
 
 test_requirements = [
@@ -25,7 +25,7 @@ test_requirements = [
 setup(
     name='pipreqs',
     version='0.1.1',
-    description="Pip Requirements generator based on imports in project",
+    description="Pip requirements.txt generator based on imports in project",
     long_description=readme + '\n\n' + history,
     author="Vadim Kravcenko",
     author_email='vadim.kravcenko@gmail.com',
@@ -56,7 +56,7 @@ setup(
     tests_require=test_requirements,
     entry_points={
         'console_scripts': [
-            'pipreqs = pipreqs.pipreqs:main',
+            'pipreqs=pipreqs.pipreqs:main',
         ],
     },
 )
