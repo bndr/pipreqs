@@ -17,7 +17,6 @@ class TestPipreqs(unittest.TestCase):
 
     def setUp(self):
     	self.modules = ['flask', 'requests', 'sqlalchemy', 'docopt']
-        pass
 
     def test_get_all_imports(self):
     	path = os.path.join(os.path.dirname(__file__),"_data")
