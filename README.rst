@@ -8,6 +8,7 @@ pipreqs
 .. image:: https://img.shields.io/pypi/v/pipreqs.svg
         :target: https://pypi.python.org/pypi/pipreqs
 
+Work In Progress
 
 Pip Requirements generator
 
@@ -17,4 +18,5 @@ Pip Requirements generator
 Features
 --------
 
-* TODO
+Why not pip freeze?
+--------
