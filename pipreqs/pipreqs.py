@@ -23,6 +23,7 @@ REGEXP = [
 def get_all_imports(start_path):
 	imports = []
 	packages = []
+	logging.debug('Traversing tree, start: %s', start_path)
 	for root, dirs, files in os.walk(start_path):
 		path = root.split('/')
 		packages.append(os.path.basename(root))       
@@ -48,12 +49,14 @@ def get_all_imports(start_path):
 								to_append = item if "." not in item else item.split(".")[0]
 								imports.append(to_append.strip())
 	third_party_packages = set(imports) - set(set(packages) & set(imports))
+	logging.debug('Found third-party packages: %s', third_party_packages)
 	with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
 		data = [x.strip() for x in f.readlines()]
 		return list(set(third_party_packages) - set(data))
 
 def generate_requirements_file(path, imports):
 	with open(path, "w") as ff:
+		logging.debug('Writing requirements to file %s', path)
 		for item in imports:
 			ff.write(item['name'] + "==" + item['version'])
 			ff.write("\n")
@@ -64,6 +67,7 @@ def get_imports_info(imports):
 		try:
 			data = yarg.get(item)
 		except HTTPError:
+			logging.debug('Package does not exist or network problems')
 			continue
 		if not data or len(data.release_ids) < 1:
 			continue
@@ -76,6 +80,7 @@ def init(args):
 	imports_with_info = get_imports_info(imports)
 	path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'],"requirements.txt")
 	generate_requirements_file(path, imports_with_info)
+	print "Successfuly saved requirements file in: " + path
 
 def main():
     args = docopt(__doc__, version='xstat 0.1')

@@ -25,7 +25,7 @@ Usage
 
     Options:
     	--savepath Supply custom path for requirements.txt
-        --debug  See debug output
+        --debug    See debug output
 
 Example
 -------
@@ -35,6 +35,6 @@ Example
     $ pipreqs /home/project/location
     Successfuly saved requirements file in: /home/project/location/requirements.txt
  
- 
+
 Why not pip freeze?
 --------
