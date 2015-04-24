@@ -33,6 +33,9 @@ Example
 ::
 
     $ pipreqs /home/project/location
+    Looking for imports
+    Getting latest version of packages information from PyPi
+    Found third-party imports: flask, requests, sqlalchemy, docopt
     Successfuly saved requirements file in: /home/project/location/requirements.txt
  
 Why not pip freeze?
