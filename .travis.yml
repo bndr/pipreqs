@@ -11,8 +11,8 @@ python:
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: 
-	- "pip install -r requirements.txt"
-	- "pip install coveralls"
+    - "pip install -r requirements.txt"
+    - "pip install coveralls"
 
 # command to run tests, e.g. python setup.py test
 script: python setup.py test
