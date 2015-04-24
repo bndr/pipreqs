@@ -11,6 +11,8 @@
 .. image:: https://img.shields.io/pypi/dm/pipreqs.svg 
         :target: https://pypi.python.org/pypi/pipreqs
 
+.. image:: https://img.shields.io/pypi/l/pipreqs.svg 
+        :target: https://pypi.python.org/pypi/pipreqs
 
         
 
