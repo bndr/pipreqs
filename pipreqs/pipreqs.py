@@ -86,7 +86,7 @@ def init(args):
 	generate_requirements_file(path, imports_with_info)
 	print ("Successfuly saved requirements file in: " + path)
 
-def main():
+def main(): # pragma: no cover
     args = docopt(__doc__, version='xstat 0.1')
     log_level = logging.WARNING
     if args['--debug']:
@@ -99,4 +99,4 @@ def main():
         sys.exit(0)
 
 if __name__ == '__main__':
-    main()
+    main() # pragma: no cover
