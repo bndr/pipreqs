@@ -3,6 +3,14 @@
 History
 -------
 
+0.1.7 (2015-04-24)
+---------------------
+
+* Add more assertions in tests
+* Add more verbose output
+* Add recursive delete to Makefile clean
+* Update Readme
+
 0.1.6 (2015-04-22)
 ---------------------
 

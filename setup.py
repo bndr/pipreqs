@@ -24,7 +24,7 @@ test_requirements = [
 
 setup(
     name='pipreqs',
-    version='0.1.6',
+    version='0.1.7',
     description="Pip requirements.txt generator based on imports in project",
     long_description=readme + '\n\n' + history,
     author="Vadim Kravcenko",
