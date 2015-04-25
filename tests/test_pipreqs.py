@@ -14,43 +14,43 @@ from pipreqs import pipreqs
 
 
 class TestPipreqs(unittest.TestCase):
-
     def setUp(self):
-    	self.modules = ['flask', 'requests', 'sqlalchemy', 'docopt', 'nonexistendmodule']
-    	self.project = os.path.join(os.path.dirname(__file__),"_data")
-    	self.requirements_path = os.path.join(self.project,"requirements.txt")
+        self.modules = ['flask', 'requests', 'sqlalchemy', 'docopt', 'nonexistendmodule']
+        self.project = os.path.join(os.path.dirname(__file__), "_data")
+        self.requirements_path = os.path.join(self.project, "requirements.txt")
 
     def test_get_all_imports(self):
-    	imports = pipreqs.get_all_imports(self.project)
-    	self.assertEqual(len(imports),5, "Incorrect Imports array length")
-    	for item in imports:
-    		self.assertTrue(item in self.modules, "Import is missing")
-    	self.assertFalse("time" in imports)
-    	self.assertFalse("logging" in imports)
-    	self.assertFalse("curses" in imports)
-    	self.assertFalse("__future__" in imports)
+        imports = pipreqs.get_all_imports(self.project)
+        self.assertEqual(len(imports), 5, "Incorrect Imports array length")
+        for item in imports:
+            self.assertTrue(item in self.modules, "Import is missing")
+        self.assertFalse("time" in imports)
+        self.assertFalse("logging" in imports)
+        self.assertFalse("curses" in imports)
+        self.assertFalse("__future__" in imports)
 
     def test_get_imports_info(self):
-    	imports = pipreqs.get_all_imports(self.project)
-    	with_info = pipreqs.get_imports_info(imports)
-    	# Should contain only 4 Elements without the "nonexistendmodule"
-    	self.assertEqual(len(with_info),4, "Length of imports array with info is wrong")
-    	for item in with_info:
-    		self.assertTrue(item['name'] in self.modules, "Import item appears to be missing")
+        imports = pipreqs.get_all_imports(self.project)
+        with_info = pipreqs.get_imports_info(imports)
+        # Should contain only 4 Elements without the "nonexistendmodule"
+        self.assertEqual(len(with_info), 4, "Length of imports array with info is wrong")
+        for item in with_info:
+            self.assertTrue(item['name'] in self.modules, "Import item appears to be missing")
 
     def test_init(self):
-    	pipreqs.init({'<path>':self.project, '--savepath':None})
-    	assert os.path.exists(self.requirements_path) == 1
-    	with open(self.requirements_path, "r") as f:
-    		 data = f.read()
-    		 for item in self.modules[:-1]:
-    		 	self.assertTrue(item in data)
+        pipreqs.init({'<path>': self.project, '--savepath': None})
+        assert os.path.exists(self.requirements_path) == 1
+        with open(self.requirements_path, "r") as f:
+            data = f.read()
+            for item in self.modules[:-1]:
+                self.assertTrue(item in data)
 
     def tearDown(self):
         try:
-        	os.remove(self.requirements_path)
+            os.remove(self.requirements_path)
         except OSError:
-        	pass
+            pass
+
 
 if __name__ == '__main__':
     unittest.main()

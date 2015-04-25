@@ -3,90 +3,99 @@
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
-	pipreqs <path>
-	pipreqs <path>[options]
+    pipreqs <path>
+    pipreqs <path>[options]
 
 Options:
     --debug  prints debug information.
     --savepath path to requirements.txt (Optional)
 """
 from __future__ import print_function
-import os, re, logging
+import os
+import sys
+import re
+import logging
+
 from docopt import docopt
 import yarg
 from yarg.exceptions import HTTPError
 
+
 REGEXP = [
-	re.compile(r'^import (.+)$'),
-	re.compile(r'from (.*?) import (?:.*)')
+    re.compile(r'^import (.+)$'),
+    re.compile(r'from (.*?) import (?:.*)')
 ]
 
+
 def get_all_imports(start_path):
-	imports = []
-	packages = []
-	logging.debug('Traversing tree, start: %s', start_path)
-	for root, dirs, files in os.walk(start_path):
-		path = root.split('/')
-		packages.append(os.path.basename(root))       
-		for file in files:
-			if file[-3:] != ".py":
-				continue
-			for rex in REGEXP:
-				with open(os.path.join(root,file), "r") as f:
-					lines = f.readlines()
-					for line in lines:
-						if line[0] == "#":
-							continue
-						if "(" in line:
-							break
-						s = rex.match(line)
-						if not s:
-							continue
-						for item in s.groups():
-							if "," in item:
-								for match in item.split(","):
-									imports.append(match.strip())
-							else:
-								to_append = item if "." not in item else item.split(".")[0]
-								imports.append(to_append.strip())
-	third_party_packages = set(imports) - set(set(packages) & set(imports))
-	logging.debug('Found third-party packages: %s', third_party_packages)
-	with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
-		data = [x.strip() for x in f.readlines()]
-		return list(set(third_party_packages) - set(data))
+    imports = []
+    packages = []
+    logging.debug('Traversing tree, start: %s', start_path)
+    for root, dirs, files in os.walk(start_path):
+        packages.append(os.path.basename(root))
+        for file_name in files:
+            if file_name[-3:] != ".py":
+                continue
+
+            with open(os.path.join(root, file_name), "r") as file_object:
+                for line in file_object:
+                    if line[0] == "#":
+                        continue
+                    if "(" in line:
+                        break
+                    for rex in REGEXP:
+                        s = rex.match(line)
+                        if not s:
+                            continue
+                        for item in s.groups():
+                            if "," in item:
+                                for match in item.split(","):
+                                    imports.append(match.strip())
+                            else:
+                                to_append = item if "." not in item else item.split(".")[0]
+                                imports.append(to_append.strip())
+    third_party_packages = set(imports) - set(set(packages) & set(imports))
+    logging.debug('Found third-party packages: %s', third_party_packages)
+    with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
+        data = [x.strip() for x in f.readlines()]
+        return list(set(third_party_packages) - set(data))
+
 
 def generate_requirements_file(path, imports):
-	with open(path, "w") as ff:
-		logging.debug('Writing requirements to file %s', path)
-		for item in imports:
-			ff.write(item['name'] + "==" + item['version'])
-			ff.write("\n")
+    with open(path, "w") as ff:
+        logging.debug('Writing requirements to file %s', path)
+        for item in imports:
+            ff.write(item['name'] + "==" + item['version'])
+            ff.write("\n")
+
 
 def get_imports_info(imports):
-	result = []
-	for item in imports:
-		try:
-			data = yarg.get(item)
-		except HTTPError:
-			logging.debug('Package does not exist or network problems')
-			continue
-		if not data or len(data.release_ids) < 1:
-			continue
-		last_release = data.release_ids[-1]
-		result.append({'name':item,'version':last_release})
-	return result
+    result = []
+    for item in imports:
+        try:
+            data = yarg.get(item)
+        except HTTPError:
+            logging.debug('Package does not exist or network problems')
+            continue
+        if not data or len(data.release_ids) < 1:
+            continue
+        last_release = data.release_ids[-1]
+        result.append({'name': item, 'version': last_release})
+    return result
+
 
 def init(args):
-	print ("Looking for imports")
-	imports = get_all_imports(args['<path>'])
-	print ("Getting latest version of packages information from PyPi")
-	imports_with_info = get_imports_info(imports)
-	print ("Found third-party imports: " + ", ".join(imports))
-	path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'],"requirements.txt")
-	generate_requirements_file(path, imports_with_info)
-	print ("Successfuly saved requirements file in: " + path)
+    print("Looking for imports")
+    imports = get_all_imports(args['<path>'])
+    print("Getting latest version of packages information from PyPi")
+    imports_with_info = get_imports_info(imports)
+    print("Found third-party imports: " + ", ".join(imports))
+    path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
+    generate_requirements_file(path, imports_with_info)
+    print("Successfuly saved requirements file in: " + path)
 
-def main(): # pragma: no cover
+
+def main():  # pragma: no cover
     args = docopt(__doc__, version='xstat 0.1')
     log_level = logging.WARNING
     if args['--debug']:
@@ -98,5 +107,6 @@ def main(): # pragma: no cover
     except KeyboardInterrupt:
         sys.exit(0)
 
+
 if __name__ == '__main__':
-    main() # pragma: no cover
+    main()  # pragma: no cover
