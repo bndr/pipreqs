@@ -29,6 +29,7 @@ class TestPipreqs(unittest.TestCase):
         self.assertFalse("curses" in imports)
         self.assertFalse("__future__" in imports)
         self.assertFalse("django" in imports)
+        self.assertFalse("models" in imports)
 
     def test_get_imports_info(self):
         imports = pipreqs.get_all_imports(self.project)

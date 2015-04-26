@@ -13,7 +13,12 @@ import nonexistendmodule
 # import django
 import flask.ext.somext
 from sqlalchemy import model
-import ujson as json
+try:
+    import ujson as json
+except ImportError:
+    import json
+
+import models
 
 def main():
 	pass
