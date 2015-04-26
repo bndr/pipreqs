@@ -3,6 +3,14 @@
 History
 -------
 
+0.1.8 (2015-04-26)
+---------------------
+
+* Fixed problems with local imports (Dongwon Shin)
+* Fixed problems with imports with 'as' (Dongwon Shin)
+* Fix indentation, pep8 Styling. (Michael Borisov)
+* Optimize imports and adding missing import for sys module. (Michael Borisov)
+
 0.1.7 (2015-04-24)
 ---------------------
 
