@@ -33,12 +33,12 @@ def get_all_imports(start_path):
     logging.debug('Traversing tree, start: %s', start_path)
     for root, dirs, files in os.walk(start_path):
         packages.append(os.path.basename(root))
+        files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+        packages += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
-            if file_name[-3:] != ".py":
-                continue
-
             with open(os.path.join(root, file_name), "r") as file_object:
-                for line in file_object:
+                lines = filter(lambda l:len(l) > 0, map(lambda l:l.strip(), file_object))
+                for line in lines:
                     if line[0] == "#":
                         continue
                     if "(" in line:
@@ -51,6 +51,9 @@ def get_all_imports(start_path):
                             if "," in item:
                                 for match in item.split(","):
                                     imports.append(match.strip())
+                            elif " as " in item:
+                                to_append = item.split(" as ")[0]
+                                imports.append(to_append.strip())
                             else:
                                 to_append = item if "." not in item else item.split(".")[0]
                                 imports.append(to_append.strip())

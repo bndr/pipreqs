@@ -10,11 +10,15 @@ import sys
 import signal
 import requests
 import nonexistendmodule
-# Ignore this Line
+# import django
 import flask.ext.somext
 from sqlalchemy import model
+try:
+    import ujson as json
+except ImportError:
+    import json
 
-
+import models
 
 def main():
 	pass
