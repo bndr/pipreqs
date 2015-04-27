@@ -80,7 +80,7 @@ def get_imports_info(imports):
         except HTTPError:
             logging.debug('Package does not exist or network problems')
             continue
-        if not data or len(data.release_ids) < 1:
+        if not data or not data.release_ids:
             continue
         last_release = data.release_ids[-1]
         result.append({'name': item, 'version': last_release})
@@ -100,9 +100,7 @@ def init(args):
 
 def main():  # pragma: no cover
     args = docopt(__doc__, version='xstat 0.1')
-    log_level = logging.WARNING
-    if args['--debug']:
-        log_level = logging.DEBUG
+    log_level = logging.DEBUG if args['--debug'] else logging.WARNING
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s')
 
     try:
