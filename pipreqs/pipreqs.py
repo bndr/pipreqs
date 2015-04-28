@@ -86,12 +86,12 @@ def get_imports_info(imports):
 def init(args):
     print("Looking for imports")
     imports = get_all_imports(args['<path>'])
-    print("Getting latest version of packages information from PyPi")
+    print("Getting latest information about packages from PyPI")
     imports_with_info = get_imports_info(imports)
     print("Found third-party imports: " + ", ".join(imports))
     path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
     generate_requirements_file(path, imports_with_info)
-    print("Successfuly saved requirements file in: " + path)
+    print("Successfully saved requirements file in " + path)
 
 
 def main():  # pragma: no cover
