@@ -58,7 +58,7 @@ def get_all_imports(start_path):
     logging.debug('Found third-party packages: {0}'.format(third_party_packages))
     with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
         data = [x.strip() for x in f.readlines()]
-        return list(set(third_party_packages) - set(data))
+        return sorted(list(set(third_party_packages) - set(data)))
 
 
 def generate_requirements_file(path, imports):
