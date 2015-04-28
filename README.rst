@@ -34,11 +34,11 @@ Usage
 ::
 
     Usage:
-        pipreqs <path> [options]
+        pipreqs [options] <path>
 
     Options:
-    	--savepath Supply custom path for requirements.txt
-        --debug    See debug output
+        --debug             Print debug information
+        --savepath <file>   Save the list of requirements in the given file
 
 Example
 -------

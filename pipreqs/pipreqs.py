@@ -3,12 +3,11 @@
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
-    pipreqs <path>
-    pipreqs <path>[options]
+    pipreqs [options] <path>
 
 Options:
-    --debug  prints debug information.
-    --savepath path to requirements.txt (Optional)
+    --debug             Print debug information
+    --savepath <file>   Save the list of requirements in the given file
 """
 from __future__ import print_function
 import os
