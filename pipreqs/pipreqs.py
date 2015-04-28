@@ -30,7 +30,7 @@ REGEXP = [
 def get_all_imports(start_path):
     imports = []
     packages = []
-    logging.debug('Traversing tree, start: %s', start_path)
+    logging.debug('Traversing tree, start: {0}'.format(start_path))
     for root, dirs, files in os.walk(start_path):
         packages.append(os.path.basename(root))
         files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
@@ -55,7 +55,7 @@ def get_all_imports(start_path):
                                 to_append = item.partition(' as ')[0].partition('.')[0]
                                 imports.append(to_append.strip())
     third_party_packages = set(imports) - set(set(packages) & set(imports))
-    logging.debug('Found third-party packages: %s', third_party_packages)
+    logging.debug('Found third-party packages: {0}'.format(third_party_packages))
     with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
         data = [x.strip() for x in f.readlines()]
         return list(set(third_party_packages) - set(data))
@@ -63,7 +63,10 @@ def get_all_imports(start_path):
 
 def generate_requirements_file(path, imports):
     with open(path, "w") as out_file:
-        logging.debug('Writing %d requirements to file %s', (len(imports), path))
+        logging.debug('Writing {num} requirements to {file}'.format(
+            num=len(imports),
+            file=path
+        ))
         fmt = '{name} == {version}'
         out_file.write('\n'.join(fmt.format(**item) for item in imports) + '\n')
 
