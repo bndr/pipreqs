@@ -34,11 +34,11 @@ Usage
 ::
 
     Usage:
-        pipreqs <path> [options]
+        pipreqs [options] <path>
 
     Options:
-    	--savepath Supply custom path for requirements.txt
-        --debug    See debug output
+        --debug             Print debug information
+        --savepath <file>   Save the list of requirements in the given file
 
 Example
 -------
@@ -47,9 +47,9 @@ Example
 
     $ pipreqs /home/project/location
     Looking for imports
-    Getting latest version of packages information from PyPi
+    Getting latest information about packages from PyPI
     Found third-party imports: flask, requests, sqlalchemy, docopt
-    Successfuly saved requirements file in: /home/project/location/requirements.txt
+    Successfully saved requirements file in /home/project/location/requirements.txt
  
 Why not pip freeze?
 -------------------

@@ -3,12 +3,11 @@
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
-    pipreqs <path>
-    pipreqs <path>[options]
+    pipreqs [options] <path>
 
 Options:
-    --debug  prints debug information.
-    --savepath path to requirements.txt (Optional)
+    --debug             Print debug information
+    --savepath <file>   Save the list of requirements in the given file
 """
 from __future__ import print_function
 import os
@@ -30,7 +29,7 @@ REGEXP = [
 def get_all_imports(start_path):
     imports = []
     packages = []
-    logging.debug('Traversing tree, start: %s', start_path)
+    logging.debug('Traversing tree, start: {0}'.format(start_path))
     for root, dirs, files in os.walk(start_path):
         packages.append(os.path.basename(root))
         files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
@@ -55,15 +54,18 @@ def get_all_imports(start_path):
                                 to_append = item.partition(' as ')[0].partition('.')[0]
                                 imports.append(to_append.strip())
     third_party_packages = set(imports) - set(set(packages) & set(imports))
-    logging.debug('Found third-party packages: %s', third_party_packages)
+    logging.debug('Found third-party packages: {0}'.format(third_party_packages))
     with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
         data = [x.strip() for x in f.readlines()]
-        return list(set(third_party_packages) - set(data))
+        return sorted(list(set(third_party_packages) - set(data)))
 
 
 def generate_requirements_file(path, imports):
     with open(path, "w") as out_file:
-        logging.debug('Writing %d requirements to file %s', (len(imports), path))
+        logging.debug('Writing {num} requirements to {file}'.format(
+            num=len(imports),
+            file=path
+        ))
         fmt = '{name} == {version}'
         out_file.write('\n'.join(fmt.format(**item) for item in imports) + '\n')
 
@@ -86,12 +88,12 @@ def get_imports_info(imports):
 def init(args):
     print("Looking for imports")
     imports = get_all_imports(args['<path>'])
-    print("Getting latest version of packages information from PyPi")
+    print("Getting latest information about packages from PyPI")
     imports_with_info = get_imports_info(imports)
     print("Found third-party imports: " + ", ".join(imports))
     path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
     generate_requirements_file(path, imports_with_info)
-    print("Successfuly saved requirements file in: " + path)
+    print("Successfully saved requirements file in " + path)
 
 
 def main():  # pragma: no cover
