@@ -3,6 +3,12 @@
 History
 -------
 
+0.1.9 (2015-05-01)
+---------------------
+
+* Output tuning (Harri Berglund)
+* Use str.partition() to simplify the logic (cclaus)
+
 0.1.8 (2015-04-26)
 ---------------------
 
