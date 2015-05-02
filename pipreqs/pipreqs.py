@@ -80,7 +80,7 @@ def get_imports_info(imports):
             continue
         if not data or not data.release_ids:
             continue
-        last_release = data.release_ids[-1]
+        last_release = data.latest_release_id
         result.append({'name': item, 'version': last_release})
     return result
 
