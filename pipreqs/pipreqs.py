@@ -22,7 +22,7 @@ from yarg.exceptions import HTTPError
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
-    re.compile(r'from (.*?) import (?:.*)')
+    re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
 
 
