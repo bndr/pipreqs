@@ -6,12 +6,14 @@ Usage:
     pipreqs [options] <path>
 
 Options:
+    --use-local         Use ONLY local package information instead of querying PyPI
     --debug             Print debug information
     --savepath <file>   Save the list of requirements in the given file
 """
 from __future__ import print_function
 import os
 import sys
+from distutils.sysconfig import get_python_lib
 import re
 import logging
 
@@ -84,13 +86,52 @@ def get_imports_info(imports):
         result.append({'name': item, 'version': last_release})
     return result
 
+def get_locally_installed_packages():
+	path = get_python_lib()
+	packages = {}
+	for root, dirs, files in os.walk(path):
+		for item in files:
+			if "top_level" in item:
+				with open(os.path.join(root,item), "r") as f:
+					package = root.split("/")[-1].split("-")
+					package_import = f.read().strip().split("\n")
+					package_import_name = ""
+					for item in package_import:
+						if item not in ["tests","_tests"]:
+							package_import_name = item
+							break
+					if package_import_name == "":
+						logging.debug('Could not determine import name for package ' + package_import)
+					else:
+						packages[package_import_name] = {
+							'version':package[1].replace(".dist",""),
+							'name': package[0]
+						}
+	return packages
+
+def get_import_local(imports):
+	local = get_locally_installed_packages()
+	result = []
+	for item in imports:
+		if item in local:
+			result.append(local[item])
+	return result
+
 
 def init(args):
     print("Looking for imports")
     imports = get_all_imports(args['<path>'])
-    print("Getting latest information about packages from PyPI")
-    imports_with_info = get_imports_info(imports)
     print("Found third-party imports: " + ", ".join(imports))
+    if args['--use-local']:
+    	print("Getting package version information ONLY from local installation.")
+    	imports_with_info = get_import_local(imports)
+    else:
+    	print("Getting latest version information about packages from Local/PyPI")
+    	imports_local = get_import_local(imports)
+    	difference = [x for x in imports if x not in [z['name'] for z in imports_local]]
+    	imports_pypi = get_imports_info(difference)
+    	imports_with_info = imports_local + imports_pypi
+    print("Imports written to requirements file:", ", ".join([x['name'] for x in imports_with_info]))
     path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
     generate_requirements_file(path, imports_with_info)
     print("Successfully saved requirements file in " + path)

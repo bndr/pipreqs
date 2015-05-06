@@ -38,9 +38,14 @@ class TestPipreqs(unittest.TestCase):
         self.assertEqual(len(with_info), 5, "Length of imports array with info is wrong")
         for item in with_info:
             self.assertTrue(item['name'] in self.modules, "Import item appears to be missing")
+    
+    def test_get_use_local_only(self):
+    	# should find only docopt and requests
+    	imports_with_info = pipreqs.get_import_local(self.modules)
+    	self.assertTrue(len(imports_with_info) == 2)
 
     def test_init(self):
-        pipreqs.init({'<path>': self.project, '--savepath': None})
+        pipreqs.init({'<path>': self.project, '--savepath': None,'--use-local':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read()
