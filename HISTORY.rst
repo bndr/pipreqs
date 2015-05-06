@@ -3,6 +3,13 @@
 History
 -------
 
+0.2.0 (2015-05-06)
+---------------------
+
+* Add --use-local option
+* Exclude relative imports. (Dongwon Shin)
+* Use "latest_release_id" instead of "release_ids[-1]" (Dongwon Shin)
+
 0.1.9 (2015-05-01)
 ---------------------
 
