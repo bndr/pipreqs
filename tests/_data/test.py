@@ -8,6 +8,7 @@ import sqlite3
 import time
 import sys
 import signal
+import bs4
 import requests
 import nonexistendmodule
 # import django
