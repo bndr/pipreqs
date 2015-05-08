@@ -72,7 +72,7 @@ class TestPipreqs(unittest.TestCase):
         import_name_with_alias = "requests as R"
         expected_import_name_without_alias = "requests"
         import_name_without_aliases = pipreqs.get_import_name_without_alias(import_name_with_alias)
-        self.assertEqual(import_name_without_aliases, expected_import_name_without_alias, "The import alias was not correctly stripped")
+        self.assertEqual(import_name_without_aliases, expected_import_name_without_alias)
 
     def tearDown(self):
         try:
