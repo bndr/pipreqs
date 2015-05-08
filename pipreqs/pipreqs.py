@@ -112,6 +112,7 @@ def get_import_local(imports):
             result.append(local[item.lower()])
     return result
 
+
 def get_pkg_names_from_import_names(pkgs):
     result = []
     with open(os.path.join(os.path.dirname(__file__), "mapping"), "r") as f:
