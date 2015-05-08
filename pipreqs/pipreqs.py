@@ -107,7 +107,7 @@ def get_locally_installed_packages():
                             break
                     if package_import_name == "":
                         logging.debug(
-                            'Could not determine import name for package ' + package_import)
+                            'Could not determine import name for package ' + str(package_import))
                     else:
                         packages[package_import_name] = {
                             'version': package[1].replace(".dist", ""),
