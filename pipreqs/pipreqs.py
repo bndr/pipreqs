@@ -62,7 +62,7 @@ def get_all_imports(start_path):
         'Found third-party packages: {0}'.format(third_party_packages))
     with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
         data = [x.strip() for x in f.readlines()]
-        return sorted(list(set(third_party_packages) - set(data)))
+        return get_pkg_names_from_import_names(sorted(list(set(third_party_packages) - set(data))))
 
 
 def generate_requirements_file(path, imports):
@@ -114,6 +114,19 @@ def get_import_local(imports):
         if item in local:
             result.append(local[item])
     return result
+
+def get_pkg_names_from_import_names(pkgs):
+	result = []
+	with open(os.path.join(os.path.dirname(__file__), "mapping"), "r") as f:
+		data = [x.strip().split(":") for x in f.readlines()]
+		for pkg in pkgs:
+			toappend = pkg
+			for item in data:
+				if item[0] == pkg:
+					toappend = item[1]
+					break
+			result.append(toappend)
+	return result
 
 
 def init(args):

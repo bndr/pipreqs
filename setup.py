@@ -36,7 +36,7 @@ setup(
     package_dir={'pipreqs':
                  'pipreqs'},
     include_package_data=True,
-    package_data={'': ['stdlib']},
+    package_data={'': ['stdlib','mapping']},
     install_requires=requirements,
     license="Apache License",
     zip_safe=False,
