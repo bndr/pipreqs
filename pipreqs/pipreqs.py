@@ -84,8 +84,6 @@ def get_imports_info(imports):
         except HTTPError:
             logging.debug('Package does not exist or network problems')
             continue
-        if not data or not data.release_ids:
-            continue
         last_release = data.latest_release_id
         result.append({'name': item, 'version': last_release})
     return result
@@ -100,19 +98,12 @@ def get_locally_installed_packages():
                 with open(os.path.join(root, item), "r") as f:
                     package = root.split("/")[-1].split("-")
                     package_import = f.read().strip().split("\n")
-                    package_import_name = ""
                     for item in package_import:
                         if item not in ["tests", "_tests"]:
-                            package_import_name = item
-                            break
-                    if package_import_name == "":
-                        logging.debug(
-                            'Could not determine import name for package ' + str(package_import))
-                    else:
-                        packages[package_import_name] = {
-                            'version': package[1].replace(".dist", ""),
-                            'name': package[0]
-                        }
+	                        packages[item] = {
+	                            'version': package[1].replace(".dist", ""),
+	                            'name': package[0]
+	                        }
     return packages
 
 
