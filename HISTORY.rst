@@ -3,6 +3,12 @@
 History
 -------
 
+0.2.2 (2015-05-08)
+---------------------
+
+* Add ImportName -> PackageName mapping
+* More tests
+
 0.2.1 (2015-05-08)
 ---------------------
 
