@@ -62,7 +62,7 @@ def get_all_imports(start_path):
         'Found third-party packages: {0}'.format(third_party_packages))
     with open(os.path.join(os.path.dirname(__file__), "stdlib"), "r") as f:
         data = [x.strip() for x in f.readlines()]
-        return get_pkg_names_from_import_names(sorted(list(set(third_party_packages) - set(data))))
+        return sorted(list(set(third_party_packages) - set(data)))
 
 
 def generate_requirements_file(path, imports):
@@ -111,8 +111,8 @@ def get_import_local(imports):
     local = get_locally_installed_packages()
     result = []
     for item in imports:
-        if item in local:
-            result.append(local[item])
+        if item.lower() in local:
+            result.append(local[item.lower()])
     return result
 
 def get_pkg_names_from_import_names(pkgs):
@@ -132,7 +132,9 @@ def get_pkg_names_from_import_names(pkgs):
 def init(args):
     print("Looking for imports")
     imports = get_all_imports(args['<path>'])
+    imports = get_pkg_names_from_import_names(imports)
     print("Found third-party imports: " + ", ".join(imports))
+
     if args['--use-local']:
         print(
             "Getting package version information ONLY from local installation.")
