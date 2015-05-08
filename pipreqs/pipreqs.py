@@ -100,10 +100,10 @@ def get_locally_installed_packages():
                     package_import = f.read().strip().split("\n")
                     for item in package_import:
                         if item not in ["tests", "_tests"]:
-	                        packages[item] = {
-	                            'version': package[1].replace(".dist", ""),
-	                            'name': package[0]
-	                        }
+                            packages[item] = {
+                                'version': package[1].replace(".dist", ""),
+                                'name': package[0]
+                            }
     return packages
 
 
@@ -115,18 +115,19 @@ def get_import_local(imports):
             result.append(local[item.lower()])
     return result
 
+
 def get_pkg_names_from_import_names(pkgs):
-	result = []
-	with open(os.path.join(os.path.dirname(__file__), "mapping"), "r") as f:
-		data = [x.strip().split(":") for x in f.readlines()]
-		for pkg in pkgs:
-			toappend = pkg
-			for item in data:
-				if item[0] == pkg:
-					toappend = item[1]
-					break
-			result.append(toappend)
-	return result
+    result = []
+    with open(os.path.join(os.path.dirname(__file__), "mapping"), "r") as f:
+        data = [x.strip().split(":") for x in f.readlines()]
+        for pkg in pkgs:
+            toappend = pkg
+            for item in data:
+                if item[0] == pkg:
+                    toappend = item[1]
+                    break
+            result.append(toappend)
+    return result
 
 
 def init(args):
