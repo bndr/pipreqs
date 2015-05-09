@@ -3,6 +3,12 @@
 History
 -------
 
+0.2.3 (2015-05-09)
+---------------------
+
+* Fix multiple alias imports on the same line (Tiago Costa)
+* More package mappings
+
 0.2.2 (2015-05-08)
 ---------------------
 
