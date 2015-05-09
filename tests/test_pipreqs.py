@@ -42,7 +42,6 @@ class TestPipreqs(unittest.TestCase):
         imports = pipreqs.get_all_imports(self.project)
         with_info = pipreqs.get_imports_info(imports)
         # Should contain only 5 Elements without the "nonexistendmodule"
-        print (with_info)
         self.assertEqual(
             len(with_info), 5, "Length of imports array with info is wrong")
         for item in with_info:
