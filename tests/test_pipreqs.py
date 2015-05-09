@@ -82,6 +82,12 @@ class TestPipreqs(unittest.TestCase):
             for item in self.modules2:
                 self.assertTrue(item.lower() in data)
 
+    def test_get_import_name_without_alias(self):
+        import_name_with_alias = "requests as R"
+        expected_import_name_without_alias = "requests"
+        import_name_without_aliases = pipreqs.get_import_name_without_alias(import_name_with_alias)
+        self.assertEqual(import_name_without_aliases, expected_import_name_without_alias)
+
     def tearDown(self):
         try:
             os.remove(self.requirements_path)
