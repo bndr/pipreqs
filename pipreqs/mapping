@@ -68,7 +68,6 @@ distutils2:Distutils2
 django:Django
 dns:dnspython
 docker:docker_py
-docopt:docopt_unicode
 dogshell:dogapi
 dpkt:dpkt_fix
 dsml:python_ldap

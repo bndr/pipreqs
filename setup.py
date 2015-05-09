@@ -18,10 +18,6 @@ requirements = [
     'docopt', 'yarg'
 ]
 
-test_requirements = [
-    'docopt', 'yarg'
-]
-
 setup(
     name='pipreqs',
     version='0.2.3',
@@ -54,7 +50,6 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
     test_suite='tests',
-    tests_require=test_requirements,
     entry_points={
         'console_scripts': [
             'pipreqs=pipreqs.pipreqs:main',

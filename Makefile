@@ -38,6 +38,7 @@ lint:
 	flake8 pipreqs tests
 
 test:
+	pip install -r requirements.txt
 	python setup.py test
 
 test-all:
