@@ -11,6 +11,7 @@ import signal
 import bs4
 import requests
 import nonexistendmodule
+import boto as b, import peewee as p,
 # import django
 import flask.ext.somext
 from sqlalchemy import model
@@ -23,3 +24,5 @@ import models
 
 def main():
 	pass
+
+import after_method_should_be_ignored

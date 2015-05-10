@@ -18,7 +18,7 @@ class TestPipreqs(unittest.TestCase):
 
     def setUp(self):
         self.modules = ['flask', 'requests', 'sqlalchemy',
-                        'docopt', 'ujson', 'nonexistendmodule', 'bs4']
+                        'docopt', 'boto', 'peewee', 'ujson', 'nonexistendmodule', 'bs4',]
         self.modules2 = ['beautifulsoup4']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
@@ -27,7 +27,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
-        self.assertEqual(len(imports), 7, "Incorrect Imports array length")
+        self.assertEqual(len(imports), 9)
         for item in imports:
             self.assertTrue(
                 item.lower() in self.modules, "Import is missing: " + item)
@@ -43,7 +43,7 @@ class TestPipreqs(unittest.TestCase):
         with_info = pipreqs.get_imports_info(imports)
         # Should contain only 5 Elements without the "nonexistendmodule"
         self.assertEqual(
-            len(with_info), 5, "Length of imports array with info is wrong")
+            len(with_info), 7)
         for item in with_info:
             self.assertTrue(item['name'].lower(
             ) in self.modules, "Import item appears to be missing " + item['name'])
@@ -84,7 +84,7 @@ class TestPipreqs(unittest.TestCase):
     def test_get_import_name_without_alias(self):
         import_name_with_alias = "requests as R"
         expected_import_name_without_alias = "requests"
-        import_name_without_aliases = pipreqs.get_import_name_without_alias(import_name_with_alias)
+        import_name_without_aliases = pipreqs.get_name_without_alias(import_name_with_alias)
         self.assertEqual(import_name_without_aliases, expected_import_name_without_alias)
 
     def tearDown(self):
