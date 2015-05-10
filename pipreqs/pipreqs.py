@@ -46,7 +46,7 @@ def get_all_imports(path):
                         s = rex.findall(line)
                         for item in s:
                             res = map(get_name_without_alias, item.split(","))
-                            imports = [x for x in imports + res if len(x) > 0]
+                            imports = imports + [x for x in res if len(x) > 0]
 
     packages = set(imports) - set(set(candidates) & set(imports))
     logging.debug('Found packages: {0}'.format(packages))
