@@ -38,7 +38,7 @@ def get_all_imports(path):
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             with open(os.path.join(root, file_name), "r") as f:
-                lines = filter(filter_line, map(lambda l: l.strip(), f))
+                lines = filter(filter_line, map(lambda l: l.partition("#")[0].strip(), f))
                 for line in lines:
                     if "(" in line:
                         break

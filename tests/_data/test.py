@@ -1,3 +1,15 @@
+"""unused import"""
+# pylint: disable=undefined-all-variable, import-error, no-absolute-import, too-few-public-methods, missing-docstring
+import xml.etree  # [unused-import]
+import xml.sax  # [unused-import]
+import os.path as test  # [unused-import]
+from sys import argv as test2  # [unused-import]
+from sys import flags  # [unused-import]
+# +1:[unused-import,unused-import]
+from collections import deque, OrderedDict, Counter
+import requests # [unused-import]
+# All imports above should be ignored 
+
 import atexit
 from __future__ import print_function
 from docopt import docopt
@@ -9,11 +21,10 @@ import time
 import sys
 import signal
 import bs4
-import requests
 import nonexistendmodule
 import boto as b, import peewee as p,
 # import django
-import flask.ext.somext
+import flask.ext.somext # # # 
 from sqlalchemy import model
 try:
     import ujson as json
