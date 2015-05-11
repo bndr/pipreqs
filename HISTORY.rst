@@ -3,6 +3,12 @@
 History
 -------
 
+0.2.4 (2015-05-11)
+---------------------
+
+* Fix exception when 'import' is used in comments #17
+* Fix duplicate entries in requirements.txt
+
 0.2.4 (2015-05-10)
 ---------------------
 

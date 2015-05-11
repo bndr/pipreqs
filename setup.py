@@ -20,7 +20,7 @@ requirements = [
 
 setup(
     name='pipreqs',
-    version='0.2.4',
+    version='0.2.5',
     description="Pip requirements.txt generator based on imports in project",
     long_description=readme + '\n\n' + history,
     author="Vadim Kravcenko",
