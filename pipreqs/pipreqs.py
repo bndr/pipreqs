@@ -88,18 +88,20 @@ def get_imports_info(imports):
 
 def get_locally_installed_packages():
     packages = {}
-    for root, dirs, files in os.walk(get_python_lib()):
-        for item in files:
-            if "top_level" in item:
-                with open(os.path.join(root, item), "r") as f:
-                    package = root.split("/")[-1].split("-")
-                    package_import = f.read().strip().split("\n")
-                    for item in package_import:
-                        if item not in ["tests", "_tests"]:
-                            packages[item] = {
-                                'version': package[1].replace(".dist", ""),
-                                'name': package[0]
-                            }
+    ignore = ["tests", "_tests", "egg", "EGG", "info"]
+    for path in sys.path:
+	    for root, dirs, files in os.walk(path):
+	        for item in files:
+	            if "top_level" in item:
+	                with open(os.path.join(root, item), "r") as f:
+	                    package = root.split("/")[-1].split("-")
+	                    package_import = f.read().strip().split("\n")
+	                    for item in package_import:
+	                        if item not in ignore and package[0] not in ignore:
+	                            packages[item] = {
+	                                'version': package[1].replace(".dist", ""),
+	                                'name': package[0]
+	                            }
     return packages
 
 
