@@ -148,7 +148,7 @@ def init(args):
         logging.debug("Getting packages information from Local/PyPI")
         local = get_import_local(candidates)
         # Get packages that were not found locally
-        difference = [x for x in candidates if x not in [z['name']
+        difference = [x for x in candidates if x.lower() not in [z['name'].lower()
                                                          for z in local]]
         imports = local + get_imports_info(difference)
 
