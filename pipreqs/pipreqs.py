@@ -38,7 +38,8 @@ def get_all_imports(path):
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             with open(os.path.join(root, file_name), "r") as f:
-                lines = filter(filter_line, map(lambda l: l.partition("#")[0].strip(), f))
+                lines = filter(
+                    filter_line, map(lambda l: l.partition("#")[0].strip(), f))
                 for line in lines:
                     if "(" in line:
                         break
@@ -127,9 +128,9 @@ def get_pkg_names(pkgs):
 
 def get_name_without_alias(name):
     if "import " in name:
-    	match = REGEXP[0].match(name.strip())
+        match = REGEXP[0].match(name.strip())
         if match:
-        	name = match.groups(0)[0]
+            name = match.groups(0)[0]
     return name.partition(' as ')[0].partition('.')[0].strip()
 
 
@@ -151,7 +152,7 @@ def init(args):
         local = get_import_local(candidates)
         # Get packages that were not found locally
         difference = [x for x in candidates if x.lower() not in [z['name'].lower()
-                                                         for z in local]]
+                                                                 for z in local]]
         imports = local + get_imports_info(difference)
 
     path = args[
