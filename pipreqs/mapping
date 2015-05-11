@@ -261,6 +261,7 @@ socketio:gevent_socketio
 socketserver:pies2overrides
 sockjs:sockjs_tornado
 socks:SocksiPy_branch
+IPython:ipython
 solr:solrpy
 solution:Solution
 sorl:sorl_thumbnail

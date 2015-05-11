@@ -18,7 +18,7 @@ class TestPipreqs(unittest.TestCase):
 
     def setUp(self):
         self.modules = ['flask', 'requests', 'sqlalchemy',
-                        'docopt', 'boto', 'peewee', 'ujson', 'nonexistendmodule', 'bs4',]
+                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'peewee', 'ujson', 'nonexistendmodule', 'bs4',]
         self.modules2 = ['beautifulsoup4']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
@@ -27,7 +27,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
-        self.assertEqual(len(imports), 9)
+        self.assertEqual(len(imports), 12)
         for item in imports:
             self.assertTrue(
                 item.lower() in self.modules, "Import is missing: " + item)
@@ -42,8 +42,7 @@ class TestPipreqs(unittest.TestCase):
         imports = pipreqs.get_all_imports(self.project)
         with_info = pipreqs.get_imports_info(imports)
         # Should contain only 5 Elements without the "nonexistendmodule"
-        self.assertEqual(
-            len(with_info), 7)
+        self.assertEqual(len(with_info), 10)
         for item in with_info:
             self.assertTrue(item['name'].lower(
             ) in self.modules, "Import item appears to be missing " + item['name'])

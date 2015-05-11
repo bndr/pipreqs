@@ -7,8 +7,28 @@ from sys import argv as test2  # [unused-import]
 from sys import flags  # [unused-import]
 # +1:[unused-import,unused-import]
 from collections import deque, OrderedDict, Counter
-import requests # [unused-import]
 # All imports above should be ignored 
+import requests # [unused-import]
+
+# setuptools
+import zipimport  # command/easy_install.py
+
+# twisted
+from importlib import invalidate_caches  # python/test/test_deprecate.py
+
+# astroid
+import zipimport  # manager.py
+# IPython
+from importlib.machinery import all_suffixes  # core/completerlib.py
+import importlib  # html/notebookapp.py
+
+from IPython.utils.importstring import import_item  # Many files
+
+# pyflakes 
+from pyflakes.test.test_imports import Test as TestImports  # test/test_doctests.py
+
+# Nose
+from nose.importer import Importer, add_path, remove_path  # loader.py
 
 import atexit
 from __future__ import print_function

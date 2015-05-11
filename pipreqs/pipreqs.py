@@ -126,8 +126,10 @@ def get_pkg_names(pkgs):
 
 
 def get_name_without_alias(name):
-    if "import" in name:
-        name = REGEXP[0].match(name.strip()).groups(0)[0]
+    if "import " in name:
+    	match = REGEXP[0].match(name.strip())
+        if match:
+        	name = match.groups(0)[0]
     return name.partition(' as ')[0].partition('.')[0].strip()
 
 
