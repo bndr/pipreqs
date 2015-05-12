@@ -71,7 +71,7 @@ class TestPipreqs(unittest.TestCase):
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
             for item in data:
-            	item = item.strip().split(" == ")
+                item = item.strip().split(" == ")
                 self.assertTrue(item[0].lower() in self.local)
 
     def test_init_savepath(self):
@@ -88,8 +88,10 @@ class TestPipreqs(unittest.TestCase):
     def test_get_import_name_without_alias(self):
         import_name_with_alias = "requests as R"
         expected_import_name_without_alias = "requests"
-        import_name_without_aliases = pipreqs.get_name_without_alias(import_name_with_alias)
-        self.assertEqual(import_name_without_aliases, expected_import_name_without_alias)
+        import_name_without_aliases = pipreqs.get_name_without_alias(
+            import_name_with_alias)
+        self.assertEqual(
+            import_name_without_aliases, expected_import_name_without_alias)
 
     def tearDown(self):
         try:
