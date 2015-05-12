@@ -20,7 +20,7 @@ class TestPipreqs(unittest.TestCase):
         self.modules = ['flask', 'requests', 'sqlalchemy',
                         'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'peewee', 'ujson', 'nonexistendmodule', 'bs4', ]
         self.modules2 = ['beautifulsoup4']
-        self.local = ["docopt", "requests"]
+        self.local = ["docopt", "requests", "nose"]
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
@@ -69,10 +69,10 @@ class TestPipreqs(unittest.TestCase):
             {'<path>': self.project, '--savepath': None, '--use-local': True})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
-            data = f.read().lower()
-            print(data)
-            for item in self.local:
-                self.assertTrue(item.lower() in data)
+            data = f.readlines()
+            for item in data:
+            	item = item.strip().split(" == ")
+                self.assertTrue(item[0].lower() in self.local)
 
     def test_init_savepath(self):
         pipreqs.init({'<path>': self.project, '--savepath':
