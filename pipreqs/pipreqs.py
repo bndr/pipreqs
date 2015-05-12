@@ -28,6 +28,8 @@ REGEXP = [
 ]
 
 
+
+
 def get_all_imports(path):
     imports = []
     candidates = []
@@ -95,7 +97,10 @@ def get_locally_installed_packages():
 	            if "top_level" in item:
 	                with open(os.path.join(root, item), "r") as f:
 	                    package = root.split("/")[-1].split("-")
-	                    package_import = f.read().strip().split("\n")
+	                    try:
+	                    	package_import = f.read().strip().split("\n")
+	                    except:
+	                    	continue
 	                    for item in package_import:
 	                        if item not in ignore and package[0] not in ignore:
 	                            packages[item] = {
