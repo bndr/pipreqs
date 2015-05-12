@@ -18,8 +18,9 @@ class TestPipreqs(unittest.TestCase):
 
     def setUp(self):
         self.modules = ['flask', 'requests', 'sqlalchemy',
-                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'peewee', 'ujson', 'nonexistendmodule', 'bs4',]
+                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'peewee', 'ujson', 'nonexistendmodule', 'bs4', ]
         self.modules2 = ['beautifulsoup4']
+        self.local = ["docopt", "requests"]
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
@@ -50,7 +51,9 @@ class TestPipreqs(unittest.TestCase):
     def test_get_use_local_only(self):
         # should find only docopt and requests
         imports_with_info = pipreqs.get_import_local(self.modules)
-        self.assertEqual(len(imports_with_info), 2)
+        print(imports_with_info)
+        for item in imports_with_info:
+            self.assertTrue(item['name'].lower() in self.local)
 
     def test_init(self):
         pipreqs.init(
@@ -66,8 +69,10 @@ class TestPipreqs(unittest.TestCase):
             {'<path>': self.project, '--savepath': None, '--use-local': True})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
-            self.assertEqual(
-                len(f.readlines()), 2, 'Only two local packages should be found')
+            data = f.read().lower()
+            print(data)
+            for item in self.local:
+                self.assertTrue(item.lower() in data)
 
     def test_init_savepath(self):
         pipreqs.init({'<path>': self.project, '--savepath':
