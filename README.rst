@@ -48,7 +48,15 @@ Example
 
     $ pipreqs /home/project/location
     Successfully saved requirements file in /home/project/location/requirements.txt
- 
+
+Contents of requirements.txt
+
+::
+
+    wheel==0.23.0
+    Yarg==0.1.9
+    docopt==0.6.2
+    
 Why not pip freeze?
 -------------------
 
