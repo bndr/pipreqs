@@ -51,13 +51,12 @@ class TestPipreqs(unittest.TestCase):
     def test_get_use_local_only(self):
         # should find only docopt and requests
         imports_with_info = pipreqs.get_import_local(self.modules)
-        print(imports_with_info)
         for item in imports_with_info:
             self.assertTrue(item['name'].lower() in self.local)
 
     def test_init(self):
         pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--use-local': None})
+            {'<path>': self.project, '--savepath': None, '--use-local': None, '--force': True})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -66,7 +65,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_init_local_only(self):
         pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--use-local': True})
+            {'<path>': self.project, '--savepath': None, '--use-local': True, '--force': True})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
@@ -84,6 +83,15 @@ class TestPipreqs(unittest.TestCase):
                 self.assertTrue(item.lower() in data)
             for item in self.modules2:
                 self.assertTrue(item.lower() in data)
+
+    def test_init_overwrite(self):
+        with open(self.requirements_path, "w") as f:
+            f.write("should_not_be_overwritten")
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None, '--force': None})
+        assert os.path.exists(self.requirements_path) == 1
+        with open(self.requirements_path, "r") as f:
+            data = f.read().lower()
+            self.assertEqual(data, "should_not_be_overwritten")
 
     def test_get_import_name_without_alias(self):
         import_name_with_alias = "requests as R"

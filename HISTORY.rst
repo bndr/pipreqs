@@ -3,6 +3,11 @@
 History
 -------
 
+0.2.8 (2015-05-11)
+---------------------
+
+* Add --force option as a protection for overwrites
+
 0.2.6 (2015-05-11)
 ---------------------
 

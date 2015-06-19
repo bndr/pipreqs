@@ -40,7 +40,7 @@ Usage
         --use-local         Use ONLY local package information instead of querying PyPI
         --debug             Print debug information
         --savepath <file>   Save the list of requirements in the given file
-
+        --force             Overwrite existing requirements.txt
 Example
 -------
 

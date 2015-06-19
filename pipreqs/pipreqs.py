@@ -9,11 +9,11 @@ Options:
     --use-local         Use ONLY local package information instead of querying PyPI
     --debug             Print debug information
     --savepath <file>   Save the list of requirements in the given file
+    --force             Overwrite existing requirements.txt
 """
 from __future__ import print_function
 import os
 import sys
-from distutils.sysconfig import get_python_lib
 import re
 import logging
 
@@ -26,8 +26,6 @@ REGEXP = [
     re.compile(r'^import (.+)$'),
     re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
-
-
 
 
 def get_all_imports(path):
@@ -92,21 +90,21 @@ def get_locally_installed_packages():
     packages = {}
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
-	    for root, dirs, files in os.walk(path):
-	        for item in files:
-	            if "top_level" in item:
-	                with open(os.path.join(root, item), "r") as f:
-	                    package = root.split("/")[-1].split("-")
-	                    try:
-	                    	package_import = f.read().strip().split("\n")
-	                    except:
-	                    	continue
-	                    for item in package_import:
-	                        if item not in ignore and package[0] not in ignore:
-	                            packages[item] = {
-	                                'version': package[1].replace(".dist", ""),
-	                                'name': package[0]
-	                            }
+        for root, dirs, files in os.walk(path):
+            for item in files:
+                if "top_level" in item:
+                    with open(os.path.join(root, item), "r") as f:
+                        package = root.split("/")[-1].split("-")
+                        try:
+                            package_import = f.read().strip().split("\n")
+                        except:
+                            continue
+                        for i_item in package_import:
+                            if i_item not in ignore and package[0] not in ignore:
+                                packages[i_item] = {
+                                    'version': package[1].replace(".dist", ""),
+                                    'name': package[0]
+                                }
     return packages
 
 
@@ -147,7 +145,7 @@ def join(f):
 
 def init(args):
     candidates = get_all_imports(args['<path>'])
-    candidates = get_pkg_names(get_all_imports(args['<path>']))
+    candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
 
     if args['--use-local']:
@@ -162,10 +160,13 @@ def init(args):
                                                                  for z in local]]
         imports = local + get_imports_info(difference)
 
-    path = args[
-        "--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
+    path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
+    
+    if not args["--savepath"] and not args["--force"] and os.path.exists(path):
+        logging.info("Requirements.txt already exists, use --force to overwrite it")
+        return
     generate_requirements_file(path, imports)
-    print("Successfully saved requirements file in " + path)
+    logging.info("Successfully saved requirements file in " + path)
 
 
 def main():  # pragma: no cover
