@@ -11,7 +11,7 @@ Options:
     --savepath <file>   Save the list of requirements in the given file
     --force             Overwrite existing requirements.txt
 """
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import os
 import sys
 import re
@@ -21,6 +21,7 @@ from docopt import docopt
 import yarg
 from yarg.exceptions import HTTPError
 
+from pipreqs import __version__
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
@@ -161,7 +162,7 @@ def init(args):
         imports = local + get_imports_info(difference)
 
     path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
-    
+
     if not args["--savepath"] and not args["--force"] and os.path.exists(path):
         logging.info("Requirements.txt already exists, use --force to overwrite it")
         return
@@ -170,7 +171,7 @@ def init(args):
 
 
 def main():  # pragma: no cover
-    args = docopt(__doc__, version='xstat 0.1')
+    args = docopt(__doc__, version=__version__)
     log_level = logging.DEBUG if args['--debug'] else logging.WARNING
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s')
 

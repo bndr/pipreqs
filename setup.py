@@ -7,6 +7,8 @@ try:
 except ImportError:
     from distutils.core import setup
 
+from pipreqs import __version__
+
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -20,7 +22,7 @@ requirements = [
 
 setup(
     name='pipreqs',
-    version='0.2.8',
+    version=__version__,
     description="Pip requirements.txt generator based on imports in project",
     long_description=readme + '\n\n' + history,
     author="Vadim Kravcenko",
