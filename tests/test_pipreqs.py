@@ -18,7 +18,8 @@ class TestPipreqs(unittest.TestCase):
 
     def setUp(self):
         self.modules = ['flask', 'requests', 'sqlalchemy',
-                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'peewee', 'ujson', 'nonexistendmodule', 'bs4', ]
+                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose',
+                        'peewee', 'ujson', 'nonexistendmodule', 'bs4', ]
         self.modules2 = ['beautifulsoup4']
         self.local = ["docopt", "requests", "nose"]
         self.project = os.path.join(os.path.dirname(__file__), "_data")
@@ -45,8 +46,9 @@ class TestPipreqs(unittest.TestCase):
         # Should contain only 5 Elements without the "nonexistendmodule"
         self.assertEqual(len(with_info), 10)
         for item in with_info:
-            self.assertTrue(item['name'].lower(
-            ) in self.modules, "Import item appears to be missing " + item['name'])
+            self.assertTrue(
+                item['name'].lower() in self.modules,
+                "Import item appears to be missing " + item['name'])
 
     def test_get_use_local_only(self):
         # should find only docopt and requests
@@ -55,8 +57,8 @@ class TestPipreqs(unittest.TestCase):
             self.assertTrue(item['name'].lower() in self.local)
 
     def test_init(self):
-        pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--use-local': None, '--force': True})
+        pipreqs.init({'<path>': self.project, '--savepath': None,
+                      '--use-local': None, '--force': True})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -64,8 +66,8 @@ class TestPipreqs(unittest.TestCase):
                 self.assertTrue(item.lower() in data)
 
     def test_init_local_only(self):
-        pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--use-local': True, '--force': True})
+        pipreqs.init({'<path>': self.project, '--savepath': None,
+                      '--use-local': True, '--force': True})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
@@ -87,7 +89,8 @@ class TestPipreqs(unittest.TestCase):
     def test_init_overwrite(self):
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
-        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None, '--force': None})
+        pipreqs.init({'<path>': self.project, '--savepath': None,
+                      '--use-local': None, '--force': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
