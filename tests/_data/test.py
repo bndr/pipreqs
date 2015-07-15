@@ -7,8 +7,8 @@ from sys import argv as test2  # [unused-import]
 from sys import flags  # [unused-import]
 # +1:[unused-import,unused-import]
 from collections import deque, OrderedDict, Counter
-# All imports above should be ignored 
-import requests # [unused-import]
+# All imports above should be ignored
+import requests  # [unused-import]
 
 # setuptools
 import zipimport  # command/easy_install.py
@@ -24,8 +24,9 @@ import importlib  # html/notebookapp.py
 
 from IPython.utils.importstring import import_item  # Many files
 
-# pyflakes 
-from pyflakes.test.test_imports import Test as TestImports  # test/test_doctests.py
+# pyflakes
+# test/test_doctests.py
+from pyflakes.test.test_imports import Test as TestImports
 
 # Nose
 from nose.importer import Importer, add_path, remove_path  # loader.py
@@ -44,7 +45,7 @@ import bs4
 import nonexistendmodule
 import boto as b, import peewee as p,
 # import django
-import flask.ext.somext # # # 
+import flask.ext.somext  # # #
 from sqlalchemy import model
 try:
     import ujson as json
@@ -53,7 +54,8 @@ except ImportError:
 
 import models
 
+
 def main():
-	pass
+    pass
 
 import after_method_should_be_ignored

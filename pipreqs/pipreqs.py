@@ -6,7 +6,7 @@ Usage:
     pipreqs [options] <path>
 
 Options:
-    --use-local         Use ONLY local package information instead of querying PyPI
+    --use-local         Use ONLY local package info instead of querying PyPI
     --debug             Print debug information
     --savepath <file>   Save the list of requirements in the given file
     --force             Overwrite existing requirements.txt
@@ -101,7 +101,8 @@ def get_locally_installed_packages():
                         except:
                             continue
                         for i_item in package_import:
-                            if i_item not in ignore and package[0] not in ignore:
+                            if ((i_item not in ignore) and
+                                    (package[0] not in ignore)):
                                 packages[i_item] = {
                                     'version': package[1].replace(".dist", ""),
                                     'name': package[0]
@@ -157,14 +158,16 @@ def init(args):
         logging.debug("Getting packages information from Local/PyPI")
         local = get_import_local(candidates)
         # Get packages that were not found locally
-        difference = [x for x in candidates if x.lower() not in [z['name'].lower()
-                                                                 for z in local]]
+        difference = [x for x in candidates
+                      if x.lower() not in [z['name'].lower() for z in local]]
         imports = local + get_imports_info(difference)
 
-    path = args["--savepath"] if args["--savepath"] else os.path.join(args['<path>'], "requirements.txt")
+    path = (args["--savepath"] if args["--savepath"] else
+            os.path.join(args['<path>'], "requirements.txt"))
 
     if not args["--savepath"] and not args["--force"] and os.path.exists(path):
-        logging.info("Requirements.txt already exists, use --force to overwrite it")
+        logging.info("Requirements.txt already exists, "
+                     "use --force to overwrite it")
         return
     generate_requirements_file(path, imports)
     logging.info("Successfully saved requirements file in " + path)
