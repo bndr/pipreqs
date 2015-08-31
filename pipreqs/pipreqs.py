@@ -32,10 +32,18 @@ REGEXP = [
 def get_all_imports(path):
     imports = []
     candidates = []
+    ignore_dirs = [".git", "__pycache__", "env"]
 
     for root, dirs, files in os.walk(path):
+        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+
+        # for d in ignore_dirs:
+            # if d in dirs:
+                # dirs.remove(d)
+
         candidates.append(os.path.basename(root))
         files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             with open(os.path.join(root, file_name), "r") as f:
