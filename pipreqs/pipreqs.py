@@ -166,8 +166,8 @@ def init(args):
             os.path.join(args['<path>'], "requirements.txt"))
 
     if not args["--savepath"] and not args["--force"] and os.path.exists(path):
-        logging.info("Requirements.txt already exists, "
-                     "use --force to overwrite it")
+        logging.warning("Requirements.txt already exists, "
+                        "use --force to overwrite it")
         return
     generate_requirements_file(path, imports)
     logging.info("Successfully saved requirements file in " + path)
