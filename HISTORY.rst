@@ -3,6 +3,12 @@
 History
 -------
 
+0.2.9 (2015-09-24)
+---------------------
+
+* Ignore irreverent directory when generating requirement.txt (Lee Wei)
+* Modify logging level of "Requirement.txt already exists" to warning (Lee Wei)
+
 0.2.8 (2015-05-11)
 ---------------------
 
