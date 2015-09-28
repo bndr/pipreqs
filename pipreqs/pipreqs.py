@@ -7,6 +7,8 @@ Usage:
 
 Options:
     --use-local         Use ONLY local package info instead of querying PyPI
+    --pypi-server       Use custom PyPi server
+    --proxy             Use Proxy, parameter will be passed to requests library
     --debug             Print debug information
     --savepath <file>   Save the list of requirements in the given file
     --force             Overwrite existing requirements.txt
@@ -18,7 +20,8 @@ import re
 import logging
 
 from docopt import docopt
-import yarg
+import requests
+from yarg import json2package
 from yarg.exceptions import HTTPError
 
 from pipreqs import __version__
@@ -36,10 +39,6 @@ def get_all_imports(path):
 
     for root, dirs, files in os.walk(path):
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
-
-        # for d in ignore_dirs:
-            # if d in dirs:
-                # dirs.remove(d)
 
         candidates.append(os.path.basename(root))
         files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
@@ -82,11 +81,20 @@ def generate_requirements_file(path, imports):
                                  for item in imports) + '\n')
 
 
-def get_imports_info(imports):
+def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
+
     for item in imports:
         try:
-            data = yarg.get(item)
+            response = requests.get("{0}{1}/json".format(pypi_server, item), proxies=proxy)
+            if response.status_code == 200:
+                if hasattr(response.content, 'decode'):
+                    data = json2package(response.content.decode())
+                else:
+                    data = json2package(response.content)
+            elif response.status_code >= 300:
+                raise HTTPError(status_code=response.status_code,
+                        reason=response.reason)
         except HTTPError:
             logging.debug(
                 'Package %s does not exist or network problems', item)
@@ -157,8 +165,15 @@ def init(args):
     candidates = get_all_imports(args['<path>'])
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
+    pypi_server = "https://pypi.python.org/pypi/"
+    proxy = None
+    if args["--pypi-server"]:
+        pypi_server = args["--pypi-server"]
 
-    if args['--use-local']:
+    if args["--proxy"]:
+        proxy = {'http':args["--proxy"], 'https':args["--proxy"]}
+
+    if args["--use-local"]:
         logging.debug(
             "Getting package information ONLY from local installation.")
         imports = get_import_local(candidates)
@@ -168,10 +183,13 @@ def init(args):
         # Get packages that were not found locally
         difference = [x for x in candidates
                       if x.lower() not in [z['name'].lower() for z in local]]
-        imports = local + get_imports_info(difference)
+        imports = local + get_imports_info(difference,
+                                           proxy=proxy,
+                                           pypi_server=pypi_server)
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(args['<path>'], "requirements.txt"))
+
 
     if not args["--savepath"] and not args["--force"] and os.path.exists(path):
         logging.warning("Requirements.txt already exists, "

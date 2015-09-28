@@ -10,6 +10,7 @@ Tests for `pipreqs` module.
 
 import unittest
 import os
+import requests
 
 from pipreqs import pipreqs
 
@@ -58,7 +59,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_init(self):
         pipreqs.init({'<path>': self.project, '--savepath': None,
-                      '--use-local': None, '--force': True})
+                      '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -67,7 +68,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_init_local_only(self):
         pipreqs.init({'<path>': self.project, '--savepath': None,
-                      '--use-local': True, '--force': True})
+                      '--use-local': True, '--force': True, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
@@ -77,7 +78,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_init_savepath(self):
         pipreqs.init({'<path>': self.project, '--savepath':
-                      self.alt_requirement_path, '--use-local': None})
+                      self.alt_requirement_path, '--use-local': None, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.alt_requirement_path) == 1
         with open(self.alt_requirement_path, "r") as f:
             data = f.read().lower()
@@ -90,7 +91,7 @@ class TestPipreqs(unittest.TestCase):
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
         pipreqs.init({'<path>': self.project, '--savepath': None,
-                      '--use-local': None, '--force': None})
+                      '--use-local': None, '--force': None, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -103,6 +104,13 @@ class TestPipreqs(unittest.TestCase):
             import_name_with_alias)
         self.assertEqual(
             import_name_without_aliases, expected_import_name_without_alias)
+
+
+    def test_custom_pypi_server(self):
+        with self.assertRaises(requests.exceptions.MissingSchema):
+            pipreqs.init({'<path>': self.project, '--savepath': None,
+                      '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':'nonexistent'})
+
 
     def tearDown(self):
         try:
