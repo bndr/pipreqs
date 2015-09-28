@@ -107,8 +107,7 @@ class TestPipreqs(unittest.TestCase):
 
 
     def test_custom_pypi_server(self):
-        with self.assertRaises(requests.exceptions.MissingSchema):
-            pipreqs.init({'<path>': self.project, '--savepath': None,
+        self.assertRaises(requests.exceptions.MissingSchema, pipreqs.init, {'<path>': self.project, '--savepath': None,
                       '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':'nonexistent'})
 
 
