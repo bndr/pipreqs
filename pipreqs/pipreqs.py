@@ -111,7 +111,7 @@ def get_locally_installed_packages():
             for item in files:
                 if "top_level" in item:
                     with open(os.path.join(root, item), "r") as f:
-                        package = root.split("/")[-1].split("-")
+                        package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
                         except:
