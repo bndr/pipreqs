@@ -37,10 +37,14 @@ Usage
         pipreqs [options] <path>
 
     Options:
-        --use-local         Use ONLY local package information instead of querying PyPI
-        --debug             Print debug information
-        --savepath <file>   Save the list of requirements in the given file
-        --force             Overwrite existing requirements.txt
+        --use-local           Use ONLY local package information instead of querying PyPI
+        --pypi-server         Use custom PyPi server
+        --proxy               Use Proxy, parameter will be passed to requests library
+        --debug               Print debug information
+        --encoding <charset>  Use encoding parameter for file open
+        --savepath <file>     Save the list of requirements in the given file
+        --force               Overwrite existing requirements.txt
+
 Example
 -------
 
