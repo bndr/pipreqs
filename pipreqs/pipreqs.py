@@ -19,6 +19,7 @@ import os
 import sys
 import re
 import logging
+import codecs
 
 from docopt import docopt
 import requests
@@ -31,6 +32,11 @@ REGEXP = [
     re.compile(r'^import (.+)$'),
     re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
+
+if sys.version_info[0] > 2:
+    open_func = open
+else:
+    open_func = codecs.open
 
 
 def get_all_imports(path, encoding=None):
@@ -46,7 +52,7 @@ def get_all_imports(path, encoding=None):
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
-            with open(os.path.join(root, file_name), "r", encoding=encoding) as f:
+            with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
                 lines = filter(
                     filter_line, map(lambda l: l.partition("#")[0].strip(), f))
                 for line in lines:
@@ -104,14 +110,14 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
     return result
 
 
-def get_locally_installed_packages():
+def get_locally_installed_packages(encoding=None):
     packages = {}
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
-                    with open(os.path.join(root, item), "r") as f:
+                    with open_func(os.path.join(root, item), "r", encoding=encoding) as f:
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
@@ -127,7 +133,7 @@ def get_locally_installed_packages():
     return packages
 
 
-def get_import_local(imports):
+def get_import_local(imports, encoding=None):
     local = get_locally_installed_packages()
     result = []
     for item in imports:
@@ -178,10 +184,10 @@ def init(args):
     if args["--use-local"]:
         logging.debug(
             "Getting package information ONLY from local installation.")
-        imports = get_import_local(candidates)
+        imports = get_import_local(candidates, encoding=encoding)
     else:
         logging.debug("Getting packages information from Local/PyPI")
-        local = get_import_local(candidates)
+        local = get_import_local(candidates, encoding=encoding)
         # Get packages that were not found locally
         difference = [x for x in candidates
                       if x.lower() not in [z['name'].lower() for z in local]]
