@@ -3,6 +3,13 @@
 History
 -------
 
+0.3.1 (2015-10-20)
+---------------------
+
+* fixed lint warnings (EJ Lee)
+* add --encoding parameter for open() (EJ Lee)
+* support windows directory separator (EJ Lee)
+
 0.3.0 (2015-09-29)
 ---------------------
 
