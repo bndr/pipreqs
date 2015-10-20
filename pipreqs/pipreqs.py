@@ -6,12 +6,13 @@ Usage:
     pipreqs [options] <path>
 
 Options:
-    --use-local         Use ONLY local package info instead of querying PyPI
-    --pypi-server       Use custom PyPi server
-    --proxy             Use Proxy, parameter will be passed to requests library
-    --debug             Print debug information
-    --savepath <file>   Save the list of requirements in the given file
-    --force             Overwrite existing requirements.txt
+    --use-local           Use ONLY local package info instead of querying PyPI
+    --pypi-server         Use custom PyPi server
+    --proxy               Use Proxy, parameter will be passed to requests library
+    --debug               Print debug information
+    --encoding <charset>  Use encoding parameter for file open
+    --savepath <file>     Save the list of requirements in the given file
+    --force               Overwrite existing requirements.txt
 """
 from __future__ import print_function, absolute_import
 import os
@@ -32,7 +33,7 @@ REGEXP = [
 ]
 
 
-def get_all_imports(path):
+def get_all_imports(path, encoding=None):
     imports = []
     candidates = []
     ignore_dirs = [".hg", ".svn", ".git", "__pycache__", "env"]
@@ -45,7 +46,7 @@ def get_all_imports(path):
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
-            with open(os.path.join(root, file_name), "r") as f:
+            with open(os.path.join(root, file_name), "r", encoding=encoding) as f:
                 lines = filter(
                     filter_line, map(lambda l: l.partition("#")[0].strip(), f))
                 for line in lines:
@@ -94,7 +95,7 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
                     data = json2package(response.content)
             elif response.status_code >= 300:
                 raise HTTPError(status_code=response.status_code,
-                        reason=response.reason)
+                                reason=response.reason)
         except HTTPError:
             logging.debug(
                 'Package %s does not exist or network problems', item)
@@ -111,7 +112,7 @@ def get_locally_installed_packages():
             for item in files:
                 if "top_level" in item:
                     with open(os.path.join(root, item), "r") as f:
-                        package = root.split("/")[-1].split("-")
+                        package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
                         except:
@@ -162,7 +163,8 @@ def join(f):
 
 
 def init(args):
-    candidates = get_all_imports(args['<path>'])
+    encoding = args.get('encoding')
+    candidates = get_all_imports(args['<path>'], encoding=encoding)
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
@@ -171,7 +173,7 @@ def init(args):
         pypi_server = args["--pypi-server"]
 
     if args["--proxy"]:
-        proxy = {'http':args["--proxy"], 'https':args["--proxy"]}
+        proxy = {'http': args["--proxy"], 'https': args["--proxy"]}
 
     if args["--use-local"]:
         logging.debug(
@@ -189,7 +191,6 @@ def init(args):
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(args['<path>'], "requirements.txt"))
-
 
     if not args["--savepath"] and not args["--force"] and os.path.exists(path):
         logging.warning("Requirements.txt already exists, "
