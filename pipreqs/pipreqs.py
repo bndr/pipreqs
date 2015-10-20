@@ -95,7 +95,7 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
                     data = json2package(response.content)
             elif response.status_code >= 300:
                 raise HTTPError(status_code=response.status_code,
-                        reason=response.reason)
+                                reason=response.reason)
         except HTTPError:
             logging.debug(
                 'Package %s does not exist or network problems', item)
@@ -173,7 +173,7 @@ def init(args):
         pypi_server = args["--pypi-server"]
 
     if args["--proxy"]:
-        proxy = {'http':args["--proxy"], 'https':args["--proxy"]}
+        proxy = {'http': args["--proxy"], 'https': args["--proxy"]}
 
     if args["--use-local"]:
         logging.debug(
@@ -191,7 +191,6 @@ def init(args):
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(args['<path>'], "requirements.txt"))
-
 
     if not args["--savepath"] and not args["--force"] and os.path.exists(path):
         logging.warning("Requirements.txt already exists, "

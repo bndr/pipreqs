@@ -105,11 +105,9 @@ class TestPipreqs(unittest.TestCase):
         self.assertEqual(
             import_name_without_aliases, expected_import_name_without_alias)
 
-
     def test_custom_pypi_server(self):
         self.assertRaises(requests.exceptions.MissingSchema, pipreqs.init, {'<path>': self.project, '--savepath': None,
-                      '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':'nonexistent'})
-
+                          '--use-local': None, '--force': True, '--proxy': None, '--pypi-server': 'nonexistent'})
 
     def tearDown(self):
         try:
