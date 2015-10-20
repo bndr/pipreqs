@@ -6,12 +6,13 @@ Usage:
     pipreqs [options] <path>
 
 Options:
-    --use-local         Use ONLY local package info instead of querying PyPI
-    --pypi-server       Use custom PyPi server
-    --proxy             Use Proxy, parameter will be passed to requests library
-    --debug             Print debug information
-    --savepath <file>   Save the list of requirements in the given file
-    --force             Overwrite existing requirements.txt
+    --use-local           Use ONLY local package info instead of querying PyPI
+    --pypi-server         Use custom PyPi server
+    --proxy               Use Proxy, parameter will be passed to requests library
+    --debug               Print debug information
+    --encoding <charset>  Use encoding parameter for file open
+    --savepath <file>     Save the list of requirements in the given file
+    --force               Overwrite existing requirements.txt
 """
 from __future__ import print_function, absolute_import
 import os
@@ -32,7 +33,7 @@ REGEXP = [
 ]
 
 
-def get_all_imports(path):
+def get_all_imports(path, encoding=None):
     imports = []
     candidates = []
     ignore_dirs = [".hg", ".svn", ".git", "__pycache__", "env"]
@@ -45,7 +46,7 @@ def get_all_imports(path):
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
-            with open(os.path.join(root, file_name), "r") as f:
+            with open(os.path.join(root, file_name), "r", encoding=encoding) as f:
                 lines = filter(
                     filter_line, map(lambda l: l.partition("#")[0].strip(), f))
                 for line in lines:
@@ -162,7 +163,8 @@ def join(f):
 
 
 def init(args):
-    candidates = get_all_imports(args['<path>'])
+    encoding = args.get('encoding')
+    candidates = get_all_imports(args['<path>'], encoding=encoding)
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
