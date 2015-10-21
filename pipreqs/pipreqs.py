@@ -42,7 +42,7 @@ else:
 def get_all_imports(path, encoding=None):
     imports = []
     candidates = []
-    ignore_dirs = [".hg", ".svn", ".git", "__pycache__", "env"]
+    ignore_dirs = [".hg", ".svn", ".git", "__pycache__", "env", "venv"]
 
     for root, dirs, files in os.walk(path):
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
