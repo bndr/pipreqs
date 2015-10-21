@@ -208,7 +208,7 @@ def init(args):
 
 def main():  # pragma: no cover
     args = docopt(__doc__, version=__version__)
-    log_level = logging.DEBUG if args['--debug'] else logging.WARNING
+    log_level = logging.DEBUG if args['--debug'] else logging.INFO
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s')
 
     try:
