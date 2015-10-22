@@ -169,7 +169,7 @@ def join(f):
 
 
 def init(args):
-    encoding = args.get('encoding')
+    encoding = args.get('--encoding')
     candidates = get_all_imports(args['<path>'], encoding=encoding)
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
