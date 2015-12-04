@@ -127,7 +127,7 @@ def get_locally_installed_packages(encoding=None):
                             if ((i_item not in ignore) and
                                     (package[0] not in ignore)):
                                 packages[i_item] = {
-                                    'version': package[1].replace(".dist", ""),
+                                    'version': package[1].replace(".dist", "").replace(".egg",""),
                                     'name': package[0]
                                 }
     return packages
