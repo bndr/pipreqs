@@ -212,7 +212,6 @@ pyck:PyCK
 pygeolib:pygeocoder
 pygments:Pygments
 pykka:Pykka
-pylab:matplotlib
 pylogo:PyLogo
 pyphen:Pyphen
 pysideuic:PySide
