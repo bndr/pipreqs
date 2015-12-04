@@ -53,8 +53,11 @@ def get_all_imports(path, encoding=None):
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
+                contents = re.sub(re.compile("'''.+?'''", re.DOTALL), '', f.read())
+                contents = re.sub(re.compile('""".+"""', re.DOTALL), "", contents)
+                lines = contents.split("\n")
                 lines = filter(
-                    filter_line, map(lambda l: l.partition("#")[0].strip(), f))
+                    filter_line, map(lambda l: l.partition("#")[0].strip(), lines))
                 for line in lines:
                     if "(" in line:
                         break
