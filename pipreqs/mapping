@@ -112,6 +112,7 @@ Globals:Zope2
 globusonline:globusonline_transfer_api_client
 googleapiclient:google_api_python_client
 google:protobuf
+picklefield:django-picklefield
 grace-dizmo:grace_dizmo
 greplin:scales
 gridfs:pymongo
