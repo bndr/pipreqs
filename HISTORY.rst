@@ -3,6 +3,14 @@
 History
 -------
 
+0.3.8 (2016-01-12)
+---------------------
+
+* Add more package mapping
+* fix(pipreqs/mapping): remove pylab reference to matplotlib
+* Remove comments """ before going through imports
+* Update proxy documentation
+
 0.3.1 (2015-10-20)
 ---------------------
 
