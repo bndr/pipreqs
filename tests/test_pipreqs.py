@@ -46,8 +46,7 @@ class TestPipreqs(unittest.TestCase):
         """
         Test that invalid python files cannot be imported.
         """
-        with self.assertRaises(SyntaxError) as exc:
-            imports = pipreqs.get_all_imports(self.project_invalid)
+        self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_invalid)    
 
     def test_get_imports_info(self):
         """
