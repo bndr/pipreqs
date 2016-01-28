@@ -3,6 +3,11 @@
 History
 -------
 
+0.4.0 (2016-01-28)
+---------------------
+
+* Walk Abstract Syntax Tree to find imports (Kay Sackey)
+
 0.3.9 (2016-01-20)
 ---------------------
 
