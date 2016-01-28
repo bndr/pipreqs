@@ -20,17 +20,18 @@ class TestPipreqs(unittest.TestCase):
     def setUp(self):
         self.modules = ['flask', 'requests', 'sqlalchemy',
                         'docopt', 'boto', 'ipython', 'pyflakes', 'nose',
-                        'peewee', 'ujson', 'nonexistendmodule', 'bs4', ]
+                        'peewee', 'ujson', 'nonexistendmodule', 'bs4', 'after_method_is_valid_even_if_not_pep8' ]
         self.modules2 = ['beautifulsoup4']
-        self.local = ["docopt", "requests", "nose"]
+        self.local = ["docopt", "requests", "nose", 'pyflakes']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
+        self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
             self.project, "requirements2.txt")
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
-        self.assertEqual(len(imports), 12)
+        self.assertEqual(len(imports), 13)
         for item in imports:
             self.assertTrue(
                 item.lower() in self.modules, "Import is missing: " + item)
@@ -41,10 +42,20 @@ class TestPipreqs(unittest.TestCase):
         self.assertFalse("django" in imports)
         self.assertFalse("models" in imports)
 
+    def test_invalid_python(self):
+        """
+        Test that invalid python files cannot be imported.
+        """
+        with self.assertRaises(SyntaxError) as exc:
+            imports = pipreqs.get_all_imports(self.project_invalid)
+
     def test_get_imports_info(self):
+        """
+        Test to see that the right number of packages were found on PyPI
+        """
         imports = pipreqs.get_all_imports(self.project)
         with_info = pipreqs.get_imports_info(imports)
-        # Should contain only 5 Elements without the "nonexistendmodule"
+        # Should contain 10 items without the "nonexistendmodule" and "after_method_is_valid_even_if_not_pep8"
         self.assertEqual(len(with_info), 10)
         for item in with_info:
             self.assertTrue(
@@ -52,21 +63,33 @@ class TestPipreqs(unittest.TestCase):
                 "Import item appears to be missing " + item['name'])
 
     def test_get_use_local_only(self):
+        """
+        Test without checking PyPI, check to see if names of local imports matches what we expect
+
+        - Note even though pyflakes isn't in requirements.txt,
+          It's added to locals since it is a development dependency for testing
+        """
         # should find only docopt and requests
         imports_with_info = pipreqs.get_import_local(self.modules)
         for item in imports_with_info:
             self.assertTrue(item['name'].lower() in self.local)
 
     def test_init(self):
+        """
+        Test that all modules we will test upon, are in requirements file
+        """
         pipreqs.init({'<path>': self.project, '--savepath': None,
                       '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
-            for item in self.modules[:-2]:
+            for item in self.modules[:-3]:
                 self.assertTrue(item.lower() in data)
 
     def test_init_local_only(self):
+        """
+        Test that items listed in requirements.text are the same as locals expected
+        """
         pipreqs.init({'<path>': self.project, '--savepath': None,
                       '--use-local': True, '--force': True, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
@@ -77,17 +100,23 @@ class TestPipreqs(unittest.TestCase):
                 self.assertTrue(item[0].lower() in self.local)
 
     def test_init_savepath(self):
+        """
+        Test that we can save requiremnts.tt correctly to a different path
+        """
         pipreqs.init({'<path>': self.project, '--savepath':
                       self.alt_requirement_path, '--use-local': None, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.alt_requirement_path) == 1
         with open(self.alt_requirement_path, "r") as f:
             data = f.read().lower()
-            for item in self.modules[:-2]:
+            for item in self.modules[:-3]:
                 self.assertTrue(item.lower() in data)
             for item in self.modules2:
                 self.assertTrue(item.lower() in data)
 
     def test_init_overwrite(self):
+        """
+        Test that if requiremnts.txt exists, it will not automatically be overwritten
+        """
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
         pipreqs.init({'<path>': self.project, '--savepath': None,
@@ -98,6 +127,10 @@ class TestPipreqs(unittest.TestCase):
             self.assertEqual(data, "should_not_be_overwritten")
 
     def test_get_import_name_without_alias(self):
+        """
+        Test that function get_name_without_alias() will work on a string.
+        - Note: This isn't truly needed when pipreqs is walking the AST to find imports
+        """
         import_name_with_alias = "requests as R"
         expected_import_name_without_alias = "requests"
         import_name_without_aliases = pipreqs.get_name_without_alias(
@@ -106,16 +139,24 @@ class TestPipreqs(unittest.TestCase):
             import_name_without_aliases, expected_import_name_without_alias)
 
     def test_custom_pypi_server(self):
+        """
+        Test that trying to get a custom pypi sever fails correctly
+        """
         self.assertRaises(requests.exceptions.MissingSchema, pipreqs.init, {'<path>': self.project, '--savepath': None,
                           '--use-local': None, '--force': True, '--proxy': None, '--pypi-server': 'nonexistent'})
 
     def tearDown(self):
+        """
+        Remove requiremnts.txt files that were written
+        """
         try:
             os.remove(self.requirements_path)
+            pass
         except OSError:
             pass
         try:
             os.remove(self.alt_requirement_path)
+            pass
         except OSError:
             pass
 

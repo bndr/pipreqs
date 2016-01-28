@@ -23,7 +23,8 @@ import sys
 import re
 import logging
 import codecs
-import ast, traceback
+import ast
+import traceback
 from docopt import docopt
 import requests
 from yarg import json2package
@@ -46,6 +47,7 @@ def get_all_imports(path, encoding=None):
     imports = set()
     raw_imports = set()
     candidates = []
+    ignore_errors = False
     ignore_dirs = [".hg", ".svn", ".git", "__pycache__", "env", "venv"]
 
     for root, dirs, files in os.walk(path):
@@ -58,21 +60,24 @@ def get_all_imports(path, encoding=None):
         for file_name in files:
             with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
                 contents = f.read()
-                #contents = re.sub(re.compile("'''.+?'''", re.DOTALL), '', f.read())
-                #contents = re.sub(re.compile('""".+?"""', re.DOTALL), "", contents)
-
                 try:
                     tree = ast.parse(contents)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.Import):
+                            for subnode in node.names:
+                                raw_imports.add(subnode.name)
+                        elif isinstance(node, ast.ImportFrom):
+                            raw_imports.add(node.module)
                 except Exception, e:
-                    traceback.print_exc(e)
-                    print("Failed on file: %s" % os.path.join(root, file_name))
-                    exit(1)
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.Import):
-                        for subnode in node.names:
-                            raw_imports.add(subnode.name)
-                    elif isinstance(node, ast.ImportFrom):
-                        raw_imports.add(node.module)
+                    if ignore_errors:
+                        traceback.print_exc(e)
+                        logging.warn("Failed on file: %s" % os.path.join(root, file_name))
+                        continue
+                    else:
+                        logging.error("Failed on file: %s" % os.path.join(root, file_name))
+                        raise e
+
+
 
     # Clean up imports
     for name in [n for n in raw_imports if n]:
