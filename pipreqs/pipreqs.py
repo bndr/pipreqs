@@ -68,14 +68,14 @@ def get_all_imports(path, encoding=None):
                                 raw_imports.add(subnode.name)
                         elif isinstance(node, ast.ImportFrom):
                             raw_imports.add(node.module)
-                except Exception, e:
+                except Exception as exc:
                     if ignore_errors:
-                        traceback.print_exc(e)
+                        traceback.print_exc(exc)
                         logging.warn("Failed on file: %s" % os.path.join(root, file_name))
                         continue
                     else:
                         logging.error("Failed on file: %s" % os.path.join(root, file_name))
-                        raise e
+                        raise exc
 
 
 
