@@ -23,7 +23,7 @@ import sys
 import re
 import logging
 import codecs
-
+import ast, traceback
 from docopt import docopt
 import requests
 from yarg import json2package
@@ -42,8 +42,6 @@ else:
     open_func = codecs.open
 
 
-import ast, traceback
-
 def get_all_imports(path, encoding=None):
     imports = set()
     raw_imports = set()
@@ -60,6 +58,9 @@ def get_all_imports(path, encoding=None):
         for file_name in files:
             with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
                 contents = f.read()
+                #contents = re.sub(re.compile("'''.+?'''", re.DOTALL), '', f.read())
+                #contents = re.sub(re.compile('""".+?"""', re.DOTALL), "", contents)
+
                 try:
                     tree = ast.parse(contents)
                 except Exception, e:
