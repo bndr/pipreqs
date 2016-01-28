@@ -46,7 +46,7 @@ class TestPipreqs(unittest.TestCase):
         """
         Test that invalid python files cannot be imported.
         """
-        self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_invalid)    
+        self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_invalid)
 
     def test_get_imports_info(self):
         """
@@ -150,12 +150,10 @@ class TestPipreqs(unittest.TestCase):
         """
         try:
             os.remove(self.requirements_path)
-            pass
         except OSError:
             pass
         try:
             os.remove(self.alt_requirement_path)
-            pass
         except OSError:
             pass
 
