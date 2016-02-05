@@ -200,10 +200,7 @@ def join(f):
 
 def init(args):
     encoding = args.get('--encoding')
-    extra_ignore_dirs = args.get('--ignore', [])
-
-    if isinstance(extra_ignore_dirs, list):
-        extra_ignore_dirs = extra_ignore_dirs.split(',')
+    extra_ignore_dirs = args.get('--ignore').split(',')
 
     candidates = get_all_imports(args['<path>'], 
                                  encoding=encoding,
