@@ -25,6 +25,7 @@ class TestPipreqs(unittest.TestCase):
         self.local = ["docopt", "requests", "nose", 'pyflakes']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
+        self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
             self.project, "requirements2.txt")
@@ -143,6 +144,24 @@ class TestPipreqs(unittest.TestCase):
         """
         self.assertRaises(requests.exceptions.MissingSchema, pipreqs.init, {'<path>': self.project, '--savepath': None,
                           '--use-local': None, '--force': True, '--proxy': None, '--pypi-server': 'nonexistent'})
+
+    def test_ignored_directory(self):
+        """
+        Test --ignore parameter
+        """
+        pipreqs.init(
+            {'<path>': self.project_with_ignore_directory, '--savepath': None,
+                      '--use-local': None, '--force': True,
+                      '--proxy':None,
+                      '--pypi-server':None,
+                      '--ignore':['.ignored_dir', '.ignore_second']
+            }
+        )
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
+            data = f.read().lower()
+            for item in ['click', 'getpass']:
+                self.assertFalse(item.lower() in data)
+
 
     def tearDown(self):
         """
