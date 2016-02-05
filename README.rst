@@ -37,10 +37,14 @@ Usage
         pipreqs [options] <path>
 
     Options:
-        --use-local           Use ONLY local package information instead of querying PyPI
+        --use-local           Use ONLY local package info instead of querying PyPI
         --pypi-server         Use custom PyPi server
-        --proxy               Use Proxy, parameter will be passed to requests library
+        --proxy               Use Proxy, parameter will be passed to requests library. You can also just set the
+                              environments parameter in your terminal:
+                              $ export HTTP_PROXY="http://10.10.1.10:3128"
+                              $ export HTTPS_PROXY="https://10.10.1.10:1080"
         --debug               Print debug information
+        --ignore <dirs>...    Ignore extra directories
         --encoding <charset>  Use encoding parameter for file open
         --savepath <file>     Save the list of requirements in the given file
         --force               Overwrite existing requirements.txt
