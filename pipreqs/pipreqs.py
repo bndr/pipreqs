@@ -195,7 +195,14 @@ def join(f):
 
 def init(args):
     encoding = args.get('--encoding')
+<<<<<<< HEAD
+    extra_ignore_dirs = args.get('--ignore', [])
+
+    if isinstance(extra_ignore_dirs, list):
+        extra_ignore_dirs = extra_ignore_dirs.split(',')
+=======
     extra_ignore_dirs = args.get('--ignore', []) 
+>>>>>>> parent of bb1eb59... comma separated dirs
 
     candidates = get_all_imports(args['<path>'], 
                                  encoding=encoding,
