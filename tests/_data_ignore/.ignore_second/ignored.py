@@ -1,2 +1,2 @@
 # Everything in here should be ignored
-from getpass import getpass
+from pattern.web import Twitter, plaintext

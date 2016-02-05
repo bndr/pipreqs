@@ -13,7 +13,7 @@ Options:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --debug               Print debug information
-    --ignore <dirs>...    Ignore extra directories         
+    --ignore <dirs>...    Ignore extra directories, each separated by a comma
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
     --force               Overwrite existing requirements.txt
@@ -44,13 +44,18 @@ else:
     open_func = codecs.open
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs = []):
+def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
     imports = set()
     raw_imports = set()
     candidates = []
     ignore_errors = False
     ignore_dirs = [".hg", ".svn", ".git", "__pycache__", "env", "venv"]
-    ignore_dirs.extend(extra_ignore_dirs)
+
+    if extra_ignore_dirs:
+        ignore_dirs_parsed = []
+        for e in extra_ignore_dirs:
+            ignore_dirs_parsed.append(os.path.basename(os.path.realpath(e)))
+        ignore_dirs.extend(ignore_dirs_parsed)
 
     for root, dirs, files in os.walk(path):
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
@@ -195,7 +200,10 @@ def join(f):
 
 def init(args):
     encoding = args.get('--encoding')
-    extra_ignore_dirs = args.get('--ignore', []) 
+    extra_ignore_dirs = args.get('--ignore')
+
+    if extra_ignore_dirs:
+        extra_ignore_dirs = extra_ignore_dirs.split(',')
 
     candidates = get_all_imports(args['<path>'], 
                                  encoding=encoding,

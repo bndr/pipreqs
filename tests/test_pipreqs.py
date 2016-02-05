@@ -154,7 +154,7 @@ class TestPipreqs(unittest.TestCase):
                       '--use-local': None, '--force': True,
                       '--proxy':None,
                       '--pypi-server':None,
-                      '--ignore':['.ignored_dir', '.ignore_second']
+                      '--ignore':'.ignored_dir,.ignore_second'
             }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
