@@ -26,6 +26,7 @@ class TestPipreqs(unittest.TestCase):
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
         self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
+        self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
             self.project, "requirements2.txt")
@@ -42,6 +43,12 @@ class TestPipreqs(unittest.TestCase):
         self.assertFalse("__future__" in imports)
         self.assertFalse("django" in imports)
         self.assertFalse("models" in imports)
+
+    def test_deduplicate_dependencies(self):
+        imports = pipreqs.get_all_imports(self.project_with_duplicated_deps)
+        pkgs = pipreqs.get_pkg_names(imports)
+        self.assertEqual(len(pkgs), 1)
+        self.assertIn("pymongo", pkgs)
 
     def test_invalid_python(self):
         """
