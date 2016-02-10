@@ -182,7 +182,8 @@ def get_pkg_names(pkgs):
                 if item[0] == pkg:
                     toappend = item[1]
                     break
-            result.append(toappend)
+            if toappend not in result:
+                result.append(toappend)
     return result
 
 
