@@ -48,7 +48,7 @@ class TestPipreqs(unittest.TestCase):
         imports = pipreqs.get_all_imports(self.project_with_duplicated_deps)
         pkgs = pipreqs.get_pkg_names(imports)
         self.assertEqual(len(pkgs), 1)
-        self.assertIn("pymongo", pkgs)
+        self.assertTrue("pymongo" in pkgs)
 
     def test_invalid_python(self):
         """
