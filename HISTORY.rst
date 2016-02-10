@@ -3,6 +3,11 @@
 History
 -------
 
+0.4.2 (2016-02-10)
+---------------------
+
+* Fix duplicated lines in requirements.txt (Dmitry Pribysh)
+
 0.4.1 (2016-02-05)
 ---------------------
 
