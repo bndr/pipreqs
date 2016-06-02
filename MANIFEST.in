@@ -3,6 +3,8 @@ include CONTRIBUTING.rst
 include HISTORY.rst
 include LICENSE
 include README.rst
+include pipreqs/stdlib
+include pipreqs/mapping
 
 recursive-include tests *
 recursive-exclude * __pycache__
