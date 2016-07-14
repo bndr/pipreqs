@@ -3,6 +3,12 @@
 History
 -------
 
+0.4.4 (2016-07-14)
+---------------------
+
+* Remove Spaces in output
+* Add package to output even without version
+
 0.4.2 (2016-02-10)
 ---------------------
 
