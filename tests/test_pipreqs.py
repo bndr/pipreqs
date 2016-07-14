@@ -63,7 +63,7 @@ class TestPipreqs(unittest.TestCase):
         imports = pipreqs.get_all_imports(self.project)
         with_info = pipreqs.get_imports_info(imports)
         # Should contain 10 items without the "nonexistendmodule" and "after_method_is_valid_even_if_not_pep8"
-        self.assertEqual(len(with_info), 10)
+        self.assertEqual(len(with_info), 11)
         for item in with_info:
             self.assertTrue(
                 item['name'].lower() in self.modules,
@@ -103,7 +103,7 @@ class TestPipreqs(unittest.TestCase):
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
             for item in data:
-                item = item.strip().split(" == ")
+                item = item.strip().split("==")
                 self.assertTrue(item[0].lower() in self.local)
 
     def test_init_savepath(self):
