@@ -113,8 +113,8 @@ def generate_requirements_file(path, imports):
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
-        fmt = '{name} == {version}'
-        out_file.write('\n'.join(fmt.format(**item)
+        fmt = '{name}=={version}'
+        out_file.write('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
                                  for item in imports) + '\n')
 
 
@@ -156,8 +156,13 @@ def get_locally_installed_packages(encoding=None):
                         for i_item in package_import:
                             if ((i_item not in ignore) and
                                     (package[0] not in ignore)):
+                                version = None
+                                if len(package) > 1:
+                                    version = package[1].replace(
+                                        ".dist", "").replace(".egg", "")
+
                                 packages[i_item] = {
-                                    'version': package[1].replace(".dist", "").replace(".egg",""),
+                                    'version': version,
                                     'name': package[0]
                                 }
     return packages
