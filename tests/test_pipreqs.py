@@ -85,7 +85,7 @@ class TestPipreqs(unittest.TestCase):
         """
         Test that all modules we will test upon, are in requirements file
         """
-        pipreqs.init({'<path>': self.project, '--savepath': None,
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
@@ -97,7 +97,7 @@ class TestPipreqs(unittest.TestCase):
         """
         Test that items listed in requirements.text are the same as locals expected
         """
-        pipreqs.init({'<path>': self.project, '--savepath': None,
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': True, '--force': True, '--proxy':None, '--pypi-server':None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
@@ -111,7 +111,7 @@ class TestPipreqs(unittest.TestCase):
         Test that we can save requiremnts.tt correctly to a different path
         """
         pipreqs.init({'<path>': self.project, '--savepath':
-                      self.alt_requirement_path, '--use-local': None, '--proxy':None, '--pypi-server':None})
+                      self.alt_requirement_path, '--use-local': None, '--proxy':None, '--pypi-server':None,  '--print': False})
         assert os.path.exists(self.alt_requirement_path) == 1
         with open(self.alt_requirement_path, "r") as f:
             data = f.read().lower()
@@ -127,7 +127,7 @@ class TestPipreqs(unittest.TestCase):
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
         pipreqs.init({'<path>': self.project, '--savepath': None,
-                      '--use-local': None, '--force': None, '--proxy':None, '--pypi-server':None})
+                      '--use-local': None, '--force': None, '--proxy':None, '--pypi-server':None, '--print': False})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -149,7 +149,7 @@ class TestPipreqs(unittest.TestCase):
         """
         Test that trying to get a custom pypi sever fails correctly
         """
-        self.assertRaises(requests.exceptions.MissingSchema, pipreqs.init, {'<path>': self.project, '--savepath': None,
+        self.assertRaises(requests.exceptions.MissingSchema, pipreqs.init, {'<path>': self.project, '--savepath': None, '--print': False,
                           '--use-local': None, '--force': True, '--proxy': None, '--pypi-server': 'nonexistent'})
 
     def test_ignored_directory(self):
@@ -157,7 +157,7 @@ class TestPipreqs(unittest.TestCase):
         Test --ignore parameter
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None,
+            {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
                       '--use-local': None, '--force': True,
                       '--proxy':None,
                       '--pypi-server':None,
