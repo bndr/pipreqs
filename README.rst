@@ -47,6 +47,7 @@ Usage
         --ignore <dirs>...    Ignore extra directories
         --encoding <charset>  Use encoding parameter for file open
         --savepath <file>     Save the list of requirements in the given file
+        --print               Output the list of requirements in the standard output
         --force               Overwrite existing requirements.txt
 
 Example
