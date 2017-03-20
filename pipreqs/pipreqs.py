@@ -125,7 +125,8 @@ def output_requirements(imports):
     ))
     fmt = '{name}=={version}'
     print('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
-                             for item in imports))
+                    for item in imports))
+
 
 def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
@@ -220,9 +221,9 @@ def init(args):
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
-    candidates = get_all_imports(args['<path>'], 
+    candidates = get_all_imports(args['<path>'],
                                  encoding=encoding,
-                                 extra_ignore_dirs = extra_ignore_dirs)
+                                 extra_ignore_dirs=extra_ignore_dirs)
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
