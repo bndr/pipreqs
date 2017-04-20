@@ -3,7 +3,13 @@
 History
 -------
 
-0.4.5 (unreleased)
+0.4.7
+--------------------
+
+* BUG: remove package/version duplicates
+* Style: pep8
+
+0.4.5
 ---------------------
 
 * Fixed the --pypi-server option
