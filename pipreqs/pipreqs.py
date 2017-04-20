@@ -184,7 +184,16 @@ def get_import_local(imports, encoding=None):
     for item in imports:
         if item.lower() in local:
             result.append(local[item.lower()])
-    return result
+
+    # removing duplicates of package/version
+    result_unique = [
+        dict(t)
+        for t in set([
+            tuple(d.items()) for d in result
+        ])
+    ]
+
+    return result_unique
 
 
 def get_pkg_names(pkgs):
