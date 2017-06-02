@@ -256,6 +256,13 @@ def parse_requirements(file_):
 def clean(file_, imports):
     modules, parameters = parse_requirements(file_)
 
+    imports = [imports[i]["name"] for i in range(len(imports))]
+    modules = [modules[i]["name"] for i in range(len(modules))]
+    modules_not_imported = set(modules) - set(imports)
+
+    print("These modules are in {} but does not seem to be imported: "
+          "\n{}".format(file_, "\n".join(x for x in modules_not_imported)))
+
 def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
