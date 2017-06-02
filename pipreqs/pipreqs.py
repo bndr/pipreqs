@@ -253,6 +253,8 @@ def parse_requirements(file_):
 
     return (modules, parameters)
 
+def clean(file_, imports):
+    modules, parameters = parse_requirements(file_)
 
 def init(args):
     encoding = args.get('--encoding')
