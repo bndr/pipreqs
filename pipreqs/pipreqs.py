@@ -234,13 +234,13 @@ def parse_requirements():
 
     for x in data:
         if not any([y in x for y in delim]): # Check for modules w/o a specifier.
-            modules.append(x)
+            modules.append({"name": x, "version": None})
         for y in x:
             if y in delim:
                 module = x.split(y)
                 module_name = module[0]
                 module_version = module[::-1][0].replace("=", "")
-                module = {module_name: module_version}
+                module = {"name": module_name, "version": module_version}
 
                 if module not in modules:
                     modules.append(module)
