@@ -251,7 +251,8 @@ def parse_requirements(file_):
 
                 break
 
-    return modules + parameters
+    return (modules, parameters)
+
 
 def init(args):
     encoding = args.get('--encoding')
@@ -294,6 +295,7 @@ def init(args):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
         return
+
     if args["--print"]:
         output_requirements(imports)
         logging.info("Successfully output requirements")
