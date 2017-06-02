@@ -222,12 +222,16 @@ def get_name_without_alias(name):
 def join(f):
     return os.path.join(os.path.dirname(__file__), f)
 
-def parse_requirements():
+def parse_requirements(file_):
     modules = []
     delim = ["<", ">", "=", "!", "~"]   # https://www.python.org/dev/peps/pep-0508/#complete-grammar
 
-    with open("requirements.txt", "r") as f:
-        data = [x.strip() for x in f.readlines() if x != "\n"]
+    try:
+        with open(file_, "r") as f:
+            data = [x.strip() for x in f.readlines() if x != "\n"]
+    except OSError as e:
+        print(e)
+        sys.exit(0)
 
     parameters = [x for x in data if x.startswith("-")]
     data = [x for x in data if x[0].isalpha()]
