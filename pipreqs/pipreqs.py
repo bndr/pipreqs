@@ -230,7 +230,7 @@ def parse_requirements(file_):
         with open(file_, "r") as f:
             data = [x.strip() for x in f.readlines() if x != "\n"]
     except OSError as e:
-        print(e)
+        logging.error(e)
         sys.exit(0)
 
     parameters = [x for x in data if x.startswith("-")]
