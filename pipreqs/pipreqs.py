@@ -229,9 +229,9 @@ def parse_requirements(file_):
     try:
         with open(file_, "r") as f:
             data = [x.strip() for x in f.readlines() if x != "\n"]
-    except OSError as e:
-        logging.error(e)
-        sys.exit(0)
+    except OSError:
+        logging.error("Failed on file {}".format(file_))
+        raise
 
     parameters = [x for x in data if x.startswith("-")]
     data = [x for x in data if x[0].isalpha()]
