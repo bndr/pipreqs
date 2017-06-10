@@ -223,6 +223,17 @@ def join(f):
     return os.path.join(os.path.dirname(__file__), f)
 
 def parse_requirements(file_):
+    """Parse a requirements formatted file.
+
+    Args:
+        file_: File to parse.
+
+    Raises:
+        OSerror: If there's any issues accessing the file.
+
+    Returns:
+        tuple: The contents of the file, excluding comments.
+    """
     modules = []
     delim = ["<", ">", "=", "!", "~"]   # https://www.python.org/dev/peps/pep-0508/#complete-grammar
 
