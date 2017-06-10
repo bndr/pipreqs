@@ -225,6 +225,10 @@ def join(f):
 def parse_requirements(file_):
     """Parse a requirements formatted file.
 
+    Traverse a string until a delimiter is detected, then split at said
+    delimiter, get module name by element index, create a dict consisting of
+    module:version, and add dict to list of parsed modules.
+
     Args:
         file_: File to parse.
 
