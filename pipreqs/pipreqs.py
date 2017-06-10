@@ -253,15 +253,26 @@ def parse_requirements(file_):
 
     return (modules, parameters)
 
-def clean(file_, imports):
+
+def compare_modules(file_, imports):
+    """Compare modules in a file to imported modules in a project.
+
+    Args:
+        file_ (str): File to parse for modules to be compared.
+        imports (tuple): Modules being imported in the project.
+
+    Returns:
+        tuple: The modules not imported in the project, but do exist in the
+               specified file.
+    """
     modules, parameters = parse_requirements(file_)
 
     imports = [imports[i]["name"] for i in range(len(imports))]
     modules = [modules[i]["name"] for i in range(len(modules))]
     modules_not_imported = set(modules) - set(imports)
 
-    print("These modules are in {} but does not seem to be imported: "
-          "\n{}".format(file_, "\n".join(x for x in modules_not_imported)))
+    return modules_not_imported
+
 
 def init(args):
     encoding = args.get('--encoding')
