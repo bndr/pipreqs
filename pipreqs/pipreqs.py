@@ -291,11 +291,15 @@ def compare_modules(file_, imports):
 
 
 def diff(file_, imports):
-    """Display the difference between modules in file a and imported modules."""
+    """Display the difference between modules in a file and imported modules."""
     modules_not_imported = compare_modules(file_, imports)
 
     logging.info("The following modules are in {} but do not seem to be imported: "
                  "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+
+def clean(file_, imports):
+    """Remove modules that aren't imported in project from file."""
+
 
 
 def init(args):
