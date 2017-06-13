@@ -19,6 +19,7 @@ Options:
     --print               Output the list of requirements in the standard output
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project imports.
+    --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
 """
 from __future__ import print_function, absolute_import
 import os
@@ -298,8 +299,22 @@ def diff(file_, imports):
 
 def clean(file_, imports):
     """Remove modules that aren't imported in project from file."""
+    modules_not_imported = compare_modules(file_, imports)
+    re_remove = re.compile("|".join(modules_not_imported))
+    to_write = []
 
+    with open(file_, "r+") as f:
+        for i in f.readlines():
+            if re_remove.match(i) is None:
+                to_write.append(i)
 
+        f.seek(0)
+        f.truncate()
+
+        for i in to_write:
+            f.write(i)
+
+    logging.info("Successfully cleaned up requirements in " + file_)
 
 def init(args):
     encoding = args.get('--encoding')
@@ -340,6 +355,10 @@ def init(args):
 
     if args["--diff"]:
         diff(args["--diff"], imports)
+        return
+
+    if args["--clean"]:
+        clean(args["--clean"], imports)
         return
 
     if not args["--print"] and not args["--savepath"] and not args["--force"] and os.path.exists(path):
