@@ -244,11 +244,14 @@ def parse_requirements(file_):
     delim = ["<", ">", "=", "!", "~"]  # https://www.python.org/dev/peps/pep-0508/#complete-grammar
 
     try:
-        with open(file_, "r") as f:
-            data = [x.strip() for x in f.readlines() if x != "\n"]
+        f = open_func(file_, "r")
     except OSError:
         logging.error("Failed on file: {}".format(file_))
         raise
+    else:
+        data = [x.strip() for x in f.readlines() if x != "\n"]
+    finally:
+        f.close()
 
     data = [x for x in data if x[0].isalpha()]
 
@@ -303,16 +306,22 @@ def clean(file_, imports):
     re_remove = re.compile("|".join(modules_not_imported))
     to_write = []
 
-    with open(file_, "r+") as f:
+    try:
+        f = open_func(file_, "r+")
+    except OSError:
+        logging.error("Failed on file: {}".format(file_))
+        raise
+    else:
         for i in f.readlines():
             if re_remove.match(i) is None:
                 to_write.append(i)
-
         f.seek(0)
         f.truncate()
 
         for i in to_write:
             f.write(i)
+    finally:
+        f.close()
 
     logging.info("Successfully cleaned up requirements in " + file_)
 
