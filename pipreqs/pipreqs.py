@@ -262,7 +262,7 @@ def parse_requirements(file_):
             if y in delim:
                 module = x.split(y)
                 module_name = module[0]
-                module_version = module[::-1][0].replace("=", "")
+                module_version = module[-1].replace("=", "")
                 module = {"name": module_name, "version": module_version}
 
                 if module not in modules:
