@@ -249,7 +249,6 @@ def parse_requirements(file_):
         logging.error("Failed on file: {}".format(file_))
         raise
 
-    parameters = [x for x in data if x.startswith("-")]
     data = [x for x in data if x[0].isalpha()]
 
     for x in data:
@@ -267,7 +266,7 @@ def parse_requirements(file_):
 
                 break
 
-    return (modules, parameters)
+    return modules
 
 
 def compare_modules(file_, imports):
@@ -281,7 +280,7 @@ def compare_modules(file_, imports):
         tuple: The modules not imported in the project, but do exist in the
                specified file.
     """
-    modules, parameters = parse_requirements(file_)
+    modules = parse_requirements(file_)
 
     imports = [imports[i]["name"] for i in range(len(imports))]
     modules = [modules[i]["name"] for i in range(len(modules))]
