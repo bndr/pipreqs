@@ -606,6 +606,7 @@ dogshell:dogapi
 dot_parser:pydot
 dot_parser:pydot2
 dot_parser:pydot3k
+dotenv:python-dotenv
 dpkt:dpkt_fix
 dsml:python_ldap
 durationfield:django_durationfield
