@@ -3,6 +3,12 @@
 History
 -------
 
+0.4.8
+--------------------
+
+* Implement '--clean' and '--diff' (kxrd)
+* Exclude concurrent{,.futures} from stdlib if py2 (kxrd)
+
 0.4.7
 --------------------
 
