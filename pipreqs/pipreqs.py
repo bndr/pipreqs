@@ -43,8 +43,11 @@ REGEXP = [
 
 if sys.version_info[0] > 2:
     open_func = open
+    py2 = False
 else:
     open_func = codecs.open
+    py2 = True
+    py2_exclude = ["concurrent", "concurrent.futures"]
 
 
 def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
@@ -102,6 +105,7 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
 
     with open(join("stdlib"), "r") as f:
         data = [x.strip() for x in f.readlines()]
+        data = [x for x in data if x not in py2_exclude] if py2 else data
         return sorted(list(set(packages) - set(data)))
 
 
