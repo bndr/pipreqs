@@ -18,6 +18,8 @@ Options:
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard output
     --force               Overwrite existing requirements.txt
+    --diff <file>         Compare modules in requirements.txt to project imports.
+    --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
 """
 from __future__ import print_function, absolute_import
 import os
@@ -222,6 +224,106 @@ def get_name_without_alias(name):
 def join(f):
     return os.path.join(os.path.dirname(__file__), f)
 
+def parse_requirements(file_):
+    """Parse a requirements formatted file.
+
+    Traverse a string until a delimiter is detected, then split at said
+    delimiter, get module name by element index, create a dict consisting of
+    module:version, and add dict to list of parsed modules.
+
+    Args:
+        file_: File to parse.
+
+    Raises:
+        OSerror: If there's any issues accessing the file.
+
+    Returns:
+        tuple: The contents of the file, excluding comments.
+    """
+    modules = []
+    delim = ["<", ">", "=", "!", "~"]  # https://www.python.org/dev/peps/pep-0508/#complete-grammar
+
+    try:
+        f = open_func(file_, "r")
+    except OSError:
+        logging.error("Failed on file: {}".format(file_))
+        raise
+    else:
+        data = [x.strip() for x in f.readlines() if x != "\n"]
+    finally:
+        f.close()
+
+    data = [x for x in data if x[0].isalpha()]
+
+    for x in data:
+        if not any([y in x for y in delim]):  # Check for modules w/o a specifier.
+            modules.append({"name": x, "version": None})
+        for y in x:
+            if y in delim:
+                module = x.split(y)
+                module_name = module[0]
+                module_version = module[-1].replace("=", "")
+                module = {"name": module_name, "version": module_version}
+
+                if module not in modules:
+                    modules.append(module)
+
+                break
+
+    return modules
+
+
+def compare_modules(file_, imports):
+    """Compare modules in a file to imported modules in a project.
+
+    Args:
+        file_ (str): File to parse for modules to be compared.
+        imports (tuple): Modules being imported in the project.
+
+    Returns:
+        tuple: The modules not imported in the project, but do exist in the
+               specified file.
+    """
+    modules = parse_requirements(file_)
+
+    imports = [imports[i]["name"] for i in range(len(imports))]
+    modules = [modules[i]["name"] for i in range(len(modules))]
+    modules_not_imported = set(modules) - set(imports)
+
+    return modules_not_imported
+
+
+def diff(file_, imports):
+    """Display the difference between modules in a file and imported modules."""
+    modules_not_imported = compare_modules(file_, imports)
+
+    logging.info("The following modules are in {} but do not seem to be imported: "
+                 "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+
+def clean(file_, imports):
+    """Remove modules that aren't imported in project from file."""
+    modules_not_imported = compare_modules(file_, imports)
+    re_remove = re.compile("|".join(modules_not_imported))
+    to_write = []
+
+    try:
+        f = open_func(file_, "r+")
+    except OSError:
+        logging.error("Failed on file: {}".format(file_))
+        raise
+    else:
+        for i in f.readlines():
+            if re_remove.match(i) is None:
+                to_write.append(i)
+        f.seek(0)
+        f.truncate()
+
+        for i in to_write:
+            f.write(i)
+    finally:
+        f.close()
+
+    logging.info("Successfully cleaned up requirements in " + file_)
 
 def init(args):
     encoding = args.get('--encoding')
@@ -260,10 +362,19 @@ def init(args):
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(args['<path>'], "requirements.txt"))
 
+    if args["--diff"]:
+        diff(args["--diff"], imports)
+        return
+
+    if args["--clean"]:
+        clean(args["--clean"], imports)
+        return
+
     if not args["--print"] and not args["--savepath"] and not args["--force"] and os.path.exists(path):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
         return
+
     if args["--print"]:
         output_requirements(imports)
         logging.info("Successfully output requirements")
