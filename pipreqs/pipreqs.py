@@ -20,6 +20,7 @@ Options:
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project imports.
     --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
+    --examine-all         Include imports from extensionless python files. (*nix only)
 """
 from __future__ import print_function, absolute_import
 import os
@@ -349,9 +350,16 @@ def init(args):
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
+    if args.get("--examine-all"):
+        examine_all = True
+    else:
+        examine_all = False
+
     candidates = get_all_imports(args['<path>'],
+                                 examine_all=examine_all,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs)
+
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
