@@ -351,6 +351,9 @@ def init(args):
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
     if args.get("--examine-all"):
+        if sys.platform == "win32":
+            raise SystemExit("This option is only available on *nix platforms!")
+
         examine_all = True
     else:
         examine_all = False
