@@ -53,7 +53,7 @@ else:
     py2_exclude = ["concurrent", "concurrent.futures"]
 
 
-def get_all_imports(path, examine_all, encoding=None, extra_ignore_dirs=None):
+def get_all_imports(path, examine_all=None, encoding=None, extra_ignore_dirs=None):
     imports = set()
     raw_imports = set()
     candidates = []
