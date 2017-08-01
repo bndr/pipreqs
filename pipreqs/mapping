@@ -580,6 +580,7 @@ daemon:python_daemon
 dare:DARE
 dateutil:python_dateutil
 dawg:DAWG
+decouple:python-decouple
 deb822:python_debian
 debian:python_debian
 demo:webunit
