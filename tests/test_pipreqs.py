@@ -7,10 +7,11 @@ test_pipreqs
 
 Tests for `pipreqs` module.
 """
-
+from StringIO import StringIO
 import unittest
 import os
 import requests
+import sys
 
 from pipreqs import pipreqs
 
@@ -93,6 +94,23 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             for item in self.modules[:-3]:
                 self.assertTrue(item.lower() in data)
+
+    def test_output_requirements(self):
+        """
+        Test that all modules we will test upon, are written out in alphabetic order
+        """
+        self.modules.extend(self.modules2)
+        mock, sys.stdout = sys.stdout, StringIO()
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': True,
+                      '--use-local': None, '--force': True, '--proxy': None, '--pypi-server': None,
+                      '--diff': None, '--clean': None})
+
+        list_output_req = sys.stdout.getvalue().split('\n')
+        for idx in xrange(len(list_output_req)):
+            name_value = list_output_req[idx].split('==')
+            if name_value[0]:
+                self.assertIn(name_value[0].lower(), self.modules)
+        sys.stdout = mock
 
     def test_init_local_only(self):
         """
