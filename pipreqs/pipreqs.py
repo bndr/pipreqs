@@ -125,6 +125,7 @@ def generate_requirements_file(path, imports):
         out_file.write('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
                                  for item in imports) + '\n')
 
+
 def output_requirements(imports):
     imports.sort(key=operator.itemgetter('name'))
     logging.debug('Writing {num} requirements: {imports} to stdout'.format(
