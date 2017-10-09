@@ -7,7 +7,7 @@ test_pipreqs
 
 Tests for `pipreqs` module.
 """
-from io import BytesIO
+from io import BytesIO, StringIO
 import unittest
 import os
 import requests
@@ -100,7 +100,10 @@ class TestPipreqs(unittest.TestCase):
         Test that all modules we will test upon, are written out in alphabetic order
         """
         self.modules.extend(self.modules2)
-        mock, sys.stdout = sys.stdout, BytesIO()
+        if sys.version_info < (3, 0):
+            mock, sys.stdout = sys.stdout, BytesIO()
+        else:
+            mock, sys.stdout = sys.stdout, StringIO()
         pipreqs.init({'<path>': self.project, '--savepath': None, '--print': True,
                       '--use-local': None, '--force': True, '--proxy': None, '--pypi-server': None,
                       '--diff': None, '--clean': None})
