@@ -22,6 +22,7 @@ Options:
     --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
 """
 from __future__ import print_function, absolute_import
+import operator
 import os
 import sys
 import re
@@ -125,6 +126,7 @@ def generate_requirements_file(path, imports):
                                  for item in imports) + '\n')
 
 def output_requirements(imports):
+    imports.sort(key=operator.itemgetter('name'))
     logging.debug('Writing {num} requirements: {imports} to stdout'.format(
         num=len(imports),
         imports=", ".join([x['name'] for x in imports])
