@@ -23,9 +23,9 @@ requirements = [
 setup(
     name='pipreqs',
     version=__version__,
-    description="Pip requirements.txt generator based on imports in project",
+    description='Pip requirements.txt generator based on imports in project',
     long_description=readme + '\n\n' + history,
-    author="Vadim Kravcenko",
+    author='Vadim Kravcenko',
     author_email='vadim.kravcenko@gmail.com',
     url='https://github.com/bndr/pipreqs',
     packages=[
@@ -36,7 +36,7 @@ setup(
     include_package_data=True,
     package_data={'': ['stdlib','mapping']},
     install_requires=requirements,
-    license="Apache License",
+    license='Apache License',
     zip_safe=False,
     keywords='pip requirements imports',
     classifiers=[
@@ -44,7 +44,7 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
-        "Programming Language :: Python :: 2",
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
