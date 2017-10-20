@@ -20,6 +20,7 @@ Options:
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project imports.
     --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
+    --examine-all         Include imports from extensionless python files. (*nix only)
 """
 from __future__ import print_function, absolute_import
 import os
@@ -38,7 +39,9 @@ from pipreqs import __version__
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
-    re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
+    re.compile(r'^from ((?!\.+).*?) import (?:.*)$'),
+    re.compile('(.*?python[\d.]*)')  # Regexp for capturing python versions,
+                                     # used in function get_all_imports
 ]
 
 if sys.version_info[0] > 2:
@@ -50,10 +53,11 @@ else:
     py2_exclude = ["concurrent", "concurrent.futures"]
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
+def get_all_imports(path, examine_all=None, encoding=None, extra_ignore_dirs=None):
     imports = set()
     raw_imports = set()
     candidates = []
+    files = []
     ignore_errors = False
     ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv"]
 
@@ -63,13 +67,23 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
             ignore_dirs_parsed.append(os.path.basename(os.path.realpath(e)))
         ignore_dirs.extend(ignore_dirs_parsed)
 
-    for root, dirs, files in os.walk(path):
+    for root, dirs, files_ in os.walk(path):
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+
+        if examine_all:
+            for file in files_:
+                check_type = os.popen("file {}".format(file)).read()
+                ext = os.path.splitext(file)[1]
+
+                if ext == ".py" or re.match(REGEXP[2], check_type.lower()):
+                    files.append(file)
+        else:
+            files = [fn for fn in files_ if os.path.splitext(fn)[1] == ".py"]
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
+
         for file_name in files:
             with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
                 contents = f.read()
@@ -336,9 +350,19 @@ def init(args):
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
+    if args.get("--examine-all"):
+        if sys.platform == "win32":
+            raise SystemExit("This option is only available on *nix platforms!")
+
+        examine_all = True
+    else:
+        examine_all = False
+
     candidates = get_all_imports(args['<path>'],
+                                 examine_all=examine_all,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs)
+
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
