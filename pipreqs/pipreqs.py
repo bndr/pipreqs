@@ -14,6 +14,7 @@ Options:
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
+    --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard output
@@ -50,7 +51,7 @@ else:
     py2_exclude = ["concurrent", "concurrent.futures"]
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
+def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=True):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -63,7 +64,8 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None):
             ignore_dirs_parsed.append(os.path.basename(os.path.realpath(e)))
         ignore_dirs.extend(ignore_dirs_parsed)
 
-    for root, dirs, files in os.walk(path):
+    walk = os.walk(path, followlinks=follow_links)
+    for root, dirs, files in walk:
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
@@ -332,13 +334,15 @@ def clean(file_, imports):
 def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
+    follow_links = not args.get('--no-follow-links')
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
     candidates = get_all_imports(args['<path>'],
                                  encoding=encoding,
-                                 extra_ignore_dirs=extra_ignore_dirs)
+                                 extra_ignore_dirs=extra_ignore_dirs,
+                                 follow_links=follow_links)
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
