@@ -21,6 +21,7 @@ Options:
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project imports.
     --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
+    --no-pin              Omit package version from requirements file.
 """
 from __future__ import print_function, absolute_import
 import os
@@ -115,16 +116,22 @@ def filter_line(l):
     return len(l) > 0 and l[0] != "#"
 
 
-def generate_requirements_file(path, imports):
+def generate_requirements_file(path, imports, omit_version=None):
     with open(path, "w") as out_file:
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
             num=len(imports),
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
-        fmt = '{name}=={version}'
-        out_file.write('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
-                                 for item in imports) + '\n')
+
+        if omit_version is True:
+            fmt = '{name}\n'
+            out_file.write(''.join(fmt.format(**item) for item in imports))
+        else:
+            fmt = '{name}=={version}\n'
+            out_file.write(''.join(fmt.format(**item) if item['version']
+                                     else '{name}'.format(**item)
+                                     for item in imports))
 
 def output_requirements(imports):
     logging.debug('Writing {num} requirements: {imports} to stdout'.format(
@@ -383,11 +390,16 @@ def init(args):
                         "use --force to overwrite it")
         return
 
+    if args["--no-pin"]:
+        omit_version = True
+    else:
+        omit_version = False
+
     if args["--print"]:
         output_requirements(imports)
         logging.info("Successfully output requirements")
     else:
-        generate_requirements_file(path, imports)
+        generate_requirements_file(path, imports, omit_version)
         logging.info("Successfully saved requirements file in " + path)
 
 
