@@ -87,7 +87,7 @@ class TestPipreqs(unittest.TestCase):
         """
         pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':None,
-                      '--diff': None, '--clean': None})
+                      '--diff': None, '--clean': None, '--no-pin': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -100,7 +100,7 @@ class TestPipreqs(unittest.TestCase):
         """
         pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': True, '--force': True, '--proxy':None, '--pypi-server':None,
-                      '--diff': None, '--clean': None})
+                      '--diff': None, '--clean': None, '--no-pin': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
@@ -114,7 +114,7 @@ class TestPipreqs(unittest.TestCase):
         """
         pipreqs.init({'<path>': self.project, '--savepath':
                       self.alt_requirement_path, '--use-local': None, '--proxy':None, '--pypi-server':None,  '--print': False,
-                      "--diff": None, "--clean": None})
+                      '--diff': None, '--clean': None, '--no-pin': None})
         assert os.path.exists(self.alt_requirement_path) == 1
         with open(self.alt_requirement_path, "r") as f:
             data = f.read().lower()
@@ -131,7 +131,7 @@ class TestPipreqs(unittest.TestCase):
             f.write("should_not_be_overwritten")
         pipreqs.init({'<path>': self.project, '--savepath': None,
                       '--use-local': None, '--force': None, '--proxy':None, '--pypi-server':None, '--print': False,
-                      "--diff": None, "--clean": None})
+                      '--diff': None, '--clean': None, '--no-pin': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -167,7 +167,8 @@ class TestPipreqs(unittest.TestCase):
                       '--pypi-server':None,
                       '--ignore':'.ignored_dir,.ignore_second',
                       '--diff': None,
-                      '--clean': None
+                      '--clean': None,
+                      '--no-pin': None
              }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
