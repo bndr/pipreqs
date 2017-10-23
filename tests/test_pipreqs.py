@@ -179,7 +179,7 @@ class TestPipreqs(unittest.TestCase):
 
     def tearDown(self):
         """
-        Remove requiremnts.txt files that were written
+        Remove requirements.txt files that were written
         """
         try:
             os.remove(self.requirements_path)
