@@ -9,13 +9,17 @@ python:
   - "2.7"
   - "pypy"
 
-# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+# Use tox to run tests on Travis-CI to keep one unified method of running tests in any environment
 install: 
-    - "pip install -r requirements.txt"
-    - "pip install coverage"
-    - "pip install coveralls"
+    - pip install coverage coveralls tox-travis
 
-# command to run tests, e.g. python setup.py test
-script: coverage run --source=pipreqs setup.py test
-after_success:
-    coveralls
+# Command to run tests, e.g. python setup.py test
+script: tox
+
+# Use a build stage instead of after_success to get a single coveralls report
+jobs:
+  include:
+    - stage: Coveralls
+      script:
+        - coverage run --source=pipreqs setup.py test
+        - coveralls
