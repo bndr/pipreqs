@@ -8,24 +8,29 @@ Usage:
 Arguments:
     <path>                The path to the directory containing the application
                           files for which a requirements file should be
-                          generated (defaults to the current working directory).
+                          generated (defaults to the current working
+                          directory).
 
 Options:
-    --use-local           Use ONLY local package info instead of querying PyPI
-    --pypi-server <url>   Use custom PyPi server
-    --proxy <url>         Use Proxy, parameter will be passed to requests library. You can also just set the
-                          environments parameter in your terminal:
+    --use-local           Use ONLY local package info instead of querying PyPI.
+    --pypi-server <url>   Use custom PyPi server.
+    --proxy <url>         Use Proxy, parameter will be passed to requests
+                          library. You can also just set the environments
+                          parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
-    --debug               Print debug information
-    --ignore <dirs>...    Ignore extra directories, each separated by a comma
+    --debug               Print debug information.
+    --ignore <dirs>...    Ignore extra directories, each separated by a comma.
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
-    --print               Output the list of requirements in the standard output
+    --print               Output the list of requirements in the standard
+                          output.
     --force               Overwrite existing requirements.txt
-    --diff <file>         Compare modules in requirements.txt to project imports.
-    --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
+    --diff <file>         Compare modules in requirements.txt to project
+                          imports.
+    --clean <file>        Clean up requirements.txt by removing modules
+                          that are not imported in project.
 """
 from __future__ import print_function, absolute_import
 import os
@@ -56,7 +61,8 @@ else:
     py2_exclude = ["concurrent", "concurrent.futures"]
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+def get_all_imports(
+        path, encoding=None, extra_ignore_dirs=None, follow_links=True):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -78,7 +84,8 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
-            with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
+            file_name = os.path.join(root, file_name)
+            with open_func(file_name, "r", encoding=encoding) as f:
                 contents = f.read()
                 try:
                     tree = ast.parse(contents)
@@ -91,19 +98,19 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
                 except Exception as exc:
                     if ignore_errors:
                         traceback.print_exc(exc)
-                        logging.warn("Failed on file: %s" % os.path.join(root, file_name))
+                        logging.warn("Failed on file: %s" % file_name)
                         continue
                     else:
-                        logging.error("Failed on file: %s" % os.path.join(root, file_name))
+                        logging.error("Failed on file: %s" % file_name)
                         raise exc
-
-
 
     # Clean up imports
     for name in [n for n in raw_imports if n]:
-        # Sanity check: Name could have been None if the import statement was as from . import X
+        # Sanity check: Name could have been None if the import
+        # statement was as ``from . import X``
         # Cleanup: We only want to first part of the import.
-        # Ex: from django.conf --> django.conf. But we only want django as an import
+        # Ex: from django.conf --> django.conf. But we only want django
+        # as an import.
         cleaned_name, _, _ = name.partition('.')
         imports.add(cleaned_name)
 
@@ -128,8 +135,10 @@ def generate_requirements_file(path, imports):
             imports=", ".join([x['name'] for x in imports])
         ))
         fmt = '{name}=={version}'
-        out_file.write('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
-                                 for item in imports) + '\n')
+        out_file.write('\n'.join(
+            fmt.format(**item) if item['version'] else '{name}'.format(**item)
+            for item in imports) + '\n')
+
 
 def output_requirements(imports):
     logging.debug('Writing {num} requirements: {imports} to stdout'.format(
@@ -137,16 +146,19 @@ def output_requirements(imports):
         imports=", ".join([x['name'] for x in imports])
     ))
     fmt = '{name}=={version}'
-    print('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
-                    for item in imports))
+    print('\n'.join(
+        fmt.format(**item) if item['version'] else '{name}'.format(**item)
+        for item in imports))
 
 
-def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+def get_imports_info(
+        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
 
     for item in imports:
         try:
-            response = requests.get("{0}{1}/json".format(pypi_server, item), proxies=proxy)
+            response = requests.get(
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
@@ -170,11 +182,13 @@ def get_locally_installed_packages(encoding=None):
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
-                    with open_func(os.path.join(root, item), "r", encoding=encoding) as f:
+                    item = os.path.join(root, item)
+                    with open_func(item, "r", encoding=encoding) as f:
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
-                        except:
+                        except:  # NOQA
+                            # TODO: What errors do we intend to suppress here?
                             continue
                         for i_item in package_import:
                             if ((i_item not in ignore) and
@@ -235,6 +249,7 @@ def get_name_without_alias(name):
 def join(f):
     return os.path.join(os.path.dirname(__file__), f)
 
+
 def parse_requirements(file_):
     """Parse a requirements formatted file.
 
@@ -252,7 +267,9 @@ def parse_requirements(file_):
         tuple: The contents of the file, excluding comments.
     """
     modules = []
-    delim = ["<", ">", "=", "!", "~"]  # https://www.python.org/dev/peps/pep-0508/#complete-grammar
+    # For the dependency identifier specification, see
+    # https://www.python.org/dev/peps/pep-0508/#complete-grammar
+    delim = ["<", ">", "=", "!", "~"]
 
     try:
         f = open_func(file_, "r")
@@ -267,7 +284,8 @@ def parse_requirements(file_):
     data = [x for x in data if x[0].isalpha()]
 
     for x in data:
-        if not any([y in x for y in delim]):  # Check for modules w/o a specifier.
+        # Check for modules w/o a specifier.
+        if not any([y in x for y in delim]):
             modules.append({"name": x, "version": None})
         for y in x:
             if y in delim:
@@ -305,11 +323,13 @@ def compare_modules(file_, imports):
 
 
 def diff(file_, imports):
-    """Display the difference between modules in a file and imported modules."""
+    """Display the difference between modules in a file and imported modules."""  # NOQA
     modules_not_imported = compare_modules(file_, imports)
 
-    logging.info("The following modules are in {} but do not seem to be imported: "
-                 "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+    logging.info(
+        "The following modules are in {} but do not seem to be imported: "
+        "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+
 
 def clean(file_, imports):
     """Remove modules that aren't imported in project from file."""
@@ -335,6 +355,7 @@ def clean(file_, imports):
         f.close()
 
     logging.info("Successfully cleaned up requirements in " + file_)
+
 
 def init(args):
     encoding = args.get('--encoding')
@@ -386,7 +407,10 @@ def init(args):
         clean(args["--clean"], imports)
         return
 
-    if not args["--print"] and not args["--savepath"] and not args["--force"] and os.path.exists(path):
+    if (not args["--print"]
+            and not args["--savepath"]
+            and not args["--force"]
+            and os.path.exists(path)):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
         return
