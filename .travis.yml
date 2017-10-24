@@ -2,24 +2,29 @@
 
 language: python
 
-python:
-  - "3.6"
-  - "3.5"
-  - "3.4"
-  - "2.7"
-  - "pypy"
+matrix:
+  include:
+    - python: 3.6
+      env: TOX_ENV=py36
+    - python: 3.5
+      env: TOX_ENV=py35
+    - python: 3.4
+      env: TOX_ENV=py34
+    - python: 2.7
+      env: TOX_ENV=py27
+    - python: pypy
+      env: TOX_ENV=pypy
+    - python: 3.6
+      env: TOX_ENV=flake8
 
 # Use tox to run tests on Travis-CI to keep one unified method of running tests in any environment
 install: 
-    - pip install coverage coveralls tox-travis
+  - pip install coverage coveralls tox
 
 # Command to run tests, e.g. python setup.py test
-script: tox
+script: tox -e $TOX_ENV
 
-# Use a build stage instead of after_success to get a single coveralls report
-jobs:
-  include:
-    - stage: Coveralls
-      script:
-        - coverage run --source=pipreqs setup.py test
-        - coveralls
+# Use after_success to get a single coveralls report
+after_success:
+  - coverage run --source=pipreqs setup.py test
+  - coveralls
