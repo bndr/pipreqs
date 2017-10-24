@@ -3,7 +3,12 @@
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
-    pipreqs [options] <path>
+    pipreqs [options] [<path>]
+
+Arguments:
+    <path>                The path to the directory containing the application
+                          files for which a requirements file should be
+                          generated (defaults to the current working directory).
 
 Options:
     --use-local           Use ONLY local package info instead of querying PyPI
@@ -335,11 +340,14 @@ def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
     follow_links = not args.get('--no-follow-links')
+    input_path = args['<path>']
+    if input_path is None:
+        input_path = os.path.abspath(os.curdir)
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
-    candidates = get_all_imports(args['<path>'],
+    candidates = get_all_imports(input_path,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs,
                                  follow_links=follow_links)
@@ -368,7 +376,7 @@ def init(args):
                                            pypi_server=pypi_server)
 
     path = (args["--savepath"] if args["--savepath"] else
-            os.path.join(args['<path>'], "requirements.txt"))
+            os.path.join(input_path, "requirements.txt"))
 
     if args["--diff"]:
         diff(args["--diff"], imports)
