@@ -3,19 +3,19 @@
 History
 -------
 
-0.4.8
+0.4.8 (2017-06-30)
 --------------------
 
 * Implement '--clean' and '--diff' (kxrd)
 * Exclude concurrent{,.futures} from stdlib if py2 (kxrd)
 
-0.4.7
+0.4.7 (2017-04-20)
 --------------------
 
 * BUG: remove package/version duplicates
 * Style: pep8
 
-0.4.5
+0.4.5 (2016-12-13)
 ---------------------
 
 * Fixed the --pypi-server option
