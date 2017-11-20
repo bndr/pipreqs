@@ -12,6 +12,7 @@ Arguments:
                           directory).
 
 Options:
+    --gt                  Replace format from name==version to name>=version
     --use-local           Use ONLY local package info instead of querying PyPI.
     --pypi-server <url>   Use custom PyPi server.
     --proxy <url>         Use Proxy, parameter will be passed to requests
@@ -160,21 +161,21 @@ def filter_line(l):
     return len(l) > 0 and l[0] != "#"
 
 
-def generate_requirements_file(path, imports):
+def generate_requirements_file(path, imports, equal_fmt):
     with _open(path, "w") as out_file:
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
             num=len(imports),
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
-        fmt = '{name}=={version}'
+        fmt = '{name}%s{version}' % equal_fmt
         out_file.write('\n'.join(
             fmt.format(**item) if item['version'] else '{name}'.format(**item)
             for item in imports) + '\n')
 
 
-def output_requirements(imports):
-    generate_requirements_file('-', imports)
+def output_requirements(imports, equal_fmt):
+    generate_requirements_file('-', imports, equal_fmt)
 
 
 def get_imports_info(
@@ -394,12 +395,13 @@ def init(args):
     extra_ignore_dirs = args.get('--ignore')
     follow_links = not args.get('--no-follow-links')
     input_path = args['<path>']
+    is_gt = args.get("--gt")
+    equal_fmt = ">=" if is_gt else "=="
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
-
     candidates = get_all_imports(input_path,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs,
@@ -448,10 +450,10 @@ def init(args):
         return
 
     if args["--print"]:
-        output_requirements(imports)
+        output_requirements(imports, equal_fmt)
         logging.info("Successfully output requirements")
     else:
-        generate_requirements_file(path, imports)
+        generate_requirements_file(path, imports, equal_fmt)
         logging.info("Successfully saved requirements file in " + path)
 
 
