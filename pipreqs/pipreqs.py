@@ -47,7 +47,8 @@ import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
-from pipreqs import __version__
+# from pipreqs import __version__
+__version__ = 2.0
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
@@ -391,7 +392,7 @@ def clean(file_, imports):
 
 
 def init(args):
-    verification = args.get('--ignore-cert-errors')
+    verification = not args.get('--ignore-cert-errors')
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
     follow_links = not args.get('--no-follow-links')
@@ -428,7 +429,7 @@ def init(args):
                       if x.lower() not in [z['name'].lower() for z in local]]
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
-                                           pypi_server=pypi_server, verification=verify)
+                                           pypi_server=pypi_server, verification=verification)
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
