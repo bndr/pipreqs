@@ -47,8 +47,7 @@ import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
-# from pipreqs import __version__
-__version__ = 2.0
+from pipreqs import __version__
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
