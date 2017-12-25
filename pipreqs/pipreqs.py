@@ -21,6 +21,7 @@ Options:
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --debug               Print debug information.
     --ignore <dirs>...    Ignore extra directories, each separated by a comma.
+    --ignore-cert-errors  Ignore SSL certificate errors
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
@@ -178,13 +179,13 @@ def output_requirements(imports):
 
 
 def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None, verification=True):
     result = []
 
     for item in imports:
         try:
             response = requests.get(
-                "{0}{1}/json".format(pypi_server, item), proxies=proxy)
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy, verify=verification)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
@@ -390,6 +391,7 @@ def clean(file_, imports):
 
 
 def init(args):
+    verification = not args.get('--ignore-cert-errors')
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
     follow_links = not args.get('--no-follow-links')
@@ -426,7 +428,7 @@ def init(args):
                       if x.lower() not in [z['name'].lower() for z in local]]
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
-                                           pypi_server=pypi_server)
+                                           pypi_server=pypi_server, verification=verification)
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
