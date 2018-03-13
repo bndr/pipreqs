@@ -349,7 +349,10 @@ def compare_modules(file_, imports):
 
     imports = [imports[i]["name"] for i in range(len(imports))]
     modules = [modules[i]["name"] for i in range(len(modules))]
-    modules_not_imported = set(modules) - set(imports)
+    # modules => declared in requirements
+    # imports => all modules needed
+    # not imported => all modules - declared
+    modules_not_imported = set(imports) - set(modules)
 
     return modules_not_imported
 
@@ -359,7 +362,7 @@ def diff(file_, imports):
     modules_not_imported = compare_modules(file_, imports)
 
     logging.info(
-        "The following modules are in {} but do not seem to be imported: "
+        "The following modules are in {} but do not seem to be imported: \n"
         "{}".format(file_, ", ".join(x for x in modules_not_imported)))
 
 
