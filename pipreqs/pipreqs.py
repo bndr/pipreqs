@@ -435,8 +435,12 @@ def init(args):
             os.path.join(input_path, "requirements.txt"))
 
     if args["--diff"]:
-        diff(args["--diff"], imports)
-        return
+        if os.path.exists(args["--diff"]):
+            diff(args["--diff"], imports)
+            return
+        else:
+            logging.info("The file [ %s ] not exist" % args["--diff"])
+            return
 
     if args["--clean"]:
         clean(args["--clean"], imports)
