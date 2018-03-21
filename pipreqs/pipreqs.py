@@ -3,27 +3,43 @@
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
-    pipreqs [options] <path>
+    pipreqs [options] [<path>]
+
+Arguments:
+    <path>                The path to the directory containing the application
+                          files for which a requirements file should be
+                          generated (defaults to the current working
+                          directory).
 
 Options:
-    --use-local           Use ONLY local package info instead of querying PyPI
-    --pypi-server <url>   Use custom PyPi server
-    --proxy <url>         Use Proxy, parameter will be passed to requests library. You can also just set the
-                          environments parameter in your terminal:
+    --use-local           Use ONLY local package info instead of querying PyPI.
+    --pypi-server <url>   Use custom PyPi server.
+    --proxy <url>         Use Proxy, parameter will be passed to requests
+                          library. You can also just set the environments
+                          parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
-    --debug               Print debug information
-    --ignore <dirs>...    Ignore extra directories, each separated by a comma
+    --debug               Print debug information.
+    --ignore <dirs>...    Ignore extra directories, each separated by a comma.
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
-    --print               Output the list of requirements in the standard output
+    --print               Output the list of requirements in the standard
+                          output.
     --force               Overwrite existing requirements.txt
+<<<<<<< HEAD
     --diff <file>         Compare modules in requirements.txt to project imports.
     --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
     --no-pin              Omit package version from requirements file.
+=======
+    --diff <file>         Compare modules in requirements.txt to project
+                          imports.
+    --clean <file>        Clean up requirements.txt by removing modules
+                          that are not imported in project.
+>>>>>>> upstream/master
 """
 from __future__ import print_function, absolute_import
+from contextlib import contextmanager
 import os
 import sys
 import re
@@ -52,7 +68,39 @@ else:
     py2_exclude = ["concurrent", "concurrent.futures"]
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+@contextmanager
+def _open(filename=None, mode='r'):
+    """Open a file or ``sys.stdout`` depending on the provided filename.
+
+    Args:
+        filename (str): The path to the file that should be opened. If
+            ``None`` or ``'-'``, ``sys.stdout`` or ``sys.stdin`` is
+            returned depending on the desired mode. Defaults to ``None``.
+        mode (str): The mode that should be used to open the file.
+
+    Yields:
+        A file handle.
+
+    """
+    if not filename or filename == '-':
+        if not mode or 'r' in mode:
+            file = sys.stdin
+        elif 'w' in mode:
+            file = sys.stdout
+        else:
+            raise ValueError('Invalid mode for file: {}'.format(mode))
+    else:
+        file = open(filename, mode)
+
+    try:
+        yield file
+    finally:
+        if file not in (sys.stdin, sys.stdout):
+            file.close()
+
+
+def get_all_imports(
+        path, encoding=None, extra_ignore_dirs=None, follow_links=True):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -74,55 +122,63 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
-            with open_func(os.path.join(root, file_name), "r", encoding=encoding) as f:
+            file_name = os.path.join(root, file_name)
+            with open_func(file_name, "r", encoding=encoding) as f:
                 contents = f.read()
-                try:
-                    tree = ast.parse(contents)
-                    for node in ast.walk(tree):
-                        if isinstance(node, ast.Import):
-                            for subnode in node.names:
-                                raw_imports.add(subnode.name)
-                        elif isinstance(node, ast.ImportFrom):
-                            raw_imports.add(node.module)
-                except Exception as exc:
-                    if ignore_errors:
-                        traceback.print_exc(exc)
-                        logging.warn("Failed on file: %s" % os.path.join(root, file_name))
-                        continue
-                    else:
-                        logging.error("Failed on file: %s" % os.path.join(root, file_name))
-                        raise exc
-
-
+            try:
+                tree = ast.parse(contents)
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Import):
+                        for subnode in node.names:
+                            raw_imports.add(subnode.name)
+                    elif isinstance(node, ast.ImportFrom):
+                        raw_imports.add(node.module)
+            except Exception as exc:
+                if ignore_errors:
+                    traceback.print_exc(exc)
+                    logging.warn("Failed on file: %s" % file_name)
+                    continue
+                else:
+                    logging.error("Failed on file: %s" % file_name)
+                    raise exc
 
     # Clean up imports
     for name in [n for n in raw_imports if n]:
-        # Sanity check: Name could have been None if the import statement was as from . import X
+        # Sanity check: Name could have been None if the import
+        # statement was as ``from . import X``
         # Cleanup: We only want to first part of the import.
-        # Ex: from django.conf --> django.conf. But we only want django as an import
+        # Ex: from django.conf --> django.conf. But we only want django
+        # as an import.
         cleaned_name, _, _ = name.partition('.')
         imports.add(cleaned_name)
 
-    packages = set(imports) - set(set(candidates) & set(imports))
+    packages = imports - (set(candidates) & imports)
     logging.debug('Found packages: {0}'.format(packages))
 
     with open(join("stdlib"), "r") as f:
-        data = [x.strip() for x in f.readlines()]
-        data = [x for x in data if x not in py2_exclude] if py2 else data
-        return sorted(list(set(packages) - set(data)))
+        data = {x.strip() for x in f}
+
+    data = {x for x in data if x not in py2_exclude} if py2 else data
+    return list(packages - data)
 
 
 def filter_line(l):
     return len(l) > 0 and l[0] != "#"
 
 
+<<<<<<< HEAD
 def generate_requirements_file(path, imports, omit_version=None):
     with open(path, "w") as out_file:
+=======
+def generate_requirements_file(path, imports):
+    with _open(path, "w") as out_file:
+>>>>>>> upstream/master
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
             num=len(imports),
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
+<<<<<<< HEAD
 
         if omit_version is True:
             fmt = '{name}\n'
@@ -132,23 +188,26 @@ def generate_requirements_file(path, imports, omit_version=None):
             out_file.write(''.join(fmt.format(**item) if item['version']
                                      else '{name}'.format(**item)
                                      for item in imports))
+=======
+        fmt = '{name}=={version}'
+        out_file.write('\n'.join(
+            fmt.format(**item) if item['version'] else '{name}'.format(**item)
+            for item in imports) + '\n')
+
+>>>>>>> upstream/master
 
 def output_requirements(imports):
-    logging.debug('Writing {num} requirements: {imports} to stdout'.format(
-        num=len(imports),
-        imports=", ".join([x['name'] for x in imports])
-    ))
-    fmt = '{name}=={version}'
-    print('\n'.join(fmt.format(**item) if item['version'] else '{name}'.format(**item)
-                    for item in imports))
+    generate_requirements_file('-', imports)
 
 
-def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+def get_imports_info(
+        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
 
     for item in imports:
         try:
-            response = requests.get("{0}{1}/json".format(pypi_server, item), proxies=proxy)
+            response = requests.get(
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
@@ -172,11 +231,13 @@ def get_locally_installed_packages(encoding=None):
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
-                    with open_func(os.path.join(root, item), "r", encoding=encoding) as f:
+                    item = os.path.join(root, item)
+                    with open_func(item, "r", encoding=encoding) as f:
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
-                        except:
+                        except:  # NOQA
+                            # TODO: What errors do we intend to suppress here?
                             continue
                         for i_item in package_import:
                             if ((i_item not in ignore) and
@@ -212,18 +273,24 @@ def get_import_local(imports, encoding=None):
 
 
 def get_pkg_names(pkgs):
-    result = []
+    """Get PyPI package names from a list of imports.
+
+    Args:
+        pkgs (List[str]): List of import names.
+
+    Returns:
+        List[str]: The corresponding PyPI package names.
+
+    """
+    result = set()
     with open(join("mapping"), "r") as f:
-        data = [x.strip().split(":") for x in f.readlines()]
-        for pkg in pkgs:
-            toappend = pkg
-            for item in data:
-                if item[0] == pkg:
-                    toappend = item[1]
-                    break
-            if toappend not in result:
-                result.append(toappend)
-    return result
+        data = dict(x.strip().split(":") for x in f)
+    for pkg in pkgs:
+        # Look up the mapped requirement. If a mapping isn't found,
+        # simply use the package name.
+        result.add(data.get(pkg, pkg))
+    # Return a sorted list for backward compatibility.
+    return sorted(result)
 
 
 def get_name_without_alias(name):
@@ -236,6 +303,7 @@ def get_name_without_alias(name):
 
 def join(f):
     return os.path.join(os.path.dirname(__file__), f)
+
 
 def parse_requirements(file_):
     """Parse a requirements formatted file.
@@ -254,7 +322,9 @@ def parse_requirements(file_):
         tuple: The contents of the file, excluding comments.
     """
     modules = []
-    delim = ["<", ">", "=", "!", "~"]  # https://www.python.org/dev/peps/pep-0508/#complete-grammar
+    # For the dependency identifier specification, see
+    # https://www.python.org/dev/peps/pep-0508/#complete-grammar
+    delim = ["<", ">", "=", "!", "~"]
 
     try:
         f = open_func(file_, "r")
@@ -269,7 +339,8 @@ def parse_requirements(file_):
     data = [x for x in data if x[0].isalpha()]
 
     for x in data:
-        if not any([y in x for y in delim]):  # Check for modules w/o a specifier.
+        # Check for modules w/o a specifier.
+        if not any([y in x for y in delim]):
             modules.append({"name": x, "version": None})
         for y in x:
             if y in delim:
@@ -307,11 +378,13 @@ def compare_modules(file_, imports):
 
 
 def diff(file_, imports):
-    """Display the difference between modules in a file and imported modules."""
+    """Display the difference between modules in a file and imported modules."""  # NOQA
     modules_not_imported = compare_modules(file_, imports)
 
-    logging.info("The following modules are in {} but do not seem to be imported: "
-                 "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+    logging.info(
+        "The following modules are in {} but do not seem to be imported: "
+        "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+
 
 def clean(file_, imports):
     """Remove modules that aren't imported in project from file."""
@@ -338,15 +411,19 @@ def clean(file_, imports):
 
     logging.info("Successfully cleaned up requirements in " + file_)
 
+
 def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
     follow_links = not args.get('--no-follow-links')
+    input_path = args['<path>']
+    if input_path is None:
+        input_path = os.path.abspath(os.curdir)
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
-    candidates = get_all_imports(args['<path>'],
+    candidates = get_all_imports(input_path,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs,
                                  follow_links=follow_links)
@@ -375,7 +452,7 @@ def init(args):
                                            pypi_server=pypi_server)
 
     path = (args["--savepath"] if args["--savepath"] else
-            os.path.join(args['<path>'], "requirements.txt"))
+            os.path.join(input_path, "requirements.txt"))
 
     if args["--diff"]:
         diff(args["--diff"], imports)
@@ -385,7 +462,10 @@ def init(args):
         clean(args["--clean"], imports)
         return
 
-    if not args["--print"] and not args["--savepath"] and not args["--force"] and os.path.exists(path):
+    if (not args["--print"]
+            and not args["--savepath"]
+            and not args["--force"]
+            and os.path.exists(path)):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
         return

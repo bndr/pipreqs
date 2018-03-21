@@ -263,7 +263,6 @@ armstrong:armstrong.hatband
 armstrong:armstrong.templates.standard
 armstrong:armstrong.utils.backends
 armstrong:armstrong.utils.celery
-arrow:arrow_fatisar
 arstecnica:arstecnica.raccoon.autobahn
 arstecnica:arstecnica.sqlalchemy.async
 article-downloader:article_downloader
