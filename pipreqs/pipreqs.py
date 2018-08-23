@@ -267,7 +267,7 @@ def get_pkg_names(pkgs):
         # simply use the package name.
         result.add(data.get(pkg, pkg))
     # Return a sorted list for backward compatibility.
-    return sorted(result)
+    return sorted(result, key=lambda s: s.lower())
 
 
 def get_name_without_alias(name):

@@ -800,7 +800,7 @@ nester:abofly
 nester:bssm_pythonSig
 novaclient:python_novaclient
 oauth2_provider:alauda_django_oauth
-oauth2client:google_api_python_client
+oauth2client:oauth2client
 odf:odfpy
 ometa:Parsley
 openid:python_openid

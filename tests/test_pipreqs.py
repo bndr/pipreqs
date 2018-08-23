@@ -69,6 +69,12 @@ class TestPipreqs(unittest.TestCase):
                 item['name'].lower() in self.modules,
                 "Import item appears to be missing " + item['name'])
 
+    def test_get_pkg_names(self):
+        pkgs = ['jury', 'Japan', 'camel', 'Caroline']
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        expected_output = ['camel', 'Caroline', 'Japan', 'jury']
+        self.assertEqual(actual_output, expected_output)
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local imports matches what we expect
