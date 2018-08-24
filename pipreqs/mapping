@@ -10,6 +10,7 @@ BioSQL:biopython
 BuildbotStatusShields:BuildbotEightStatusShields
 ComputedAttribute:ExtensionClass
 Crypto:pycryptodome
+Cryptodome:pycryptodomex
 FSM:pexpect
 FiftyOneDegrees:51degrees_mobile_detector_v3_wrapper
 GeoBaseMain:GeoBasesDev
