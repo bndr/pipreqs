@@ -913,6 +913,7 @@ polymorphic:django_polymorphic
 portalocker:ConcurrentLogHandler
 postmark:python_postmark
 powerprompt:bash_powerprompt
+prefetch:django-prefetch
 printList:AndrewList
 progressbar:progressbar2
 progressbar:progressbar33
