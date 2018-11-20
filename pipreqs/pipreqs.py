@@ -259,16 +259,26 @@ def get_pkg_names(pkgs):
         List[str]: The corresponding PyPI package names.
 
     """
-    result = set()
+    mapfile = join("mapping")
+    logging.debug("Looking up mappings in %s", mapfile)
     with open(join("mapping"), "r") as f:
-        data = dict(x.strip().split(":") for x in f)
-    for pkg in pkgs:
-        # Look up the mapped requirement. If a mapping isn't found,
-        # simply use the package name.
-        result.add(data.get(pkg, pkg))
-    # Return a sorted list for backward compatibility.
-    return sorted(result, key=lambda s: s.lower())
+        mappings = dict(x.strip().split(":") for x in f)
 
+    # Look up the mapped requirement. If a mapping isn't found,
+    # simply use the package name.
+    names = {pkg: mappings.get(pkg, pkg)
+             for pkg in pkgs}
+
+    # Print mappings to debug logger
+    pkgalign = max(len(s) for s in names.keys())
+    reqalign = max(len(s) for s in names.values())
+    fmt = "[%-{}s] : %-{}s (%s)".format(pkgalign, reqalign)
+    for pkg, name in names.items():
+        note = "mapped" if pkg != name else "default"
+        logging.debug(fmt, pkg, name, note)
+
+    # Return a sorted list for backward compatibility.
+    return sorted(set(names.values()), key=lambda s: s.lower())
 
 def get_name_without_alias(name):
     if "import " in name:
