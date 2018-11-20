@@ -193,9 +193,15 @@ def get_imports_info(
             elif response.status_code >= 300:
                 raise HTTPError(status_code=response.status_code,
                                 reason=response.reason)
-        except HTTPError:
-            logging.debug(
-                'Package %s does not exist or network problems', item)
+        except HTTPError as err:
+            if err.errno == 404:
+                msg = "Package `%s` isn't on pypi, skipping"
+                logging.warning(msg, item)
+                msg = "(possible missing mapping for import name `%s`?)"
+                logging.warning(msg, item)
+            else:
+                msg = "HTTP error %s querying package %s, skipping"
+                logging.warning(msg, err.errno, item)
             continue
         result.append({'name': item, 'version': data.latest_release_id})
     return result
