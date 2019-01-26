@@ -9,7 +9,8 @@ BeautifulSoupTests:BeautifulSoup
 BioSQL:biopython
 BuildbotStatusShields:BuildbotEightStatusShields
 ComputedAttribute:ExtensionClass
-Crypto:pycrypto
+Crypto:pycryptodome
+Cryptodome:pycryptodomex
 FSM:pexpect
 FiftyOneDegrees:51degrees_mobile_detector_v3_wrapper
 GeoBaseMain:GeoBasesDev
@@ -800,7 +801,7 @@ nester:abofly
 nester:bssm_pythonSig
 novaclient:python_novaclient
 oauth2_provider:alauda_django_oauth
-oauth2client:google_api_python_client
+oauth2client:oauth2client
 odf:odfpy
 ometa:Parsley
 openid:python_openid
@@ -913,6 +914,7 @@ polymorphic:django_polymorphic
 portalocker:ConcurrentLogHandler
 postmark:python_postmark
 powerprompt:bash_powerprompt
+prefetch:django-prefetch
 printList:AndrewList
 progressbar:progressbar2
 progressbar:progressbar33
