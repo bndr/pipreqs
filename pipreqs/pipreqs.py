@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """pipreqs - Generate pip requirements.txt file based on imports
 
@@ -32,7 +32,7 @@ Options:
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project.
 """
-from __future__ import print_function, absolute_import
+# from __future__ import print_function, absolute_import
 from contextlib import contextmanager
 import os
 import sys
@@ -46,7 +46,10 @@ import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
-from pipreqs import __version__
+try:
+    from pipreqs import __version__
+except ImportError:
+    from __init__ import __version__
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
