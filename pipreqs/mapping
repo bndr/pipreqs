@@ -580,10 +580,11 @@ daemon:python_daemon
 dare:DARE
 dateutil:python_dateutil
 dawg:DAWG
-decouple:python-decouple
 deb822:python_debian
 debian:python_debian
+decouple:python-decouple
 demo:webunit
+demosongs:PySynth
 deployer:juju_deployer
 depot:filedepot
 devtools:tg.devtools
@@ -772,6 +773,8 @@ mimeparse:python_mimeparse
 minitage:minitage.paste
 minitage:minitage.recipe.common
 missingdrawables:android_missingdrawables
+mixfiles:PySynth
+mkfreq:PySynth
 mkrst_themes:2lazy2rest
 mockredis:mockredispy
 modargs:python_modargs
@@ -828,6 +831,7 @@ picasso:anderson.picasso
 picklefield:django-picklefield
 pilot:BigJob
 pivotal:pivotal_py
+play_wav:PySynth
 playhouse:peewee
 plivoxml:plivo
 plone:plone.alterego
@@ -949,6 +953,14 @@ pyrimaa:AEI
 pysideuic:PySide
 pysqlite2:adhocracy_pysqlite
 pysqlite2:pysqlite
+pysynth_b:PySynth
+pysynth_beeper:PySynth
+pysynth_c:PySynth
+pysynth_d:PySynth
+pysynth_e:PySynth
+pysynth_p:PySynth
+pysynth_s:PySynth
+pysynth_samp:PySynth
 pythongettext:python_gettext
 pythonjsonlogger:python_json_logger
 pyutilib:PyUtilib
@@ -1006,6 +1018,7 @@ singleton:pysingleton
 sittercommon:cerebrod
 skbio:scikit_bio
 sklearn:scikit_learn
+slack:slackclient
 slugify:unicode_slugify
 smarkets:smk_python_sdk
 snappy:ctypes_snappy
