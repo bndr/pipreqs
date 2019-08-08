@@ -336,6 +336,7 @@ sched
 ScrolledText
 select
 sets
+setuptools
 sgmllib
 sha
 shelve
