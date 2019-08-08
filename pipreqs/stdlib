@@ -306,6 +306,7 @@ pickle
 pickletools
 pipes
 PixMapWrapper
+pkg_resources
 pkgutil
 platform
 plistlib
