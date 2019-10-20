@@ -49,6 +49,7 @@ Usage
         --force               Overwrite existing requirements.txt
         --diff <file>         Compare modules in requirements.txt to project imports.
         --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
+        --no-pin              Omit version of output packages.
 Example
 -------
 
