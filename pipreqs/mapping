@@ -792,6 +792,7 @@ msgpack:msgpack_python
 mutations:aino_mutations
 mws:amazon_mws
 mysql:mysql_connector_repackaged
+MySQL-python:MySQLdb
 native_tags:django_native_tags
 ndg:ndg_httpsclient
 nereid:trytond_nereid
