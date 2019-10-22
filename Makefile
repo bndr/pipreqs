@@ -1,5 +1,23 @@
 .PHONY: clean-pyc clean-build docs clean
 
+SHELL := /bin/bash
+export PATH := $(PATH):$(HOME)/.local/bin/
+ipynb_dir := dirname
+ipynb_files := $(shell find $(ipynb_dir) -type f -name *.ipynb ! -name *checkpoint*)
+temp_dir := .tempy
+
+requirements:
+	@which pipreqs || pip3 install --user pipreqs
+	@which jupyter || pip3 install --user jupyter
+	@[ -d $(temp_dir) ] || mkdir $(temp_dir)
+	@num=210696 ; for each in $(ipynb_files) ; do \
+		b=felipe$$num ; \
+		jupyter nbconvert --output=$$b --output-dir=$(temp_dir) --to=python $$each ; \
+		((num = num + 1)) ; \
+	done
+	@pipreqs --force --savepath requirements.txt $(temp_dir)
+	@rm -rf $(temp_dir)
+
 help:
 	@echo "clean - remove all build, test, coverage and Python artifacts"
 	@echo "clean-build - remove build artifacts"
