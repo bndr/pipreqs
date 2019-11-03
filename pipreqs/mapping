@@ -536,6 +536,7 @@ cassandra:cassandra_driver
 cassandralauncher:CassandraLauncher
 cc42:42qucc
 cerberus:Cerberus
+cfnlint:cfn-lint
 chameleon:Chameleon
 charmtools:charm_tools
 chef:PyChef
