@@ -31,6 +31,7 @@ Options:
                           imports.
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project.
+    --no-pin              Omit version of output packages.
 """
 from __future__ import print_function, absolute_import
 from contextlib import contextmanager
@@ -446,6 +447,9 @@ def init(args):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
         return
+
+    if args.get('--no-pin'):
+        imports = [{'name': item["name"], 'version': ''} for item in imports]
 
     if args["--print"]:
         output_requirements(imports)
