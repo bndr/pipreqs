@@ -829,6 +829,7 @@ past:future
 paste:PasteScript
 path:forked_path
 path:path.py
+patricia:patricia-trie
 paver:Paver
 peak:ProxyTypes
 picasso:anderson.picasso
