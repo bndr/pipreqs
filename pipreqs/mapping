@@ -792,6 +792,7 @@ monthdelta:MonthDelta
 mopidy:Mopidy
 mopytools:MoPyTools
 mptt:django_mptt
+mpv:python-mpv
 mrbob:mr.bob
 msgpack:msgpack_python
 mutations:aino_mutations
@@ -918,7 +919,6 @@ plone:plone.z3cform
 plonetheme:plonetheme.barceloneta
 png:pypng
 polymorphic:django_polymorphic
-portalocker:ConcurrentLogHandler
 postmark:python_postmark
 powerprompt:bash_powerprompt
 prefetch:django-prefetch
