@@ -699,7 +699,7 @@ html:pies2overrides
 htmloutput:nosehtmloutput
 http:pies2overrides
 hvad:django_hvad
-krbV:krbv
+krbv:krbV
 i99fix:199Fix
 igraph:python_igraph
 imdb:IMDbPY
@@ -793,7 +793,7 @@ msgpack:msgpack_python
 mutations:aino_mutations
 mws:amazon_mws
 mysql:mysql_connector_repackaged
-MySQL-python:MySQLdb
+MySQLdb:MySQL-python
 native_tags:django_native_tags
 ndg:ndg_httpsclient
 nereid:trytond_nereid
