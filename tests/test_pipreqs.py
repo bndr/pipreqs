@@ -19,11 +19,12 @@ class TestPipreqs(unittest.TestCase):
 
     def setUp(self):
         self.modules = ['flask', 'requests', 'sqlalchemy',
-                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'analytics_python', 'flask_seasurf',
+                        'docopt', 'boto', 'ipython', 'pyflakes', 'nose', 'analytics', 'flask_seasurf',
                         'peewee', 'ujson', 'nonexistendmodule', 'bs4', 'after_method_is_valid_even_if_not_pep8' ]
         self.modules2 = ['beautifulsoup4']
         self.local = ["docopt", "requests", "nose", 'pyflakes']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
+        self.project_clean = os.path.join(os.path.dirname(__file__), "_data_clean")
         self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
         self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
         self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
@@ -33,6 +34,7 @@ class TestPipreqs(unittest.TestCase):
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
+        print(imports)
         self.assertEqual(len(imports), 15)      # old value, 13
         for item in imports:
             self.assertTrue(
@@ -208,16 +210,29 @@ class TestPipreqs(unittest.TestCase):
                       '--use-local': None, '--force': True, '--proxy': None,
                       '--pypi-server': None, '--diff': None, '--clean': None})
         assert os.path.exists(self.requirements_path) == 1
-        # with open(self.requirements_path, "r") as f:
-        #     print('A')
-        #     for l in f: print(l)
         pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': None, '--force': None, '--proxy': None,
                       '--pypi-server': None, '--diff': None,
                       '--clean': self.requirements_path, '--no-pin': True})
-        # with open(self.requirements_path, "r") as f:
-        #     print('B')
-        #     for l in f: print(l)
+        with open(self.requirements_path, "r") as f:
+            data = f.read().lower()
+            print(data)
+            for item in self.modules[:-3]: # ['analytics_python', 'flask_seasurf']:
+                self.assertTrue(item.lower() in data)
+
+    def test_clean_with_extras(self):
+        """
+        Test --clean parameter when there are imports to clean
+        """
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
+                      '--use-local': None, '--force': True, '--proxy': None,
+                      '--pypi-server': None, '--diff': None, '--clean': None})
+        assert os.path.exists(self.requirements_path) == 1
+        # Continua...
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
+                      '--use-local': None, '--force': None, '--proxy': None,
+                      '--pypi-server': None, '--diff': None,
+                      '--clean': self.requirements_path, '--no-pin': True})
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
             print(data)
