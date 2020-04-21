@@ -999,6 +999,7 @@ ruamel:ruamel.base
 s2repoze:pysaml2
 saga:saga_python
 saml2:pysaml2
+samtranslator:aws-sam-translator
 sass:libsass
 sassc:libsass
 sasstests:libsass
