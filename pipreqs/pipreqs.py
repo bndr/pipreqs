@@ -46,6 +46,7 @@ from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
+from nbconvert import PythonExporter
 
 from pipreqs import __version__
 
@@ -113,13 +114,21 @@ def get_all_imports(
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+        files = [fn for fn in files if filter_ext(fn, [".py", ".ipynb"])]
 
-        candidates += [os.path.splitext(fn)[0] for fn in files]
+        candidates = list(map(
+            lambda fn: os.path.splitext(fn)[0],
+            filter(lambda fn: filter_ext(fn, [".py"]), files)
+        ))
+
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open_func(file_name, "r", encoding=encoding) as f:
-                contents = f.read()
+            contents = ''
+            if filter_ext(file_name, [".py"]):
+                with open_func(file_name, "r", encoding=encoding) as f:
+                    contents = f.read()
+            elif filter_ext(file_name, [".ipynb"]):
+                contents = ipynb_2_py(file_name, encoding=encoding)
             try:
                 tree = ast.parse(contents)
                 for node in ast.walk(tree):
@@ -135,6 +144,10 @@ def get_all_imports(
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
+                    if filter_ext(file_name, [".ipynb"]):
+                        logging.error(
+                            "Magic command without % might be failed"
+                        )
                     raise exc
 
     # Clean up imports
@@ -159,6 +172,28 @@ def get_all_imports(
 
 def filter_line(line):
     return len(line) > 0 and line[0] != "#"
+
+
+def filter_ext(file_name, acceptable):
+    return os.path.splitext(file_name)[1] in acceptable
+
+
+def ipynb_2_py(file_name, encoding="utf-8"):
+    """
+
+    Args:
+        file_name (str): notebook file path to parse as python script
+        encoding  (str): encoding of file
+
+    Returns:
+        str: parsed string
+
+    """
+
+    exporter = PythonExporter()
+    (body, _) = exporter.from_filename(file_name)
+
+    return body.encode(encoding if encoding is not None else "utf-8")
 
 
 def generate_requirements_file(path, imports):

@@ -27,9 +27,13 @@ class TestPipreqs(unittest.TestCase):
         self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
         self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
         self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
+        self.project_with_notebooks = os.path.join(os.path.dirname(__file__), "_data_notebook")
+        self.project_with_invalid_notebooks = os.path.join(os.path.dirname(__file__), "_invalid_data_notebook")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
             self.project, "requirements2.txt")
+        self.compatible_files_path = {"original": os.path.join(os.path.dirname(__file__), "_data/test.py"),
+                                      "notebook": os.path.join(os.path.dirname(__file__), "_data_notebook/test.ipynb")}
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -199,6 +203,46 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             for item in ['beautifulsoup4==4.8.1', 'boto==2.49.0']:
                 self.assertFalse(item.lower() in data)
+
+    def test_import_notebooks(self):
+        """
+        Test the function get_all_imports() using .ipynb file
+        """
+        imports = pipreqs.get_all_imports(self.project_with_notebooks, encoding="utf-8")
+        self.assertEqual(len(imports), 13)
+        for item in imports:
+            self.assertTrue(
+                item.lower() in self.modules, "Import is missing: " + item)
+        self.assertFalse("time" in imports)
+        self.assertFalse("logging" in imports)
+        self.assertFalse("curses" in imports)
+        self.assertFalse("__future__" in imports)
+        self.assertFalse("django" in imports)
+        self.assertFalse("models" in imports)
+        self.assertFalse("FastAPI" in imports)
+        self.assertFalse("sklearn" in imports)
+
+    def test_invalid_notebook(self):
+        """
+        Test that invalid notebook files cannot be imported.
+        """
+        self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_with_invalid_notebooks)
+
+    def test_ipynb_2_py(self):
+        """
+        Test the function ipynb_2_py() which converts .ipynb file to .py format
+        """
+        expected = pipreqs.get_all_imports(self.compatible_files_path["original"])
+        parsed = pipreqs.get_all_imports(self.compatible_files_path["notebook"])
+        self.assertEqual(expected, parsed)
+
+    def test_filter_ext(self):
+        """
+        Test the  function filter_ext()
+        """
+        self.assertTrue(pipreqs.filter_ext("main.py", [".py"]))
+        self.assertTrue(pipreqs.filter_ext("main.py", [".py", ".ipynb"]))
+        self.assertFalse(pipreqs.filter_ext("main.py", [".ipynb"]))
 
     def tearDown(self):
         """
