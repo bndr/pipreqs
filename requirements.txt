@@ -1,3 +1,5 @@
 wheel==0.38.1
 Yarg==0.1.9
 docopt==0.6.2
+nbconvert==7.9.2
+
