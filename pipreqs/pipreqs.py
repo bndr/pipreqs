@@ -182,7 +182,7 @@ def output_requirements(imports):
 def add_requirements_poetry(imports):
     packages = [item["name"] for item in imports]
     # Run all commands even if one fails
-    poetry_command = "".join([f"poetry add {pkg}; " for pkg in packages])
+    poetry_command = "".join(["poetry add {pkg}; ".format(pkg) for pkg in packages])
     # Remove extra lingering ; from end of command
     poetry_command_cleaned = poetry_command[:-2]
     logging.info("Running '%s'", poetry_command_cleaned)
