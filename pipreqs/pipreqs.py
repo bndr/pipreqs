@@ -468,6 +468,9 @@ def init(args):
     if args["--print"]:
         output_requirements(imports)
         logging.info("Successfully output requirements")
+    elif args["--poetry"]:
+        add_requirements_poetry(imports)
+        logging.info("Successfully installed via poetry")
     else:
         generate_requirements_file(path, imports)
         logging.info("Successfully saved requirements file in " + path)
