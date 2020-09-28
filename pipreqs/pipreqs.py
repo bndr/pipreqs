@@ -194,6 +194,8 @@ def add_requirements_poetry(imports):
         os.system("poetry init -n -q")
         os.system(poetry_command_cleaned)
 
+
+def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
 
     for item in imports:
