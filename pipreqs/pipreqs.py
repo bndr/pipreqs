@@ -179,8 +179,21 @@ def output_requirements(imports):
     generate_requirements_file('-', imports)
 
 
-def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+def add_requirements_poetry(imports):
+    packages = [item["name"] for item in imports]
+    # Run all commands even if one fails
+    poetry_command = "".join([f"poetry add {pkg}; " for pkg in packages])
+    # Remove extra lingering ; from end of command
+    poetry_command_cleaned = poetry_command[:-2]
+    logging.info("Running '%s'", poetry_command_cleaned)
+    if os.path.exists("pyproject.toml"):
+        os.system(poetry_command_cleaned)
+    else:
+        # Install poetry and create pyproject.toml file if needed
+        os.system("pip install poetry -q")
+        os.system("poetry init -n -q")
+        os.system(poetry_command_cleaned)
+
     result = []
 
     for item in imports:
