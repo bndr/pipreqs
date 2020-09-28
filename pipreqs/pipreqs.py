@@ -456,10 +456,16 @@ def init(args):
         clean(args["--clean"], imports)
         return
 
+    if (
+        not args["--print"]
         and not args["--poetry"]
-            and os.path.exists(path)):
-        logging.warning("Requirements.txt already exists, "
-                        "use --force to overwrite it")
+        and not args["--savepath"]
+        and not args["--force"]
+        and os.path.exists(path)
+    ):
+        logging.warning(
+            "Requirements.txt already exists, " "use --force to overwrite it"
+        )
         return
 
     if args.get('--no-pin'):
