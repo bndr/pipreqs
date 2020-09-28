@@ -26,6 +26,7 @@ Options:
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard
                           output.
+    --poetry              Run poetry to add all requirements to pyproject.toml file
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project
                           imports.
