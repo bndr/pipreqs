@@ -456,9 +456,7 @@ def init(args):
         clean(args["--clean"], imports)
         return
 
-    if (not args["--print"]
-            and not args["--savepath"]
-            and not args["--force"]
+        and not args["--poetry"]
             and os.path.exists(path)):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
