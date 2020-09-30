@@ -180,6 +180,11 @@ def output_requirements(imports):
 
 
 def add_requirements_poetry(imports):
+    """Identifies required imports and runs command to add to poetry.
+
+    Args:
+        imports (list)
+    """
     packages = [item["name"] for item in imports]
     # Run all commands even if one fails
     poetry_command = "".join(["poetry add {pkg}; ".format(pkg) for pkg in packages])
