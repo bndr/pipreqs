@@ -22,6 +22,7 @@ Kittens:astro_kittens
 Levenshtein:python_Levenshtein
 Lifetime:Zope2
 MethodObject:ExtensionClass
+MySQL-python:MySQLdb
 OFS:Zope2
 OpenGL:PyOpenGL
 OpenSSL:pyOpenSSL
@@ -592,6 +593,7 @@ devtools:tg.devtools
 dgis:2gis
 dhtmlparser:pyDHTMLParser
 digitalocean:python_digitalocean
+discord:discord.py
 distribute_setup:ez_setup
 distutils2:Distutils2
 django:Django
@@ -701,7 +703,6 @@ html:pies2overrides
 htmloutput:nosehtmloutput
 http:pies2overrides
 hvad:django_hvad
-krbV:krbv
 i99fix:199Fix
 igraph:python_igraph
 imdb:IMDbPY
@@ -727,6 +728,7 @@ keyczar:python_keyczar
 keyedcache:django_keyedcache
 keystoneclient:python_keystoneclient
 kickstarter:kickstart
+krbV:krbv
 kss:kss.core
 kuyruk:Kuyruk
 langconv:AdvancedLangConv
@@ -798,7 +800,6 @@ msgpack:msgpack_python
 mutations:aino_mutations
 mws:amazon_mws
 mysql:mysql_connector_repackaged
-MySQL-python:MySQLdb
 native_tags:django_native_tags
 ndg:ndg_httpsclient
 nereid:trytond_nereid
