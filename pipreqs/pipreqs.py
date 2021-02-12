@@ -46,6 +46,16 @@ from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
+import copy
+
+if sys.version_info.major == 3 and sys.version_info.minor >= 3:
+    import IPython
+    import nbformat
+    
+    SUPPORT_IPYTHON = True
+    transformer = IPython.core.inputtransformer2.TransformerManager()
+else:
+    SUPPORT_IPYTHON = False
 
 from pipreqs import __version__
 
@@ -110,10 +120,12 @@ def get_all_imports(
 
     walk = os.walk(path, followlinks=follow_links)
     for root, dirs, files in walk:
+        files_raw = copy.deepcopy(files)
+        
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+        files = [fn for fn in files_raw if os.path.splitext(fn)[1] == ".py"]
 
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
@@ -136,6 +148,33 @@ def get_all_imports(
                 else:
                     logging.error("Failed on file: %s" % file_name)
                     raise exc
+            
+        if SUPPORT_IPYTHON:
+            files_ipy = [fn for fn in files_raw if os.path.splitext(fn)[1] == ".ipynb"]
+            
+            for file_name in files_ipy:
+                file_name = os.path.join(root, file_name)
+                nb = nbformat.read(file_name, as_version=4)
+                contents = ""
+                for cell in nb.cells:
+                    if cell.cell_type == "code":
+                        contents += transformer.transform_cell(cell.source) + "\n"
+                try:
+                    tree = ast.parse(contents)
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.Import):
+                            for subnode in node.names:
+                                raw_imports.add(subnode.name)
+                        elif isinstance(node, ast.ImportFrom):
+                            raw_imports.add(node.module)
+                except Exception as exc:
+                    if ignore_errors:
+                        traceback.print_exc(exc)
+                        logging.warn("Failed on file: %s" % file_name)
+                        continue
+                    else:
+                        logging.error("Failed on file: %s" % file_name)
+                        raise exc
 
     # Clean up imports
     for name in [n for n in raw_imports if n]:
@@ -157,8 +196,8 @@ def get_all_imports(
     return list(packages - data)
 
 
-def filter_line(line):
-    return len(line) > 0 and line[0] != "#"
+def filter_line(l):
+    return len(l) > 0 and l[0] != "#"
 
 
 def generate_requirements_file(path, imports):

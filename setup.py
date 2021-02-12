@@ -17,7 +17,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-    'docopt', 'yarg'
+    'docopt', 'yarg', 'IPython>=7.0.0', 'nbformat>=5.0.0'
 ]
 
 setup(
