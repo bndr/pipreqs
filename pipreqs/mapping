@@ -13,6 +13,7 @@ Crypto:pycryptodome
 Cryptodome:pycryptodomex
 FSM:pexpect
 FiftyOneDegrees:51degrees_mobile_detector_v3_wrapper
+functional:pyfunctional
 GeoBaseMain:GeoBasesDev
 GeoBases:GeoBasesDev
 Globals:Zope2
