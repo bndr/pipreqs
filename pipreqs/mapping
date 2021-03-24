@@ -24,7 +24,7 @@ Kittens:astro_kittens
 Levenshtein:python_Levenshtein
 Lifetime:Zope2
 MethodObject:ExtensionClass
-MySQL-python:MySQLdb
+MySQLdb:MySQL-python
 OFS:Zope2
 OpenGL:PyOpenGL
 OpenSSL:pyOpenSSL
@@ -730,7 +730,7 @@ keyczar:python_keyczar
 keyedcache:django_keyedcache
 keystoneclient:python_keystoneclient
 kickstarter:kickstart
-krbV:krbv
+krbv:krbV
 kss:kss.core
 kuyruk:Kuyruk
 langconv:AdvancedLangConv
