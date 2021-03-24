@@ -99,6 +99,9 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             for item in self.modules[:-3]:
                 self.assertTrue(item.lower() in data)
+        # It should be sorted based on names.
+        data = data.strip().split('\n')
+        self.assertEqual(data, sorted(data))
 
     def test_init_local_only(self):
         """
