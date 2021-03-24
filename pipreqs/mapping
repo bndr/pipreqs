@@ -1,3 +1,4 @@
+AFQ:pyAFQ
 AG_fft_tools:agpy
 ANSI:pexpect
 Adafruit:Adafruit_Libraries
@@ -13,6 +14,7 @@ Crypto:pycryptodome
 Cryptodome:pycryptodomex
 FSM:pexpect
 FiftyOneDegrees:51degrees_mobile_detector_v3_wrapper
+functional:pyfunctional
 GeoBaseMain:GeoBasesDev
 GeoBases:GeoBasesDev
 Globals:Zope2
@@ -22,6 +24,7 @@ Kittens:astro_kittens
 Levenshtein:python_Levenshtein
 Lifetime:Zope2
 MethodObject:ExtensionClass
+MySQLdb:MySQL-python
 OFS:Zope2
 OpenGL:PyOpenGL
 OpenSSL:pyOpenSSL
@@ -536,6 +539,7 @@ cassandra:cassandra_driver
 cassandralauncher:CassandraLauncher
 cc42:42qucc
 cerberus:Cerberus
+cfnlint:cfn-lint
 chameleon:Chameleon
 charmtools:charm_tools
 chef:PyChef
@@ -580,16 +584,18 @@ daemon:python_daemon
 dare:DARE
 dateutil:python_dateutil
 dawg:DAWG
-decouple:python-decouple
 deb822:python_debian
 debian:python_debian
+decouple:python-decouple
 demo:webunit
+demosongs:PySynth
 deployer:juju_deployer
 depot:filedepot
 devtools:tg.devtools
 dgis:2gis
 dhtmlparser:pyDHTMLParser
 digitalocean:python_digitalocean
+discord:discord.py
 distribute_setup:ez_setup
 distutils2:Distutils2
 django:Django
@@ -699,7 +705,6 @@ html:pies2overrides
 htmloutput:nosehtmloutput
 http:pies2overrides
 hvad:django_hvad
-krbv:krbV
 i99fix:199Fix
 igraph:python_igraph
 imdb:IMDbPY
@@ -725,6 +730,7 @@ keyczar:python_keyczar
 keyedcache:django_keyedcache
 keystoneclient:python_keystoneclient
 kickstarter:kickstart
+krbv:krbV
 kss:kss.core
 kuyruk:Kuyruk
 langconv:AdvancedLangConv
@@ -773,6 +779,8 @@ mimeparse:python_mimeparse
 minitage:minitage.paste
 minitage:minitage.recipe.common
 missingdrawables:android_missingdrawables
+mixfiles:PySynth
+mkfreq:PySynth
 mkrst_themes:2lazy2rest
 mockredis:mockredispy
 modargs:python_modargs
@@ -788,12 +796,12 @@ monthdelta:MonthDelta
 mopidy:Mopidy
 mopytools:MoPyTools
 mptt:django_mptt
+mpv:python-mpv
 mrbob:mr.bob
 msgpack:msgpack_python
 mutations:aino_mutations
 mws:amazon_mws
 mysql:mysql_connector_repackaged
-MySQLdb:MySQL-python
 native_tags:django_native_tags
 ndg:ndg_httpsclient
 nereid:trytond_nereid
@@ -824,12 +832,14 @@ past:future
 paste:PasteScript
 path:forked_path
 path:path.py
+patricia:patricia-trie
 paver:Paver
 peak:ProxyTypes
 picasso:anderson.picasso
 picklefield:django-picklefield
 pilot:BigJob
 pivotal:pivotal_py
+play_wav:PySynth
 playhouse:peewee
 plivoxml:plivo
 plone:plone.alterego
@@ -913,7 +923,6 @@ plone:plone.z3cform
 plonetheme:plonetheme.barceloneta
 png:pypng
 polymorphic:django_polymorphic
-portalocker:ConcurrentLogHandler
 postmark:python_postmark
 powerprompt:bash_powerprompt
 prefetch:django-prefetch
@@ -951,6 +960,14 @@ pyrimaa:AEI
 pysideuic:PySide
 pysqlite2:adhocracy_pysqlite
 pysqlite2:pysqlite
+pysynth_b:PySynth
+pysynth_beeper:PySynth
+pysynth_c:PySynth
+pysynth_d:PySynth
+pysynth_e:PySynth
+pysynth_p:PySynth
+pysynth_s:PySynth
+pysynth_samp:PySynth
 pythongettext:python_gettext
 pythonjsonlogger:python_json_logger
 pyutilib:PyUtilib
@@ -985,6 +1002,7 @@ ruamel:ruamel.base
 s2repoze:pysaml2
 saga:saga_python
 saml2:pysaml2
+samtranslator:aws-sam-translator
 sass:libsass
 sassc:libsass
 sasstests:libsass
@@ -1008,6 +1026,7 @@ singleton:pysingleton
 sittercommon:cerebrod
 skbio:scikit_bio
 sklearn:scikit_learn
+slack:slackclient
 slugify:unicode_slugify
 smarkets:smk_python_sdk
 snappy:ctypes_snappy

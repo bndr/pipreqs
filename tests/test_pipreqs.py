@@ -99,6 +99,9 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             for item in self.modules[:-3]:
                 self.assertTrue(item.lower() in data)
+        # It should be sorted based on names.
+        data = data.strip().split('\n')
+        self.assertEqual(data, sorted(data))
 
     def test_init_local_only(self):
         """
@@ -181,6 +184,24 @@ class TestPipreqs(unittest.TestCase):
             for item in ['click', 'getpass']:
                 self.assertFalse(item.lower() in data)
 
+    def test_omit_version(self):
+        """
+        Test --no-pin parameter
+        """
+        pipreqs.init(
+            {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
+             '--use-local': None, '--force': True,
+             '--proxy': None,
+             '--pypi-server': None,
+             '--diff': None,
+             '--clean': None,
+             '--no-pin': True
+             }
+        )
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
+            data = f.read().lower()
+            for item in ['beautifulsoup4==4.8.1', 'boto==2.49.0']:
+                self.assertFalse(item.lower() in data)
 
     def tearDown(self):
         """

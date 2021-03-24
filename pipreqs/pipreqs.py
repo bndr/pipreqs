@@ -31,6 +31,7 @@ Options:
                           imports.
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project.
+    --no-pin              Omit version of output packages.
 """
 from __future__ import print_function, absolute_import
 from contextlib import contextmanager
@@ -156,8 +157,8 @@ def get_all_imports(
     return list(packages - data)
 
 
-def filter_line(l):
-    return len(l) > 0 and l[0] != "#"
+def filter_line(line):
+    return len(line) > 0 and line[0] != "#"
 
 
 def generate_requirements_file(path, imports):
@@ -309,9 +310,10 @@ def parse_requirements(file_):
         logging.error("Failed on file: {}".format(file_))
         raise
     else:
-        data = [x.strip() for x in f.readlines() if x != "\n"]
-    finally:
-        f.close()
+        try:
+            data = [x.strip() for x in f.readlines() if x != "\n"]
+        finally:
+            f.close()
 
     data = [x for x in data if x[0].isalpha()]
 
@@ -375,16 +377,17 @@ def clean(file_, imports):
         logging.error("Failed on file: {}".format(file_))
         raise
     else:
-        for i in f.readlines():
-            if re_remove.match(i) is None:
-                to_write.append(i)
-        f.seek(0)
-        f.truncate()
+        try:
+            for i in f.readlines():
+                if re_remove.match(i) is None:
+                    to_write.append(i)
+            f.seek(0)
+            f.truncate()
 
-        for i in to_write:
-            f.write(i)
-    finally:
-        f.close()
+            for i in to_write:
+                f.write(i)
+        finally:
+            f.close()
 
     logging.info("Successfully cleaned up requirements in " + file_)
 
@@ -427,6 +430,8 @@ def init(args):
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
                                            pypi_server=pypi_server)
+    # sort imports based on lowercase name of package, similar to `pip freeze`.
+    imports = sorted(imports, key=lambda x: x['name'].lower())
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
@@ -446,6 +451,9 @@ def init(args):
         logging.warning("Requirements.txt already exists, "
                         "use --force to overwrite it")
         return
+
+    if args.get('--no-pin'):
+        imports = [{'name': item["name"], 'version': ''} for item in imports]
 
     if args["--print"]:
         output_requirements(imports)
