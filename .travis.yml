@@ -17,8 +17,12 @@ matrix:
     - python: 3.6
       env: TOX_ENV=flake8
 
+# This should ensure that all tests use the same pip version
+before_install:
+  - python -m pip install --upgrade pip
+
 # Use tox to run tests on Travis-CI to keep one unified method of running tests in any environment
-install: 
+install:
   - pip install coverage coveralls tox
 
 # Command to run tests, e.g. python setup.py test
