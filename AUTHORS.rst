@@ -10,4 +10,5 @@ Development Lead
 Contributors
 ------------
 
-None yet. Why not be the first?
+* Jake Teo <mapattacker@gmail.com>
+* Jerome Chan <cjerome94@gmail.com>

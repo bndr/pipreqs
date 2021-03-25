@@ -31,7 +31,8 @@ Options:
                           imports.
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project.
-    --no-pin              Omit version of output packages.
+    --dynamic <scheme>    Enables dynamic version updates by 'minor',
+                          'micro' or 'all' schemes.
 """
 from __future__ import print_function, absolute_import
 from contextlib import contextmanager
@@ -392,6 +393,28 @@ def clean(file_, imports):
     logging.info("Successfully cleaned up requirements in " + file_)
 
 
+def dynamic_versioning(scheme, imports):
+    """Enables dynamic versioning by minor, micro or all scheme."""
+    if scheme == "all":
+        imports = [{"name": item["name"], "version": ""} for item in imports]
+    else:
+        for item in imports:
+            version = item["version"]
+            arr = version.split(".")
+            length = len(arr)
+            if length != 1:
+                if scheme == "minor":
+                    arr = arr[0]
+
+                elif scheme == "micro" and length >= 2:
+                    arr = arr[:2]
+                    arr = ".".join(arr)
+
+                arr = arr + ".*"
+                item["version"] = arr
+    return imports
+
+
 def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
@@ -450,8 +473,13 @@ def init(args):
                         "use --force to overwrite it")
         return
 
-    if args.get('--no-pin'):
-        imports = [{'name': item["name"], 'version': ''} for item in imports]
+    if args["--dynamic"]:
+        scheme = args.get("--dynamic")
+        if scheme in ["minor", "micro", "all"]:
+            imports = dynamic_versioning(scheme, imports)
+        else:
+            raise ValueError("Invalid argument for dynamic scheme, "
+                             "use 'minor', 'micro' or 'all' instead")
 
     if args["--print"]:
         output_requirements(imports)
