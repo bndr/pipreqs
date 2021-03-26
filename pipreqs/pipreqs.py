@@ -368,6 +368,11 @@ def diff(file_, imports):
 def clean(file_, imports):
     """Remove modules that aren't imported in project from file."""
     modules_not_imported = compare_modules(file_, imports)
+
+    if len(modules_not_imported) == 0:
+        logging.info("Nothing to clean in " + file_)
+        return
+
     re_remove = re.compile("|".join(modules_not_imported))
     to_write = []
 
