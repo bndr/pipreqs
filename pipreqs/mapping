@@ -679,6 +679,7 @@ geventwebsocket:gevent_websocket
 gflags:python_gflags
 git:GitPython
 github:PyGithub
+github3:github3.py
 gitpy:git_py
 globusonline:globusonline_transfer_api_client
 google:protobuf
