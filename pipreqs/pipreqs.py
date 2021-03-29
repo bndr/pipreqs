@@ -410,8 +410,6 @@ def dynamic_versioning(scheme, imports):
         symbol = ">="
     elif scheme == "compat":
         symbol = "~="
-    else:
-        symbol = "=="
     return imports, symbol
 
 
