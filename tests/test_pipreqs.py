@@ -93,7 +93,7 @@ class TestPipreqs(unittest.TestCase):
         """
         pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':None,
-                      '--diff': None, '--clean': None, '--dynamic': None})
+                      '--diff': None, '--clean': None, '--mode': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -106,7 +106,7 @@ class TestPipreqs(unittest.TestCase):
         """
         pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
                       '--use-local': True, '--force': True, '--proxy':None, '--pypi-server':None,
-                      '--diff': None, '--clean': None, '--dynamic': None})
+                      '--diff': None, '--clean': None, '--mode': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
@@ -120,7 +120,7 @@ class TestPipreqs(unittest.TestCase):
         """
         pipreqs.init({'<path>': self.project, '--savepath':
                       self.alt_requirement_path, '--use-local': None, '--proxy':None, '--pypi-server':None,  '--print': False,
-                      "--diff": None, "--clean": None, '--dynamic': None})
+                      "--diff": None, "--clean": None, '--mode': None})
         assert os.path.exists(self.alt_requirement_path) == 1
         with open(self.alt_requirement_path, "r") as f:
             data = f.read().lower()
@@ -137,7 +137,7 @@ class TestPipreqs(unittest.TestCase):
             f.write("should_not_be_overwritten")
         pipreqs.init({'<path>': self.project, '--savepath': None,
                       '--use-local': None, '--force': None, '--proxy':None, '--pypi-server':None, '--print': False,
-                      "--diff": None, "--clean": None, '--dynamic': None})
+                      "--diff": None, "--clean": None, '--mode': None})
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -174,7 +174,7 @@ class TestPipreqs(unittest.TestCase):
                       '--ignore':'.ignored_dir,.ignore_second',
                       '--diff': None,
                       '--clean': None,
-                      '--dynamic': None
+                      '--mode': None
              }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
@@ -182,9 +182,9 @@ class TestPipreqs(unittest.TestCase):
             for item in ['click', 'getpass']:
                 self.assertFalse(item.lower() in data)
 
-    def test_dynamic_version_all_scheme(self):
+    def test_dynamic_version_no_pin_scheme(self):
         """
-        Test --dynamic=all
+        Test --mode=no-pin
         """
         pipreqs.init(
             {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
@@ -193,7 +193,7 @@ class TestPipreqs(unittest.TestCase):
              '--pypi-server': None,
              '--diff': None,
              '--clean': None,
-             '--dynamic': 'all'
+             '--mode': 'no-pin'
              }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
@@ -201,9 +201,9 @@ class TestPipreqs(unittest.TestCase):
             for item in ['beautifulsoup4', 'boto']:
                 self.assertTrue(item.lower() in data)
 
-    def test_dynamic_version_micro_scheme(self):
+    def test_dynamic_version_gt_scheme(self):
         """
-        Test --dynamic=micro
+        Test --mode=gt
         """
         pipreqs.init(
             {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
@@ -212,18 +212,19 @@ class TestPipreqs(unittest.TestCase):
              '--pypi-server': None,
              '--diff': None,
              '--clean': None,
-             '--dynamic': 'micro'
+             '--mode': 'gt'
              }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
             for item in data:
-                asterisk = item.strip().split(".")[2]
-                self.assertEqual(asterisk, "*",)
+                symbol = '>='
+                message = 'symbol is not in item'
+                self.assertIn(symbol, item, message)
 
-    def test_dynamic_version_minor_scheme(self):
+    def test_dynamic_version_compat_scheme(self):
         """
-        Test --dynamic=minor
+        Test --mode=compat
         """
         pipreqs.init(
             {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
@@ -232,14 +233,15 @@ class TestPipreqs(unittest.TestCase):
              '--pypi-server': None,
              '--diff': None,
              '--clean': None,
-             '--dynamic': 'minor'
+             '--mode': 'compat'
              }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
             for item in data:
-                asterisk = item.strip().split(".")[1]
-                self.assertEqual(asterisk, "*",)
+                symbol = '~='
+                message = 'symbol is not in item'
+                self.assertIn(symbol, item, message)
 
     def tearDown(self):
         """
