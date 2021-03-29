@@ -49,7 +49,10 @@ Usage
         --force               Overwrite existing requirements.txt
         --diff <file>         Compare modules in requirements.txt to project imports.
         --clean <file>        Clean up requirements.txt by removing modules that are not imported in project.
-        --no-pin              Omit version of output packages.
+        --mode <scheme>       Enables dynamic versioning with <compat>, <gt> or <non-pin> schemes.
+                              <compat> | e.g. Flask~=1.1.2
+                              <gt>     | e.g. Flask>=1.1.2
+                              <no-pin> | e.g. Flask
 Example
 -------
 

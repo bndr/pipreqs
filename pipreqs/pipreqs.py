@@ -31,7 +31,11 @@ Options:
                           imports.
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project.
-    --no-pin              Omit version of output packages.
+    --mode <scheme>       Enables dynamic versioning with <compat>,
+                          <gt> or <non-pin> schemes.
+                          <compat> | e.g. Flask~=1.1.2
+                          <gt>     | e.g. Flask>=1.1.2
+                          <no-pin> | e.g. Flask
 """
 from __future__ import print_function, absolute_import
 from contextlib import contextmanager
@@ -161,21 +165,21 @@ def filter_line(line):
     return len(line) > 0 and line[0] != "#"
 
 
-def generate_requirements_file(path, imports):
+def generate_requirements_file(path, imports, symbol):
     with _open(path, "w") as out_file:
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
             num=len(imports),
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
-        fmt = '{name}=={version}'
+        fmt = '{name}' + symbol + '{version}'
         out_file.write('\n'.join(
             fmt.format(**item) if item['version'] else '{name}'.format(**item)
             for item in imports) + '\n')
 
 
-def output_requirements(imports):
-    generate_requirements_file('-', imports)
+def output_requirements(imports, symbol):
+    generate_requirements_file('-', imports, symbol)
 
 
 def get_imports_info(
@@ -397,6 +401,18 @@ def clean(file_, imports):
     logging.info("Successfully cleaned up requirements in " + file_)
 
 
+def dynamic_versioning(scheme, imports):
+    """Enables dynamic versioning with <compat>, <gt> or <non-pin> schemes."""
+    if scheme == "no-pin":
+        imports = [{"name": item["name"], "version": ""} for item in imports]
+        symbol = ""
+    elif scheme == "gt":
+        symbol = ">="
+    elif scheme == "compat":
+        symbol = "~="
+    return imports, symbol
+
+
 def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
@@ -457,14 +473,21 @@ def init(args):
                         "use --force to overwrite it")
         return
 
-    if args.get('--no-pin'):
-        imports = [{'name': item["name"], 'version': ''} for item in imports]
+    if args["--mode"]:
+        scheme = args.get("--mode")
+        if scheme in ["compat", "gt", "no-pin"]:
+            imports, symbol = dynamic_versioning(scheme, imports)
+        else:
+            raise ValueError("Invalid argument for mode flag, "
+                             "use 'compat', 'gt' or 'no-pin' instead")
+    else:
+        symbol = "=="
 
     if args["--print"]:
-        output_requirements(imports)
+        output_requirements(imports, symbol)
         logging.info("Successfully output requirements")
     else:
-        generate_requirements_file(path, imports)
+        generate_requirements_file(path, imports, symbol)
         logging.info("Successfully saved requirements file in " + path)
 
 
