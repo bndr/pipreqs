@@ -133,6 +133,7 @@ curses
 curses.ascii
 curses.panel
 curses.textpad
+dataclasses
 datetime
 dbhash
 dbm
