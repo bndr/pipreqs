@@ -209,7 +209,7 @@ def get_imports_info(
 def get_locally_installed_packages(encoding=None):
     packages = {}
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    for path in sys.path:
+    for path in reversed(sys.path):
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
@@ -223,7 +223,11 @@ def get_locally_installed_packages(encoding=None):
                             continue
                         for i_item in package_import:
                             if ((i_item not in ignore) and
-                                    (package[0] not in ignore)):
+                                    (package[0] not in ignore) and
+                                    (
+                                        os.path.isdir(os.path.join(path, i_item)) or
+                                        os.path.isfile(os.path.join(path, i_item + '.py'))
+                                    )):
                                 version = None
                                 if len(package) > 1:
                                     version = package[1].replace(
