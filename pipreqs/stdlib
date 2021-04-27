@@ -370,6 +370,7 @@ robotparser
 runpy
 sched
 ScrolledText
+secrets
 select
 selectors
 sets
