@@ -469,7 +469,7 @@ def init(args):
             and not args["--savepath"]
             and not args["--force"]
             and os.path.exists(path)):
-        logging.warning("Requirements.txt already exists, "
+        logging.warning("requirements.txt already exists, "
                         "use --force to overwrite it")
         return
 
