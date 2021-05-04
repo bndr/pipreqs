@@ -31,10 +31,6 @@ from pyflakes.test.test_imports import Test as TestImports
 # Nose
 from nose.importer import Importer, add_path, remove_path  # loader.py
 
-# see issue #88
-import analytics
-import flask_seasurf
-
 import atexit
 from __future__ import print_function
 from docopt import docopt

@@ -12,13 +12,13 @@ matrix:
       env: TOX_ENV=py34
     - python: 2.7
       env: TOX_ENV=py27
-    - python: pypy3
-      env: TOX_ENV=pypy3
+    - python: pypy
+      env: TOX_ENV=pypy
     - python: 3.6
       env: TOX_ENV=flake8
 
 # Use tox to run tests on Travis-CI to keep one unified method of running tests in any environment
-install:
+install: 
   - pip install coverage coveralls tox
 
 # Command to run tests, e.g. python setup.py test

@@ -1,4 +1,3 @@
-AFQ:pyAFQ
 AG_fft_tools:agpy
 ANSI:pexpect
 Adafruit:Adafruit_Libraries
@@ -14,7 +13,6 @@ Crypto:pycryptodome
 Cryptodome:pycryptodomex
 FSM:pexpect
 FiftyOneDegrees:51degrees_mobile_detector_v3_wrapper
-functional:pyfunctional
 GeoBaseMain:GeoBasesDev
 GeoBases:GeoBasesDev
 Globals:Zope2
@@ -24,7 +22,6 @@ Kittens:astro_kittens
 Levenshtein:python_Levenshtein
 Lifetime:Zope2
 MethodObject:ExtensionClass
-MySQLdb:MySQL-python
 OFS:Zope2
 OpenGL:PyOpenGL
 OpenSSL:pyOpenSSL
@@ -595,7 +592,6 @@ devtools:tg.devtools
 dgis:2gis
 dhtmlparser:pyDHTMLParser
 digitalocean:python_digitalocean
-discord:discord.py
 distribute_setup:ez_setup
 distutils2:Distutils2
 django:Django
@@ -679,7 +675,6 @@ geventwebsocket:gevent_websocket
 gflags:python_gflags
 git:GitPython
 github:PyGithub
-github3:github3.py
 gitpy:git_py
 globusonline:globusonline_transfer_api_client
 google:protobuf
@@ -706,7 +701,7 @@ html:pies2overrides
 htmloutput:nosehtmloutput
 http:pies2overrides
 hvad:django_hvad
-hydra:hydra-core
+krbV:krbv
 i99fix:199Fix
 igraph:python_igraph
 imdb:IMDbPY
@@ -732,7 +727,6 @@ keyczar:python_keyczar
 keyedcache:django_keyedcache
 keystoneclient:python_keystoneclient
 kickstarter:kickstart
-krbv:krbV
 kss:kss.core
 kuyruk:Kuyruk
 langconv:AdvancedLangConv
@@ -804,6 +798,7 @@ msgpack:msgpack_python
 mutations:aino_mutations
 mws:amazon_mws
 mysql:mysql_connector_repackaged
+MySQL-python:MySQLdb
 native_tags:django_native_tags
 ndg:ndg_httpsclient
 nereid:trytond_nereid
@@ -1004,7 +999,6 @@ ruamel:ruamel.base
 s2repoze:pysaml2
 saga:saga_python
 saml2:pysaml2
-samtranslator:aws-sam-translator
 sass:libsass
 sassc:libsass
 sasstests:libsass

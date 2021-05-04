@@ -133,7 +133,6 @@ curses
 curses.ascii
 curses.panel
 curses.textpad
-dataclasses
 datetime
 dbhash
 dbm
@@ -371,7 +370,6 @@ robotparser
 runpy
 sched
 ScrolledText
-secrets
 select
 selectors
 sets
