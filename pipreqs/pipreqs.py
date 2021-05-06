@@ -100,7 +100,7 @@ def get_all_imports(
     raw_imports = set()
     candidates = []
     ignore_errors = False
-    ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv"]
+    ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv", ".venv"]
 
     if extra_ignore_dirs:
         ignore_dirs_parsed = []
@@ -118,9 +118,9 @@ def get_all_imports(
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open_func(file_name, "r", encoding=encoding) as f:
-                contents = f.read()
             try:
+                with open_func(file_name, "r", encoding=encoding) as f:
+                    contents = f.read()
                 tree = ast.parse(contents)
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
