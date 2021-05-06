@@ -26,6 +26,7 @@ Options:
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard
                           output.
+    --poetry              Run poetry to add all requirements to pyproject.toml file
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project
                           imports.
@@ -178,8 +179,28 @@ def output_requirements(imports):
     generate_requirements_file('-', imports)
 
 
-def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+def add_requirements_poetry(imports):
+    """Identifies required imports and runs command to add to poetry.
+
+    Args:
+        imports (list)
+    """
+    packages = [item["name"] for item in imports]
+    # Run all commands even if one fails
+    poetry_command = "".join(["poetry add {pkg}; ".format(pkg) for pkg in packages])
+    # Remove extra lingering ; from end of command
+    poetry_command_cleaned = poetry_command[:-2]
+    logging.info("Running '%s'", poetry_command_cleaned)
+    if os.path.exists("pyproject.toml"):
+        os.system(poetry_command_cleaned)
+    else:
+        # Install poetry and create pyproject.toml file if needed
+        os.system("pip install poetry -q")
+        os.system("poetry init -n -q")
+        os.system(poetry_command_cleaned)
+
+
+def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
 
     for item in imports:
@@ -442,12 +463,16 @@ def init(args):
         clean(args["--clean"], imports)
         return
 
-    if (not args["--print"]
-            and not args["--savepath"]
-            and not args["--force"]
-            and os.path.exists(path)):
-        logging.warning("Requirements.txt already exists, "
-                        "use --force to overwrite it")
+    if (
+        not args["--print"]
+        and not args["--poetry"]
+        and not args["--savepath"]
+        and not args["--force"]
+        and os.path.exists(path)
+    ):
+        logging.warning(
+            "Requirements.txt already exists, " "use --force to overwrite it"
+        )
         return
 
     if args.get('--no-pin'):
@@ -456,6 +481,9 @@ def init(args):
     if args["--print"]:
         output_requirements(imports)
         logging.info("Successfully output requirements")
+    elif args["--poetry"]:
+        add_requirements_poetry(imports)
+        logging.info("Successfully installed via poetry")
     else:
         generate_requirements_file(path, imports)
         logging.info("Successfully saved requirements file in " + path)
