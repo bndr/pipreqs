@@ -352,17 +352,26 @@ def compare_modules(file_, imports):
     imports = [imports[i]["name"] for i in range(len(imports))]
     modules = [modules[i]["name"] for i in range(len(modules))]
     modules_not_imported = set(modules) - set(imports)
-
-    return modules_not_imported
+    modules_not_declared = set(imports) - set(modules)
+    return modules_not_imported, modules_not_declared
 
 
 def diff(file_, imports):
     """Display the difference between modules in a file and imported modules."""  # NOQA
-    modules_not_imported = compare_modules(file_, imports)
+    modules_not_imported, modules_not_declared = compare_modules(file_, imports)
+    if modules_not_imported:
+        logging.info(
+            "The following modules are in {} but do not seem to be imported: \n"
+            "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+    else:
+        logging.info("No module is in {} but do not seem to be imported.".format(file_))
 
-    logging.info(
-        "The following modules are in {} but do not seem to be imported: "
-        "{}".format(file_, ", ".join(x for x in modules_not_imported)))
+    if modules_not_declared:
+        logging.info(
+            "The following modules are not in {} but seem to be imported: \n"
+            "{}".format(file_, ", ".join(x for x in modules_not_declared)))
+    else:
+        logging.info("No module is not in {} but seem to be imported:.".format(file_))
 
 
 def clean(file_, imports):

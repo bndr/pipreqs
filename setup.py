@@ -21,7 +21,7 @@ requirements = [
 ]
 
 setup(
-    name='pipreqs',
+    name='pipreqs-spenly',
     version=__version__,
     description='Pip requirements.txt generator based on imports in project',
     long_description=readme + '\n\n' + history,

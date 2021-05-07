@@ -3,6 +3,11 @@
 History
 -------
 
+0.4.9 (2018-03-14)
+--------------------
+
+* Add to show imported but not declared requirements for '--diff'  (spenly)
+
 0.4.8 (2017-06-30)
 --------------------
 
