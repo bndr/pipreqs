@@ -42,10 +42,7 @@ import logging
 import codecs
 import ast
 import traceback
-from docopt import docopt
 import requests
-from yarg import json2package
-from yarg.exceptions import HTTPError
 
 from pipreqs import __version__
 
@@ -180,6 +177,10 @@ def output_requirements(imports):
 
 def get_imports_info(
         imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+
+    from yarg import json2package
+    from yarg.exceptions import HTTPError
+
     result = []
 
     for item in imports:
@@ -462,6 +463,8 @@ def init(args):
 
 
 def main():  # pragma: no cover
+    from docopt import docopt
+
     args = docopt(__doc__, version=__version__)
     log_level = logging.DEBUG if args['--debug'] else logging.INFO
     logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s')
