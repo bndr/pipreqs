@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
@@ -37,13 +36,11 @@ Options:
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
 """
-from __future__ import print_function, absolute_import
 from contextlib import contextmanager
 import os
 import sys
 import re
 import logging
-import codecs
 import ast
 import traceback
 from docopt import docopt
@@ -57,14 +54,6 @@ REGEXP = [
     re.compile(r'^import (.+)$'),
     re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
-
-if sys.version_info[0] > 2:
-    open_func = open
-    py2 = False
-else:
-    open_func = codecs.open
-    py2 = True
-    py2_exclude = ["concurrent", "concurrent.futures"]
 
 
 @contextmanager
@@ -122,7 +111,7 @@ def get_all_imports(
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open_func(file_name, "r", encoding=encoding) as f:
+            with open(file_name, "r", encoding=encoding) as f:
                 contents = f.read()
             try:
                 tree = ast.parse(contents)
@@ -157,7 +146,6 @@ def get_all_imports(
     with open(join("stdlib"), "r") as f:
         data = {x.strip() for x in f}
 
-    data = {x for x in data if x not in py2_exclude} if py2 else data
     return list(packages - data)
 
 
@@ -214,7 +202,7 @@ def get_locally_installed_packages(encoding=None):
             for item in files:
                 if "top_level" in item:
                     item = os.path.join(root, item)
-                    with open_func(item, "r", encoding=encoding) as f:
+                    with open(item, "r", encoding=encoding) as f:
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
@@ -309,7 +297,7 @@ def parse_requirements(file_):
     delim = ["<", ">", "=", "!", "~"]
 
     try:
-        f = open_func(file_, "r")
+        f = open(file_, "r")
     except OSError:
         logging.error("Failed on file: {}".format(file_))
         raise
@@ -381,7 +369,7 @@ def clean(file_, imports):
     to_write = []
 
     try:
-        f = open_func(file_, "r+")
+        f = open(file_, "r+")
     except OSError:
         logging.error("Failed on file: {}".format(file_))
         raise
