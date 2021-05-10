@@ -18,18 +18,18 @@ Options:
                           parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
-    --debug               Print debug information.
-    --ignore <dirs>...    Ignore extra directories, each separated by a comma.
+    --debug               Print debug information
+    --ignore <dirs>...    Ignore extra directories, each separated by a comma
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard
-                          output.
+                          output
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project
-                          imports.
+                          imports
     --clean <file>        Clean up requirements.txt by removing modules
-                          that are not imported in project.
+                          that are not imported in project
     --mode <scheme>       Enables dynamic versioning with <compat>,
                           <gt> or <non-pin> schemes.
                           <compat> | e.g. Flask~=1.1.2
