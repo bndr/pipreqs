@@ -19,7 +19,8 @@ Options:
                           parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
-    --trusted-host        Ignore SSL warnings, recommended using with enterprise proxy.
+    --trusted-host        Ignore SSL warnings, recommended using with
+                          enterprise proxy.
     --debug               Print debug information.
     --ignore <dirs>...    Ignore extra directories, each separated by a comma.
     --no-follow-links     Do not follow symbolic links in the project
@@ -182,13 +183,15 @@ def output_requirements(imports):
 
 
 def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None, verify_ssl=True):
+        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None,
+        verify_ssl=True):
     result = []
 
     for item in imports:
         try:
             response = requests.get(
-                "{0}{1}/json".format(pypi_server, item), proxies=proxy, verify=verify_ssl)
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy,
+                verify=verify_ssl)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
