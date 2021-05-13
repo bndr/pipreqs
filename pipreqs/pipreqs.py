@@ -161,8 +161,8 @@ def get_all_imports(
     return list(packages - data)
 
 
-def filter_line(l):
-    return len(l) > 0 and l[0] != "#"
+def filter_line(line):
+    return len(line) > 0 and line[0] != "#"
 
 
 def generate_requirements_file(path, imports):
