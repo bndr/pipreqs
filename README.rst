@@ -41,6 +41,8 @@ Usage
                               environments parameter in your terminal:
                               $ export HTTP_PROXY="http://10.10.1.10:3128"
                               $ export HTTPS_PROXY="https://10.10.1.10:1080"
+        --trusted-host        Ignore SSL warnings, recommended using with
+                              enterprise proxy.
         --debug               Print debug information
         --ignore <dirs>...    Ignore extra directories
         --encoding <charset>  Use encoding parameter for file open
