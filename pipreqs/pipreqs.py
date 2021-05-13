@@ -19,6 +19,7 @@ Options:
                           parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
+    --trusted-host        Ignore SSL warnings, recommended using with enterprise proxy.
     --debug               Print debug information.
     --ignore <dirs>...    Ignore extra directories, each separated by a comma.
     --no-follow-links     Do not follow symbolic links in the project
