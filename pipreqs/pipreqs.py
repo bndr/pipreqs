@@ -47,6 +47,8 @@ from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
+from urllib3 import disable_warnings
+from urllib3.exceptions import InsecureRequestWarning
 
 from pipreqs import __version__
 
@@ -180,13 +182,13 @@ def output_requirements(imports):
 
 
 def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None, verify_ssl=True):
     result = []
 
     for item in imports:
         try:
             response = requests.get(
-                "{0}{1}/json".format(pypi_server, item), proxies=proxy)
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy, verify=verify_ssl)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
@@ -397,12 +399,16 @@ def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
     follow_links = not args.get('--no-follow-links')
+    verify_ssl = not args.get('--trusted-host')
     input_path = args['<path>']
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
+
+    if not verify_ssl:
+        disable_warnings(InsecureRequestWarning)
 
     candidates = get_all_imports(input_path,
                                  encoding=encoding,
@@ -430,7 +436,8 @@ def init(args):
                       if x.lower() not in [z['name'].lower() for z in local]]
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
-                                           pypi_server=pypi_server)
+                                           pypi_server=pypi_server,
+                                           verify_ssl=verify_ssl)
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
