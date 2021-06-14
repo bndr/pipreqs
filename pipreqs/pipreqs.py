@@ -171,7 +171,8 @@ def generate_requirements_file(path, imports):
         fmt = '{name}=={version}'
         out_file.write('\n'.join(
             fmt.format(**item) if item['version'] else '{name}'.format(**item)
-            for item in sorted(imports, key=lambda x: x['name'].lower())) + '\n')
+            for item in sorted(imports, key=lambda x: x['name'].lower()))
+            + '\n')
 
 
 def output_requirements(imports):
