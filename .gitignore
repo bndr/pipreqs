@@ -53,3 +53,4 @@ Session.vim
 *~
 
 /pipreqs/*.bak
+.vscode/
