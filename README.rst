@@ -10,9 +10,8 @@
         :target: https://pypi.python.org/pypi/pipreqs
 
 
-.. image:: https://img.shields.io/coveralls/bndr/pipreqs.svg
-        :target: https://coveralls.io/r/bndr/pipreqs
-
+.. image:: https://codecov.io/gh/bndr/pipreqs/branch/master/graph/badge.svg?token=0rfPfUZEAX
+        :target: https://codecov.io/gh/bndr/pipreqs
 
 .. image:: https://img.shields.io/pypi/l/pipreqs.svg
         :target: https://pypi.python.org/pypi/pipreqs
