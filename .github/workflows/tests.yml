@@ -1,0 +1,50 @@
+name: Tests and Codecov
+on: pull_request
+jobs:
+    run_tests:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: [3.6, 3.7, 3.8, 3.9, pypy-3.7]
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python-version }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python-version }}
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install tox tox-gh-actions
+
+            - name: Test with tox
+              run: tox
+
+    coverage_report:
+        needs: run_tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install coverage docopt yarg requests
+
+            - name: Calculate coverage
+              run: coverage run --source=pipreqs -m unittest discover
+
+            - name: Create XML report
+              run: coverage xml
+
+            - name: Upload coverage to Codecov
+              uses: codecov/codecov-action@v2
+              with:
+                  files: coverage.xml
+                  fail_ci_if_error: true
