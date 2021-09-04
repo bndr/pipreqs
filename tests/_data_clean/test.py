@@ -50,7 +50,7 @@ import nonexistendmodule
 import boto as b, peewee as p
 # import django
 import flask.ext.somext  # # #
-from sqlalchemy import model
+# from sqlalchemy import model
 try:
     import ujson as json
 except ImportError:

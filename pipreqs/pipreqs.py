@@ -31,7 +31,11 @@ Options:
                           imports.
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project.
-    --no-pin              Omit version of output packages.
+    --mode <scheme>       Enables dynamic versioning with <compat>,
+                          <gt> or <non-pin> schemes.
+                          <compat> | e.g. Flask~=1.1.2
+                          <gt>     | e.g. Flask>=1.1.2
+                          <no-pin> | e.g. Flask
 """
 from __future__ import print_function, absolute_import
 from contextlib import contextmanager
@@ -157,25 +161,25 @@ def get_all_imports(
     return list(packages - data)
 
 
-def filter_line(l):
-    return len(l) > 0 and l[0] != "#"
+def filter_line(line):
+    return len(line) > 0 and line[0] != "#"
 
 
-def generate_requirements_file(path, imports):
+def generate_requirements_file(path, imports, symbol):
     with _open(path, "w") as out_file:
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
             num=len(imports),
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
-        fmt = '{name}=={version}'
+        fmt = '{name}' + symbol + '{version}'
         out_file.write('\n'.join(
             fmt.format(**item) if item['version'] else '{name}'.format(**item)
             for item in imports) + '\n')
 
 
-def output_requirements(imports):
-    generate_requirements_file('-', imports)
+def output_requirements(imports, symbol):
+    generate_requirements_file('-', imports, symbol)
 
 
 def get_imports_info(
@@ -368,6 +372,11 @@ def diff(file_, imports):
 def clean(file_, imports):
     """Remove modules that aren't imported in project from file."""
     modules_not_imported = compare_modules(file_, imports)
+
+    if len(modules_not_imported) == 0:
+        logging.info("Nothing to clean in " + file_)
+        return
+
     re_remove = re.compile("|".join(modules_not_imported))
     to_write = []
 
@@ -390,6 +399,18 @@ def clean(file_, imports):
             f.close()
 
     logging.info("Successfully cleaned up requirements in " + file_)
+
+
+def dynamic_versioning(scheme, imports):
+    """Enables dynamic versioning with <compat>, <gt> or <non-pin> schemes."""
+    if scheme == "no-pin":
+        imports = [{"name": item["name"], "version": ""} for item in imports]
+        symbol = ""
+    elif scheme == "gt":
+        symbol = ">="
+    elif scheme == "compat":
+        symbol = "~="
+    return imports, symbol
 
 
 def init(args):
@@ -430,6 +451,8 @@ def init(args):
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
                                            pypi_server=pypi_server)
+    # sort imports based on lowercase name of package, similar to `pip freeze`.
+    imports = sorted(imports, key=lambda x: x['name'].lower())
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
@@ -446,18 +469,25 @@ def init(args):
             and not args["--savepath"]
             and not args["--force"]
             and os.path.exists(path)):
-        logging.warning("Requirements.txt already exists, "
+        logging.warning("requirements.txt already exists, "
                         "use --force to overwrite it")
         return
 
-    if args.get('--no-pin'):
-        imports = [{'name': item["name"], 'version': ''} for item in imports]
+    if args["--mode"]:
+        scheme = args.get("--mode")
+        if scheme in ["compat", "gt", "no-pin"]:
+            imports, symbol = dynamic_versioning(scheme, imports)
+        else:
+            raise ValueError("Invalid argument for mode flag, "
+                             "use 'compat', 'gt' or 'no-pin' instead")
+    else:
+        symbol = "=="
 
     if args["--print"]:
-        output_requirements(imports)
+        output_requirements(imports, symbol)
         logging.info("Successfully output requirements")
     else:
-        generate_requirements_file(path, imports)
+        generate_requirements_file(path, imports, symbol)
         logging.info("Successfully saved requirements file in " + path)
 
 
