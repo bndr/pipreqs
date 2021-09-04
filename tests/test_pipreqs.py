@@ -212,7 +212,10 @@ class TestPipreqs(unittest.TestCase):
                       '--mode': None
              }
         )
-        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
+        with open(
+                os.path.join(
+                    self.project_with_ignore_directory, "requirements.txt"
+                ), "r") as f:
             data = f.read().lower()
             for item in ['click', 'getpass']:
                 self.assertFalse(item.lower() in data)
