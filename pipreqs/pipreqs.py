@@ -333,7 +333,7 @@ def compare_modules(file_, imports):
 
     Args:
         file_ (str): File to parse for modules to be compared.
-        imports (tuple): Modules being imported in the project.
+        imports (tuple): Modules being imported in the project.htrttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
 
     Returns:
         tuple: The modules not imported in the project, but do exist in the

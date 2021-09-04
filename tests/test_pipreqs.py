@@ -145,7 +145,7 @@ class TestPipreqs(unittest.TestCase):
         Test that we can save requirements.txt correctly
         to a different path
         """
-        pipreqs.init({'<path>': self.project, '--savepath': self.alt_requirement_path, 
+        pipreqs.init({'<path>': self.project, '--savepath': self.alt_requirement_path,
                       '--use-local': None, '--proxy':None, '--pypi-server':None,  '--print': False,
                       '--diff': None, '--clean': None, '--mode': None})
         assert os.path.exists(self.alt_requirement_path) == 1
@@ -163,7 +163,7 @@ class TestPipreqs(unittest.TestCase):
         """
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
-        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None, 
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None,
                       '--force': None, '--proxy':None, '--pypi-server':None, '--print': False,
                       '--diff': None, '--clean': None, '--mode': None})
         assert os.path.exists(self.requirements_path) == 1
@@ -203,7 +203,7 @@ class TestPipreqs(unittest.TestCase):
         Test --ignore parameter
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, 
+            {'<path>': self.project_with_ignore_directory, '--savepath': None,
                       '--print': False, '--use-local': None, '--force': True,
                       '--proxy':None, '--pypi-server':None,
                       '--ignore':'.ignored_dir,.ignore_second',
@@ -222,7 +222,7 @@ class TestPipreqs(unittest.TestCase):
         Test --mode=no-pin
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, 
+            {'<path>': self.project_with_ignore_directory, '--savepath': None,
              '--print': False, '--use-local': None, '--force': True,
              '--proxy': None, '--pypi-server': None,
              '--diff': None,
@@ -235,92 +235,7 @@ class TestPipreqs(unittest.TestCase):
             for item in ['beautifulsoup4', 'boto']:
                 self.assertTrue(item.lower() in data)
 
-    def test_dynamic_version_gt_scheme(self):
-        """
-        Test --mode=gt
-        """
-        pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True,
-             '--proxy': None,
-             '--pypi-server': None,
-             '--diff': None,
-             '--clean': None,
-             '--mode': 'gt'
-             }
-        )
-        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
-            data = f.readlines()
-            for item in data:
-                symbol = '>='
-                message = 'symbol is not in item'
-                self.assertIn(symbol, item, message)
 
-    def test_dynamic_version_compat_scheme(self):
-        """
-        Test --mode=compat
-        """
-        pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True,
-             '--proxy': None,
-             '--pypi-server': None,
-             '--diff': None,
-             '--clean': None,
-             '--mode': 'compat'
-             }
-        )
-        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
-            data = f.readlines()
-            for item in data:
-                symbol = '~='
-                message = 'symbol is not in item'
-                self.assertIn(symbol, item, message)
-
-    def test_clean(self):
-        """
-        Test --clean parameter
-        """
-        pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True, '--proxy': None,
-             '--pypi-server': None, '--diff': None, '--clean': None,
-             '--mode': None}
-            )
-        assert os.path.exists(self.requirements_path) == 1
-        pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--print': False,
-            '--use-local': None, '--force': None, '--proxy': None,
-            '--pypi-server': None, '--diff': None,
-            '--clean': self.requirements_path, '--mode': 'non-pin'}
-            )
-        with open(self.requirements_path, "r") as f:
-            data = f.read().lower()
-            for item in self.modules[:-3]:
-                self.assertTrue(item.lower() in data)
-
-    def test_clean_with_imports_to_clean(self):
-        """
-        Test --clean parameter when there are imports to clean
-        """
-        cleaned_module = 'sqlalchemy'
-        pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--print': False,
-            '--use-local': None, '--force': True, '--proxy': None,
-            '--pypi-server': None, '--diff': None, '--clean': None,
-            '--mode': None}
-            )
-        assert os.path.exists(self.requirements_path) == 1
-        modules_clean = [m for m in self.modules if m != cleaned_module]
-        pipreqs.init(
-            {'<path>': self.project_clean, '--savepath': None,
-            '--print': False, '--use-local': None, '--force': None,
-            '--proxy': None, '--pypi-server': None, '--diff': None,
-            '--clean': self.requirements_path, '--mode': 'non-pin'}
-            )
-        with open(self.requirements_path, "r") as f:
-            data = f.read().lower()
-            self.assertTrue(cleaned_module not in data)
 
     def tearDown(self):
         """
