@@ -31,25 +31,24 @@ from IPython.utils.importstring import import_item  # noqa:F401  # Many files
 from pyflakes.test.test_imports import Test as TestImports  # noqa:F401
 
 # Nose
-from nose.importer import Importer, add_path, remove_path  # loader.py
+from nose.importer import Importer, add_path, remove_path  # noqa:F401, E501  # loader.py
 
 # see issue #88
-import analytics
-import flask_seasurf
+import analytics  # noqa:F401
+import flask_seasurf  # noqa:F401
 
-import atexit
-from __future__ import print_function
-from docopt import docopt
-import curses, logging, sqlite3
-import logging
-import os
-import sqlite3
-import time
-import sys
-import signal
-import bs4
-import nonexistendmodule
-import boto as b, peewee as p
+import atexit  # noqa:F401
+from docopt import docopt  # noqa:F401
+import curses, logging, sqlite3  # noqa:F401, E401
+import logging  # noqa:F401, F811
+import os  # noqa:F401
+import sqlite3  # noqa:F401, F811
+import time  # noqa:F401
+import sys  # noqa:F401
+import signal  # noqa:F401
+import bs4  # noqa:F401
+import nonexistendmodule  # noqa:F401
+import boto as b, peewee as p  # noqa:F401, E401
 # import django
 import flask.ext.somext  # noqa:F401  # # #
 from sqlalchemy import model  # noqa:F401
