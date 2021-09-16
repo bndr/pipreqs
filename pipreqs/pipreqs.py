@@ -114,7 +114,7 @@ def get_all_imports(
             with open(file_name, "r", encoding=encoding) as f:
                 contents = f.read()
             try:
-                tree = ast.parse(contents)
+                tree = ast.parse(contents, filename=file_name)
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
                         for subnode in node.names:
