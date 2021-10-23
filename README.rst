@@ -1,6 +1,6 @@
-===============================
+=============================================================================
 ``pipreqs`` - Generate requirements.txt file for any project based on imports
-===============================
+=============================================================================
 
 .. image:: https://img.shields.io/travis/bndr/pipreqs.svg
         :target: https://travis-ci.org/bndr/pipreqs
@@ -57,6 +57,7 @@ Usage
                               <compat> | e.g. Flask~=1.1.2
                               <gt>     | e.g. Flask>=1.1.2
                               <no-pin> | e.g. Flask
+
 Example
 -------
 
