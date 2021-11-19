@@ -20,6 +20,7 @@ Options:
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
+    --ignore-errors       Ignore errors when parsing single .py file
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
@@ -88,11 +89,10 @@ def _open(filename=None, mode='r'):
 
 
 def get_all_imports(
-        path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+        path, encoding=None, extra_ignore_dirs=None, follow_links=True, ignore_errors=False):
     imports = set()
     raw_imports = set()
     candidates = []
-    ignore_errors = False
     ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv"]
 
     if extra_ignore_dirs:
@@ -111,9 +111,9 @@ def get_all_imports(
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open(file_name, "r", encoding=encoding) as f:
-                contents = f.read()
             try:
+                with open(file_name, "r", encoding=encoding) as f:
+                    contents = f.read()
                 tree = ast.parse(contents)
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
@@ -415,7 +415,8 @@ def init(args):
     candidates = get_all_imports(input_path,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs,
-                                 follow_links=follow_links)
+                                 follow_links=follow_links,
+                                 ignore_errors=args["--ignore-errors"])
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
