@@ -57,7 +57,7 @@ REGEXP = [
 
 
 @contextmanager
-def _open(filename=None, mode='r'):
+def _open(filename=None, mode='r', encoding="utf8"):
     """Open a file or ``sys.stdout`` depending on the provided filename.
 
     Args:
@@ -78,7 +78,7 @@ def _open(filename=None, mode='r'):
         else:
             raise ValueError('Invalid mode for file: {}'.format(mode))
     else:
-        file = open(filename, mode)
+        file = open(filename, mode, encoding)
 
     try:
         yield file
