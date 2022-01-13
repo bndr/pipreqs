@@ -1,3 +1,4 @@
 wheel==0.23.0
 Yarg==0.1.9
+# required only for the cli
 docopt==0.6.2
