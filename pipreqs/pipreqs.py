@@ -194,10 +194,10 @@ def get_imports_info(
     return result
 
 
-def get_locally_installed_packages(encoding=None):
+def get_locally_installed_packages(search_path, encoding=None):
     packages = {}
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    for path in sys.path:
+    for path in search_path:
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
@@ -224,8 +224,8 @@ def get_locally_installed_packages(encoding=None):
     return packages
 
 
-def get_import_local(imports, encoding=None):
-    local = get_locally_installed_packages()
+def get_import_local(search_path, imports, encoding=None):
+    local = get_locally_installed_packages(search_path)
     result = []
     for item in imports:
         if item.lower() in local:
@@ -408,6 +408,11 @@ def init(args):
     input_path = args['<path>']
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
+        search_path = sys.path
+    else:
+        search_path = sys.path
+        search_path.remove(os.path.abspath(os.curdir))
+        search_path.append(os.path.abspath(input_path))
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
@@ -429,10 +434,10 @@ def init(args):
     if args["--use-local"]:
         logging.debug(
             "Getting package information ONLY from local installation.")
-        imports = get_import_local(candidates, encoding=encoding)
+        imports = get_import_local(search_path, candidates, encoding=encoding)
     else:
         logging.debug("Getting packages information from Local/PyPI")
-        local = get_import_local(candidates, encoding=encoding)
+        local = get_import_local(search_path, candidates, encoding=encoding)
         # Get packages that were not found locally
         difference = [x for x in candidates
                       if x.lower() not in [z['name'].lower() for z in local]]
