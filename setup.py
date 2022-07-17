@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 
 try:
     from setuptools import setup
@@ -34,7 +32,7 @@ setup(
     package_dir={'pipreqs':
                  'pipreqs'},
     include_package_data=True,
-    package_data={'': ['stdlib','mapping']},
+    package_data={'': ['stdlib', 'mapping']},
     install_requires=requirements,
     license='Apache License',
     zip_safe=False,
@@ -44,12 +42,11 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     test_suite='tests',
     entry_points={

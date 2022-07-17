@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """pipreqs - Generate pip requirements.txt file based on imports
 
 Usage:
@@ -19,27 +18,29 @@ Options:
                           parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
-    --debug               Print debug information.
-    --ignore <dirs>...    Ignore extra directories, each separated by a comma.
+    --debug               Print debug information
+    --ignore <dirs>...    Ignore extra directories, each separated by a comma
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard
-                          output.
+                          output
     --force               Overwrite existing requirements.txt
     --diff <file>         Compare modules in requirements.txt to project
-                          imports.
+                          imports
     --clean <file>        Clean up requirements.txt by removing modules
-                          that are not imported in project.
-    --no-pin              Omit version of output packages.
+                          that are not imported in project
+    --mode <scheme>       Enables dynamic versioning with <compat>,
+                          <gt> or <non-pin> schemes.
+                          <compat> | e.g. Flask~=1.1.2
+                          <gt>     | e.g. Flask>=1.1.2
+                          <no-pin> | e.g. Flask
 """
-from __future__ import print_function, absolute_import
 from contextlib import contextmanager
 import os
 import sys
 import re
 import logging
-import codecs
 import ast
 import traceback
 from docopt import docopt
@@ -54,14 +55,6 @@ REGEXP = [
     re.compile(r'^import (.+)$'),
     re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
-
-if sys.version_info[0] > 2:
-    open_func = open
-    py2 = False
-else:
-    open_func = codecs.open
-    py2 = True
-    py2_exclude = ["concurrent", "concurrent.futures"]
 
 
 @contextmanager
@@ -126,7 +119,7 @@ def get_all_imports(
             file_name = os.path.join(root, file_name)
             contents = ''
             if filter_ext(file_name, [".py"]):
-                with open_func(file_name, "r", encoding=encoding) as f:
+                with open(file_name, "r", encoding=encoding) as f:
                     contents = f.read()
             elif filter_ext(file_name, [".ipynb"]):
                 contents = ipynb_2_py(file_name, encoding=encoding)
@@ -167,7 +160,6 @@ def get_all_imports(
     with open(join("stdlib"), "r") as f:
         data = {x.strip() for x in f}
 
-    data = {x for x in data if x not in py2_exclude} if py2 else data
     return list(packages - data)
 
 
@@ -184,7 +176,7 @@ def ipynb_2_py(file_name, encoding=None):
 
     Args:
         file_name (str): notebook file path to parse as python script
-        encoding  (str): encoding of file
+        encoding  (str): file encoding
 
     Returns:
         str: parsed string
@@ -196,22 +188,21 @@ def ipynb_2_py(file_name, encoding=None):
 
     return body.encode(encoding if encoding is not None else "utf-8")
 
-
-def generate_requirements_file(path, imports):
+def generate_requirements_file(path, imports, symbol):
     with _open(path, "w") as out_file:
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
             num=len(imports),
             file=path,
             imports=", ".join([x['name'] for x in imports])
         ))
-        fmt = '{name}=={version}'
+        fmt = '{name}' + symbol + '{version}'
         out_file.write('\n'.join(
             fmt.format(**item) if item['version'] else '{name}'.format(**item)
             for item in imports) + '\n')
 
 
-def output_requirements(imports):
-    generate_requirements_file('-', imports)
+def output_requirements(imports, symbol):
+    generate_requirements_file('-', imports, symbol)
 
 
 def get_imports_info(
@@ -246,7 +237,7 @@ def get_locally_installed_packages(encoding=None):
             for item in files:
                 if "top_level" in item:
                     item = os.path.join(root, item)
-                    with open_func(item, "r", encoding=encoding) as f:
+                    with open(item, "r", encoding=encoding) as f:
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
@@ -341,7 +332,7 @@ def parse_requirements(file_):
     delim = ["<", ">", "=", "!", "~"]
 
     try:
-        f = open_func(file_, "r")
+        f = open(file_, "r")
     except OSError:
         logging.error("Failed on file: {}".format(file_))
         raise
@@ -404,11 +395,16 @@ def diff(file_, imports):
 def clean(file_, imports):
     """Remove modules that aren't imported in project from file."""
     modules_not_imported = compare_modules(file_, imports)
+
+    if len(modules_not_imported) == 0:
+        logging.info("Nothing to clean in " + file_)
+        return
+
     re_remove = re.compile("|".join(modules_not_imported))
     to_write = []
 
     try:
-        f = open_func(file_, "r+")
+        f = open(file_, "r+")
     except OSError:
         logging.error("Failed on file: {}".format(file_))
         raise
@@ -426,6 +422,18 @@ def clean(file_, imports):
             f.close()
 
     logging.info("Successfully cleaned up requirements in " + file_)
+
+
+def dynamic_versioning(scheme, imports):
+    """Enables dynamic versioning with <compat>, <gt> or <non-pin> schemes."""
+    if scheme == "no-pin":
+        imports = [{"name": item["name"], "version": ""} for item in imports]
+        symbol = ""
+    elif scheme == "gt":
+        symbol = ">="
+    elif scheme == "compat":
+        symbol = "~="
+    return imports, symbol
 
 
 def init(args):
@@ -466,6 +474,8 @@ def init(args):
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
                                            pypi_server=pypi_server)
+    # sort imports based on lowercase name of package, similar to `pip freeze`.
+    imports = sorted(imports, key=lambda x: x['name'].lower())
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
@@ -482,18 +492,25 @@ def init(args):
             and not args["--savepath"]
             and not args["--force"]
             and os.path.exists(path)):
-        logging.warning("Requirements.txt already exists, "
+        logging.warning("requirements.txt already exists, "
                         "use --force to overwrite it")
         return
 
-    if args.get('--no-pin'):
-        imports = [{'name': item["name"], 'version': ''} for item in imports]
+    if args["--mode"]:
+        scheme = args.get("--mode")
+        if scheme in ["compat", "gt", "no-pin"]:
+            imports, symbol = dynamic_versioning(scheme, imports)
+        else:
+            raise ValueError("Invalid argument for mode flag, "
+                             "use 'compat', 'gt' or 'no-pin' instead")
+    else:
+        symbol = "=="
 
     if args["--print"]:
-        output_requirements(imports)
+        output_requirements(imports, symbol)
         logging.info("Successfully output requirements")
     else:
-        generate_requirements_file(path, imports)
+        generate_requirements_file(path, imports, symbol)
         logging.info("Successfully saved requirements file in " + path)
 
 
