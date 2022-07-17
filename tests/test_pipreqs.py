@@ -49,20 +49,20 @@ class TestPipreqs(unittest.TestCase):
             "requirements2.txt"
             )
         self.project_with_notebooks = os.path.join(
-            os.path.dirname(__file__), 
+            os.path.dirname(__file__),
             "_data_notebook"
             )
         self.project_with_invalid_notebooks = os.path.join(
-            os.path.dirname(__file__), 
+            os.path.dirname(__file__),
             "_invalid_data_notebook"
             )
-        self.compatible_files_path = {
+        self.compatible_files = {
             "original": os.path.join(
-                os.path.dirname(__file__), 
+                os.path.dirname(__file__),
                 "_data/test.py"
             ),
             "notebook": os.path.join(
-                os.path.dirname(__file__), 
+                os.path.dirname(__file__),
                 "_data_notebook/test.ipynb"
             )}
 
@@ -374,12 +374,12 @@ class TestPipreqs(unittest.TestCase):
         """
         Test the function ipynb_2_py() which converts .ipynb file to .py format
         """
-        expected = pipreqs.get_all_imports(self.compatible_files_path["original"])
-        parsed = pipreqs.get_all_imports(self.compatible_files_path["notebook"])
+        expected = pipreqs.get_all_imports(self.compatible_files["original"])
+        parsed = pipreqs.get_all_imports(self.compatible_files["notebook"])
         self.assertEqual(expected, parsed)
 
         parsed = pipreqs.get_all_imports(
-            self.compatible_files_path["notebook"],
+            self.compatible_files["notebook"],
             encoding="utf-8"
             )
         self.assertEqual(expected, parsed)

@@ -1,5 +1,4 @@
 wheel==0.23.0
 Yarg==0.1.9
 docopt==0.6.2
-nbconvert==5.4.1
-ipython==5.4.1
+nbconvert==6.0.7
