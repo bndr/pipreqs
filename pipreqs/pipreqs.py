@@ -180,7 +180,7 @@ def get_imports_info(
                 "{0}{1}/json".format(pypi_server, item), proxies=proxy)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
-                    data = json2package(response.content.decode())
+                    data = json2package(response.content.decode(response.apparent_encoding))
                 else:
                     data = json2package(response.content)
             elif response.status_code >= 300:
