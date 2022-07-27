@@ -189,7 +189,7 @@ def get_imports_info(
                         except:
                             logging.error(f"Failed to decode response from {item} pypi query.")
                             raise
-                    data = json2package(response.content.decode(response.apparent_encoding))
+                    data = json2package(content_decode)
                 else:
                     data = json2package(response.content)
             elif response.status_code >= 300:
