@@ -105,6 +105,11 @@ def get_all_imports(
     for root, dirs, files in walk:
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
+        ipynb_files = [fn for fn in files if os.path.splitext(fn)[1] == ".ipynb"]
+
+        for ipynb_file in ipynb_files:
+            os.system("ipython nbconvert --to script " + str(ipynb_file))
+
         candidates.append(os.path.basename(root))
         files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
 
@@ -129,6 +134,11 @@ def get_all_imports(
                 else:
                     logging.error("Failed on file: %s" % file_name)
                     raise exc
+
+    # Clean up created .py files from .ipynb files
+
+    for ipynb_file in ipynb_files:
+        os.remove(ipynb_file.replace("ipynb", "py"))
 
     # Clean up imports
     for name in [n for n in raw_imports if n]:
