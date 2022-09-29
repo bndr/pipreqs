@@ -111,7 +111,7 @@ def get_all_imports(
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open(file_name, "r", encoding=encoding) as f:
+            with open(file_name, "r", encoding='UTF-8') as f:
                 contents = f.read()
             try:
                 tree = ast.parse(contents)
