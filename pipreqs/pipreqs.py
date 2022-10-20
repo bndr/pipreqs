@@ -111,7 +111,7 @@ def get_all_imports(
         candidates += [os.path.splitext(fn)[0] for fn in files]
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open(file_name, "r", encoding=encoding, errors='ignore') as f:
+            with open(file_name, "r", encoding=encoding, errors="ignore") as f:
                 contents = f.read()
             try:
                 tree = ast.parse(contents)
@@ -202,7 +202,7 @@ def get_locally_installed_packages(encoding=None):
             for item in files:
                 if "top_level" in item:
                     item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
+                    with open(item, "r", encoding=encoding, errors="ignore") as f:
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
