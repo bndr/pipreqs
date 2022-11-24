@@ -124,7 +124,7 @@ def get_all_imports(
             except Exception as exc:
                 if ignore_errors:
                     traceback.print_exc(exc)
-                    logging.warn("Failed on file: %s" % file_name)
+                    logging.warning("Failed on file: %s" % file_name)
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
@@ -206,7 +206,7 @@ def get_locally_installed_packages(encoding=None):
                         package = root.split(os.sep)[-1].split("-")
                         try:
                             package_import = f.read().strip().split("\n")
-                        except:  # NOQA
+                        except Exception:  # NOQA
                             # TODO: What errors do we intend to suppress here?
                             continue
                         for i_item in package_import:
