@@ -10,6 +10,7 @@ BeautifulSoupTests:BeautifulSoup
 BioSQL:biopython
 BuildbotStatusShields:BuildbotEightStatusShields
 ComputedAttribute:ExtensionClass
+constraint:python-constraint
 Crypto:pycryptodome
 Cryptodome:pycryptodomex
 FSM:pexpect
