@@ -18,6 +18,8 @@ Options:
                           parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
+    --verify <ca_bundle>  Use verify to provide a CA_BUNDLE file or directory
+                          with certificates of trusted CAs
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
     --no-follow-links     Do not follow symbolic links in the project
@@ -171,13 +173,13 @@ def output_requirements(imports, symbol):
 
 
 def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None, verify=None):
     result = []
 
     for item in imports:
         try:
             response = requests.get(
-                "{0}{1}/json".format(pypi_server, item), proxies=proxy)
+                "{0}{1}/json".format(pypi_server, item), proxies=proxy, verify=verify)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
@@ -419,12 +421,16 @@ def init(args):
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
+    verify = None
     proxy = None
     if args["--pypi-server"]:
         pypi_server = args["--pypi-server"]
 
     if args["--proxy"]:
         proxy = {'http': args["--proxy"], 'https': args["--proxy"]}
+
+    if args["--verify"]:
+        verify = args["--verify"]
 
     if args["--use-local"]:
         logging.debug(
@@ -438,6 +444,7 @@ def init(args):
                       if x.lower() not in [z['name'].lower() for z in local]]
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
+										   verify=verify,
                                            pypi_server=pypi_server)
     # sort imports based on lowercase name of package, similar to `pip freeze`.
     imports = sorted(imports, key=lambda x: x['name'].lower())
