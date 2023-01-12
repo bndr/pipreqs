@@ -8,8 +8,9 @@ test_pipreqs
 Tests for `pipreqs` module.
 """
 
-import unittest
 import os
+import unittest
+
 import requests
 
 from pipreqs import pipreqs
@@ -145,7 +146,7 @@ class TestPipreqs(unittest.TestCase):
         Test that we can save requirements.txt correctly
         to a different path
         """
-        pipreqs.init({'<path>': self.project, '--savepath': self.alt_requirement_path, 
+        pipreqs.init({'<path>': self.project, '--savepath': self.alt_requirement_path,
                       '--use-local': None, '--proxy':None, '--pypi-server':None,  '--print': False,
                       '--diff': None, '--clean': None, '--mode': None})
         assert os.path.exists(self.alt_requirement_path) == 1
@@ -163,7 +164,7 @@ class TestPipreqs(unittest.TestCase):
         """
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
-        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None, 
+        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None,
                       '--force': None, '--proxy':None, '--pypi-server':None, '--print': False,
                       '--diff': None, '--clean': None, '--mode': None})
         assert os.path.exists(self.requirements_path) == 1
@@ -203,7 +204,7 @@ class TestPipreqs(unittest.TestCase):
         Test --ignore parameter
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, 
+            {'<path>': self.project_with_ignore_directory, '--savepath': None,
                       '--print': False, '--use-local': None, '--force': True,
                       '--proxy':None, '--pypi-server':None,
                       '--ignore':'.ignored_dir,.ignore_second',
@@ -222,7 +223,7 @@ class TestPipreqs(unittest.TestCase):
         Test --mode=no-pin
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, 
+            {'<path>': self.project_with_ignore_directory, '--savepath': None,
              '--print': False, '--use-local': None, '--force': True,
              '--proxy': None, '--pypi-server': None,
              '--diff': None,
