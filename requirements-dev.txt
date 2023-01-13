@@ -1,3 +1,4 @@
 black
 flake8
 tox
+python-dotenv  # optional to use .env file instead of environment variables

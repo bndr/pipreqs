@@ -17,6 +17,9 @@ with open('HISTORY.rst') as history_file:
 requirements = [
     'docopt', 'yarg'
 ]
+tests_requirements = [
+    'python-dotenv'
+]
 
 setup(
     name='pipreqs',
@@ -49,6 +52,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
     ],
+    tests_require=tests_requirements,
     test_suite='tests',
     entry_points={
         'console_scripts': [

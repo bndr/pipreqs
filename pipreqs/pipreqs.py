@@ -187,6 +187,7 @@ def get_imports_info(
     pypi_server="https://pypi.python.org/pypi/",
     proxy=None,
     verify=None,
+    c=None,
 ):
     result = []
 

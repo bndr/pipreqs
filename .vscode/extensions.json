@@ -1,0 +1,185 @@
+{
+  "recommendations": [
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // VS Code Editor, Config, Spelling and Themes
+    // -----------------------------------------------------------------------
+    // - Code Spell Checker
+    "streetsidesoftware.code-spell-checker",
+    // - EditorConfig for VS Code
+    "editorconfig.editorconfig",
+    // - Peacock
+    "johnpapa.vscode-peacock",
+    // - Night Owl
+    "sdras.night-owl",
+    // - indent-rainbow
+    "oderwat.indent-rainbow",
+    // - isort
+    "ms-python.isort",
+    // - Prettier - Code formatter
+    "esbenp.prettier-vscode",
+    // - vscode-icons
+    "vscode-icons-team.vscode-icons",
+    // - vscode-pdf
+    "tomoki1207.pdf",
+    // - Workspace Config+
+    "swellaby.workspace-config-plus",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Python
+    // -----------------------------------------------------------------------
+    // - autoDocstring - Python Docstring Generator
+    //"njpwerner.autodocstring",
+    // - Django
+    "batisteo.vscode-django",
+    // - Pylance
+    "ms-python.vscode-pylance",
+    // - Python
+    "ms-python.python",
+    // - Python Environment Manager
+    "donjayamanne.python-environment-manager",
+    // - Python Extension Pack
+    "donjayamanne.python-extension-pack",
+    // - Python Indent
+    "kevinrose.vsc-python-indent",
+    // - Test Adapter Converter
+    "ms-vscode.test-adapter-converter",
+    // - Test Explorer UI
+    "hbenl.vscode-test-explorer",
+    // - python-tox
+    "the-compiler.python-tox",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Rust
+    // -----------------------------------------------------------------------
+    // - Rust-Analyzer
+    "rust-lang.rust-analyzer",
+    // Better TOML
+    "bungcip.better-toml",
+    // - crates
+    "serayuzgur.crates",
+    // - Rust Test Explorer
+    "swellaby.vscode-rust-test-adapter",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Docker
+    // -----------------------------------------------------------------------
+    // - Docker Compose
+    "p1c2u.docker-compose",
+    // - Dev Container
+    "ms-vscode-remote.remote-containers",
+    // - Docker
+    "ms-azuretools.vscode-docker",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Data
+    // -----------------------------------------------------------------------
+    // - Excel Viewer
+    "grapecity.gc-excelviewer",
+    // - MongoDB for VS Code
+    "mongodb.mongodb-vscode",
+    // - PlantUML
+    //"jebbs.plantuml",
+    // - REST Client
+    //"humao.rest-client",
+    // - SQLite Viewer
+    "qwtel.sqlite-viewer",
+    // - Thunder Client
+    "rangav.vscode-thunder-client",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Git
+    // -----------------------------------------------------------------------
+    // - Git Config User Profiles
+    "onlyutkarsh.git-config-user-profiles",
+    // - Git Graph
+    "mhutchie.git-graph",
+    // - Git History
+    "donjayamanne.githistory",
+    // - git-autoconfig
+    "shyykoserhiy.git-autoconfig",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Jupyter Notebook
+    // -----------------------------------------------------------------------
+    // - Jupyter
+    "ms-toolsai.jupyter",
+    // - Jupyter Cell Tags
+    "ms-toolsai.vscode-jupyter-cell-tags",
+    // - Jupyter Keymap
+    "ms-toolsai.jupyter-keymap",
+    // - Jupyter Notebook Renderers
+    "ms-toolsai.jupyter-renderers",
+    // - Jupyter PowerToys
+    //"ms-toolsai.vscode-jupyter-powertoys",
+    // - Jupyter Slide Show
+    "ms-toolsai.vscode-jupyter-slideshow",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Yaml and Json
+    // -----------------------------------------------------------------------
+    // - .NET Install Tool for Extension Authors
+    "ms-dotnettools.vscode-dotnet-runtime",
+    // - Azure Resource Manager (ARM) Tools
+    "msazurermtools.azurerm-vscode-tools",
+    // - YAML
+    "redhat.vscode-yaml",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Markdown
+    // -----------------------------------------------------------------------
+    // - Markdown All in One
+    "yzhang.markdown-all-in-one",
+    // - Markdown PDF
+    "yzane.markdown-pdf",
+    // - markdownlint
+    "davidanson.vscode-markdownlint"
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // CSS
+    // -----------------------------------------------------------------------
+    // - Auto Rename Tag
+    //"formulahendry.auto-rename-tag",
+    // - IntelliSense for CSS class names in HTML
+    //"zignd.html-css-class-completion",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // local web server
+    // -----------------------------------------------------------------------
+    // - Live Server
+    //"ritwickdey.liveserver",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // JavaScript
+    // -----------------------------------------------------------------------
+    // - Babel JavaScript
+    //"mgmcdermott.vscode-language-babel",
+    // - ES7+ React/Redux/React-Native snippets
+    //"dsznajder.es7-react-js-snippets",
+    // - ESLint
+    //"dbaeumer.vscode-eslint",
+    // - JavaScript (ES6) code snippets
+    //"xabikos.javascriptsnippets",
+    // - JavaScript Debugger (Nightly)
+    //"ms-vscode.js-debug-nightly",
+    // - Material-UI Snippets
+    //"vscodeshift.material-ui-snippets",
+    // - TypeScript + Webpack Problem Matchers
+    //"amodio.tsl-problem-matcher",
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Java
+    // -----------------------------------------------------------------------
+    // - Debugger for Java
+    //"vscjava.vscode-java-debug",
+    // - Extension Pack for Java
+    //"vscjava.vscode-java-pack",
+    // - Language Support for Java(TM) by Red Hat
+    //"redhat.java",
+    // - Maven for Java
+    //"vscjava.vscode-maven",
+    // - Project Manager for Java
+    //"vscjava.vscode-java-dependency",
+    // - Test Runner for Java
+    //"vscjava.vscode-java-test",
+  ]
+}
