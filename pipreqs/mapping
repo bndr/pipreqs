@@ -1032,7 +1032,7 @@ slack:slackclient
 slugify:unicode_slugify
 smarkets:smk_python_sdk
 snappy:ctypes_snappy
-socketio:gevent_socketio
+socketio:python-socketio
 socketserver:pies2overrides
 sockjs:sockjs_tornado
 socks:SocksiPy_branch
