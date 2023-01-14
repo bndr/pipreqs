@@ -412,6 +412,16 @@ def init(args):
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
 
+    path = (args["--savepath"] if args["--savepath"] else
+            os.path.join(input_path, "requirements.txt"))
+    if (not args["--print"]
+            and not args["--savepath"]
+            and not args["--force"]
+            and os.path.exists(path)):
+        logging.warning("requirements.txt already exists, "
+                        "use --force to overwrite it")
+        return
+
     candidates = get_all_imports(input_path,
                                  encoding=encoding,
                                  extra_ignore_dirs=extra_ignore_dirs,
@@ -442,23 +452,12 @@ def init(args):
     # sort imports based on lowercase name of package, similar to `pip freeze`.
     imports = sorted(imports, key=lambda x: x['name'].lower())
 
-    path = (args["--savepath"] if args["--savepath"] else
-            os.path.join(input_path, "requirements.txt"))
-
     if args["--diff"]:
         diff(args["--diff"], imports)
         return
 
     if args["--clean"]:
         clean(args["--clean"], imports)
-        return
-
-    if (not args["--print"]
-            and not args["--savepath"]
-            and not args["--force"]
-            and os.path.exists(path)):
-        logging.warning("requirements.txt already exists, "
-                        "use --force to overwrite it")
         return
 
     if args["--mode"]:
