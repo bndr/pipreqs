@@ -44,6 +44,12 @@ Usage
                               environments parameter in your terminal:
                               $ export HTTP_PROXY="http://10.10.1.10:3128"
                               $ export HTTPS_PROXY="https://10.10.1.10:1080"
+        --verify <ca_bundle>  Use verify to provide a CA_BUNDLE file or directory
+                              with certificates of trusted CAs
+                              You can also just set the environment variable in
+                              your terminal: (`export` for nix and `set` for win)
+                              $ export CA_BUNDLE="/certs/path/certificates.pem"
+                              $ set CA_BUNDLE="C:/certs/path/certificates.pem"
         --debug               Print debug information
         --ignore <dirs>...    Ignore extra directories, each separated by a comma
         --no-follow-links     Do not follow symbolic links in the project

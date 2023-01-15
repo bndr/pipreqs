@@ -66,7 +66,7 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 
     $ mkvirtualenv pipreqs
     $ cd pipreqs/
-    $ python setup.py develop
+    $ python setup.py develop (or $pip install -e .)
 
 4. Create a branch for local development::
 
@@ -80,7 +80,12 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
     $ python setup.py test
     $ tox
 
-   To get flake8 and tox, just pip install them into your virtualenv.
+   To get flake8 and tox, just pip install them into your virtualenv. (or $pip install -r requirements-dev.txt)
+
+   You may also need to provide `CA_BUNDLE` as an environment variable or parameter in the `tests/.env.test` file.
+
+    $ export CA_BUNDLE="/certs/path/certificates.pem"  # for nix OS
+    $ set CA_BUNDLE="C:/certs/path/certificates.pem"   # for win OS
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -99,9 +104,9 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.7 to 3.11, and PyPy. Check
-   https://travis-ci.org/bndr/pipreqs/pull_requests and make sure that the
-   tests pass for all supported Python versions.
+3. The pull request should work for Python 3.7 to 3.10 (3.11 needs work),
+   and PyPy3. Check https://travis-ci.org/bndr/pipreqs/pull_requests and
+   make sure that the tests pass for all supported Python versions.
 
 Tips
 ----
