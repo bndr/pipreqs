@@ -18,8 +18,6 @@ from pipreqs import pipreqs
 CA_BUNDLE = os.environ.get("CA_BUNDLE")
 
 if CA_BUNDLE is None:
-    #from .settings import CA_BUNDLE
-    # ImportError: attempted relative import with no known parent package
     from tests.settings import CA_BUNDLE
 
 
