@@ -1,3 +1,15 @@
+"""
+Environment variables can be used as a first choice
+$ set CA_BUNDLE="certificates.pem"     # for win OS
+$ export CA_BUNDLE="certificates.pem"  # for nix OS
+
+If environment variables are not found then a second attempt
+will be made by loading the values from a .env.test file in
+the same directory
+
+See ./env.test.example for details.
+"""
+
 import importlib
 import os
 

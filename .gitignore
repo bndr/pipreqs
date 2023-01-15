@@ -1,3 +1,11 @@
+# fix_SSLError -----
+.env38/
+.vscode/
+pipreqs_flake8_results.txt
+pipreqs_setup_test_results.txt
+pipreqs_tox_results.txt
+# ------------------
+
 *.py[cod]
 
 # C extensions

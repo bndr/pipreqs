@@ -6,11 +6,6 @@ test_pipreqs
 ----------------------------------
 
 Tests for `pipreqs` module.
-
-Environment variables used to mock arguments
-e.g.,
-$ set CA_BUNDLE="certificates.pem"     # for win OS
-$ export CA_BUNDLE="certificates.pem"  # for nix OS
 """
 
 import os
@@ -19,55 +14,54 @@ import unittest
 import requests
 
 from pipreqs import pipreqs
-from .settings import CA_BUNDLE
+
+CA_BUNDLE = os.environ.get("CA_BUNDLE")
+
+if CA_BUNDLE is None:
+    from tests.settings import CA_BUNDLE
 
 
 class TestPipreqs(unittest.TestCase):
+
     def setUp(self):
         self.modules = [
-            "flask",
-            "requests",
-            "sqlalchemy",
-            "docopt",
-            "boto",
-            "ipython",
-            "pyflakes",
-            "nose",
-            "analytics",
-            "flask_seasurf",
-            "peewee",
-            "ujson",
-            "nonexistendmodule",
-            "bs4",
-            "after_method_is_valid_even_if_not_pep8",
-        ]
-        self.modules2 = ["beautifulsoup4"]
-        self.local = ["docopt", "requests", "nose", "pyflakes"]
+            'flask', 'requests', 'sqlalchemy', 'docopt', 'boto', 'ipython',
+            'pyflakes', 'nose', 'analytics', 'flask_seasurf', 'peewee',
+            'ujson', 'nonexistendmodule', 'bs4',
+            'after_method_is_valid_even_if_not_pep8'
+            ]
+        self.modules2 = ['beautifulsoup4']
+        self.local = ["docopt", "requests", "nose", 'pyflakes']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
         self.project_clean = os.path.join(
-            os.path.dirname(__file__), "_data_clean"
-        )
+            os.path.dirname(__file__),
+            "_data_clean"
+            )
         self.project_invalid = os.path.join(
-            os.path.dirname(__file__), "_invalid_data"
-        )
+            os.path.dirname(__file__),
+            "_invalid_data"
+            )
         self.project_with_ignore_directory = os.path.join(
-            os.path.dirname(__file__), "_data_ignore"
-        )
+            os.path.dirname(__file__),
+            "_data_ignore"
+            )
         self.project_with_duplicated_deps = os.path.join(
-            os.path.dirname(__file__), "_data_duplicated_deps"
-        )
+            os.path.dirname(__file__),
+            "_data_duplicated_deps"
+            )
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(
-            self.project, "requirements2.txt"
-        )
+            self.project,
+            "requirements2.txt"
+            )
+
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
         self.assertEqual(len(imports), 15)
         for item in imports:
             self.assertTrue(
-                item.lower() in self.modules, "Import is missing: " + item
-            )
+                item.lower() in self.modules, "Import is missing: " + item)
         self.assertFalse("time" in imports)
         self.assertFalse("logging" in imports)
         self.assertFalse("curses" in imports)
@@ -86,8 +80,7 @@ class TestPipreqs(unittest.TestCase):
         Test that invalid python files cannot be imported.
         """
         self.assertRaises(
-            SyntaxError, pipreqs.get_all_imports, self.project_invalid
-        )
+            SyntaxError, pipreqs.get_all_imports, self.project_invalid)
 
     def test_get_imports_info(self):
         """
@@ -102,14 +95,13 @@ class TestPipreqs(unittest.TestCase):
         self.assertEqual(len(with_info), 13)
         for item in with_info:
             self.assertTrue(
-                item["name"].lower() in self.modules,
-                "Import item appears to be missing " + item["name"],
-            )
+                item['name'].lower() in self.modules,
+                "Import item appears to be missing " + item['name'])
 
     def test_get_pkg_names(self):
-        pkgs = ["jury", "Japan", "camel", "Caroline"]
+        pkgs = ['jury', 'Japan', 'camel', 'Caroline']
         actual_output = pipreqs.get_pkg_names(pkgs)
-        expected_output = ["camel", "Caroline", "Japan", "jury"]
+        expected_output = ['camel', 'Caroline', 'Japan', 'jury']
         self.assertEqual(actual_output, expected_output)
 
     def test_get_use_local_only(self):
@@ -124,7 +116,7 @@ class TestPipreqs(unittest.TestCase):
         # should find only docopt and requests
         imports_with_info = pipreqs.get_import_local(self.modules)
         for item in imports_with_info:
-            self.assertTrue(item["name"].lower() in self.local)
+            self.assertTrue(item['name'].lower() in self.local)
 
     def test_init(self):
         """
@@ -151,7 +143,7 @@ class TestPipreqs(unittest.TestCase):
             for item in self.modules[:-3]:
                 self.assertTrue(item.lower() in data)
         # It should be sorted based on names.
-        data = data.strip().split("\n")
+        data = data.strip().split('\n')
         self.assertEqual(data, sorted(data))
 
     def test_init_local_only(self):
@@ -245,11 +237,11 @@ class TestPipreqs(unittest.TestCase):
         import_name_with_alias = "requests as R"
         expected_import_name_without_alias = "requests"
         import_name_without_aliases = pipreqs.get_name_without_alias(
-            import_name_with_alias
-        )
+            import_name_with_alias)
         self.assertEqual(
-            import_name_without_aliases, expected_import_name_without_alias
-        )
+            import_name_without_aliases,
+            expected_import_name_without_alias
+            )
 
     def test_custom_pypi_server(self):
         """
@@ -290,14 +282,9 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": None,
             }
         )
-        with open(
-            os.path.join(
-                self.project_with_ignore_directory, "requirements.txt"
-            ),
-            "r",
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.read().lower()
-            for item in ["click", "getpass"]:
+            for item in ['click', 'getpass']:
                 self.assertFalse(item.lower() in data)
 
     def test_dynamic_version_no_pin_scheme(self):
@@ -319,14 +306,9 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": "no-pin",
             }
         )
-        with open(
-            os.path.join(
-                self.project_with_ignore_directory, "requirements.txt"
-            ),
-            "r",
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.read().lower()
-            for item in ["beautifulsoup4", "boto"]:
+            for item in ['beautifulsoup4', 'boto']:
                 self.assertTrue(item.lower() in data)
 
     def test_dynamic_version_gt_scheme(self):
@@ -348,16 +330,11 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": "gt",
             }
         )
-        with open(
-            os.path.join(
-                self.project_with_ignore_directory, "requirements.txt"
-            ),
-            "r",
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
             for item in data:
-                symbol = ">="
-                message = "symbol is not in item"
+                symbol = '>='
+                message = 'symbol is not in item'
                 self.assertIn(symbol, item, message)
 
     def test_dynamic_version_compat_scheme(self):
@@ -379,16 +356,11 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": "compat",
             }
         )
-        with open(
-            os.path.join(
-                self.project_with_ignore_directory, "requirements.txt"
-            ),
-            "r",
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
             for item in data:
-                symbol = "~="
-                message = "symbol is not in item"
+                symbol = '~='
+                message = 'symbol is not in item'
                 self.assertIn(symbol, item, message)
 
     def test_clean(self):
@@ -435,7 +407,7 @@ class TestPipreqs(unittest.TestCase):
         """
         Test --clean parameter when there are imports to clean
         """
-        cleaned_module = "sqlalchemy"
+        cleaned_module = 'sqlalchemy'
         pipreqs.init(
             {
                 "<path>": self.project,
@@ -486,5 +458,5 @@ class TestPipreqs(unittest.TestCase):
             pass
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

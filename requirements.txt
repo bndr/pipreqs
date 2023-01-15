@@ -1,3 +1,4 @@
 wheel==0.23.0
 Yarg==0.1.9
 docopt==0.6.2
+requests==2.28.2

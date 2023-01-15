@@ -77,10 +77,15 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
     $ flake8 pipreqs tests
-    $ python setup.py test
+    $ python setup.py test > pipreqs_setup_test_result.txt
     $ tox
 
    To get flake8 and tox, just pip install them into your virtualenv. (or $pip install -r requirements-dev.txt)
+
+   You may also need to provide `CA_BUNDLE` as an environment variable or parameter in the `tests/.env.test` file.
+
+    $ export CA_BUNDLE="/certs/path/certificates.pem"  # for nix OS
+    $ set CA_BUNDLE="C:/certs/path/certificates.pem"   # for win OS
 
 6. Commit your changes and push your branch to GitHub::
 

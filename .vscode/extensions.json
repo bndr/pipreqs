@@ -45,8 +45,6 @@
     "ms-vscode.test-adapter-converter",
     // - Test Explorer UI
     "hbenl.vscode-test-explorer",
-    // - python-tox
-    "the-compiler.python-tox",
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Rust

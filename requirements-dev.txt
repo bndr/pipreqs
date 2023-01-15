@@ -1,4 +1,32 @@
-black
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# > python38 -m venv .env38
+# # activate (.env38) virtual environment
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# upgrade pip
+# (.env38)> python.exe -m pip install --upgrade pip
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# development packages
+# (.env38)> pip install -r requirements-dev.txt
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# development mode installation of `pipreqs`
+# (.env38)> pip install -e .
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# fix_SSLError tests.settings (optional) use of .env file
+# alternative would be to set CA_BUNDLE environment variable
+python-dotenv
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# required per CONTRIBUTING workflow
 flake8
-tox
-python-dotenv  # optional to use .env file instead of environment variables
+tox   # only needed in the environment from which tox is run
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# (optional, personal choice)
+# vscode settings: "python.formatting.provider": "black",
+#black
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

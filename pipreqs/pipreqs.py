@@ -20,6 +20,10 @@ Options:
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --verify <ca_bundle>  Use verify to provide a CA_BUNDLE file or directory
                           with certificates of trusted CAs
+                          You can also just set the environment variable in
+                          your terminal: (`export` for nix and `set` for win)
+                          $ export CA_BUNDLE="/certs/path/certificates.pem" #or
+                          $ set CA_BUNDLE="C:/certs/path/certificates.pem"
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
     --no-follow-links     Do not follow symbolic links in the project
@@ -54,13 +58,14 @@ from yarg.exceptions import HTTPError
 from pipreqs import __version__
 
 REGEXP = [
-    re.compile(r"^import (.+)$"),
-    re.compile(r"^from ((?!\.+).*?) import (?:.*)$"),
+    re.compile(r'^import (.+)$'),
+    re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
 
+CA_BUNDLE = os.environ.get("CA_BUNDLE")
 
 @contextmanager
-def _open(filename=None, mode="r"):
+def _open(filename=None, mode='r'):
     """Open a file or ``sys.stdout`` depending on the provided filename.
 
     Args:
@@ -73,13 +78,13 @@ def _open(filename=None, mode="r"):
         A file handle.
 
     """
-    if not filename or filename == "-":
-        if not mode or "r" in mode:
+    if not filename or filename == '-':
+        if not mode or 'r' in mode:
             file = sys.stdin
-        elif "w" in mode:
+        elif 'w' in mode:
             file = sys.stdout
         else:
-            raise ValueError("Invalid mode for file: {}".format(mode))
+            raise ValueError('Invalid mode for file: {}'.format(mode))
     else:
         file = open(filename, mode)
 
@@ -91,8 +96,7 @@ def _open(filename=None, mode="r"):
 
 
 def get_all_imports(
-    path, encoding=None, extra_ignore_dirs=None, follow_links=True
-):
+        path, encoding=None, extra_ignore_dirs=None, follow_links=True):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -141,11 +145,11 @@ def get_all_imports(
         # Cleanup: We only want to first part of the import.
         # Ex: from django.conf --> django.conf. But we only want django
         # as an import.
-        cleaned_name, _, _ = name.partition(".")
+        cleaned_name, _, _ = name.partition('.')
         imports.add(cleaned_name)
 
     packages = imports - (set(candidates) & imports)
-    logging.debug("Found packages: {0}".format(packages))
+    logging.debug('Found packages: {0}'.format(packages))
 
     with open(join("stdlib"), "r") as f:
         data = {x.strip() for x in f}
@@ -159,34 +163,26 @@ def filter_line(line):
 
 def generate_requirements_file(path, imports, symbol):
     with _open(path, "w") as out_file:
-        logging.debug(
-            "Writing {num} requirements: {imports} to {file}".format(
-                num=len(imports),
-                file=path,
-                imports=", ".join([x["name"] for x in imports]),
-            )
-        )
-        fmt = "{name}" + symbol + "{version}"
-        out_file.write(
-            "\n".join(
-                fmt.format(**item)
-                if item["version"]
-                else "{name}".format(**item)
-                for item in imports
-            )
-            + "\n"
-        )
+        logging.debug('Writing {num} requirements: {imports} to {file}'.format(
+            num=len(imports),
+            file=path,
+            imports=", ".join([x['name'] for x in imports])
+        ))
+        fmt = '{name}' + symbol + '{version}'
+        out_file.write('\n'.join(
+            fmt.format(**item) if item['version'] else '{name}'.format(**item)
+            for item in imports) + '\n')
 
 
 def output_requirements(imports, symbol):
-    generate_requirements_file("-", imports, symbol)
+    generate_requirements_file('-', imports, symbol)
 
 
 def get_imports_info(
     imports,
     pypi_server="https://pypi.python.org/pypi/",
     proxy=None,
-    verify=None,
+    verify=CA_BUNDLE,
     c=None,
 ):
     result = []
@@ -199,20 +195,18 @@ def get_imports_info(
                 verify=verify,
             )
             if response.status_code == 200:
-                if hasattr(response.content, "decode"):
+                if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
                 else:
                     data = json2package(response.content)
             elif response.status_code >= 300:
-                raise HTTPError(
-                    status_code=response.status_code, reason=response.reason
-                )
+                raise HTTPError(status_code=response.status_code,
+                                reason=response.reason)
         except HTTPError:
             logging.debug(
-                "Package %s does not exist or network problems", item
-            )
+                'Package %s does not exist or network problems', item)
             continue
-        result.append({"name": item, "version": data.latest_release_id})
+        result.append({'name': item, 'version': data.latest_release_id})
     return result
 
 
@@ -232,20 +226,16 @@ def get_locally_installed_packages(encoding=None):
                             # TODO: What errors do we intend to suppress here?
                             continue
                         for i_item in package_import:
-                            if (i_item not in ignore) and (
-                                package[0] not in ignore
-                            ):
+                            if ((i_item not in ignore) and
+                                    (package[0] not in ignore)):
                                 version = None
                                 if len(package) > 1:
-                                    version = (
-                                        package[1]
-                                        .replace(".dist", "")
-                                        .replace(".egg", "")
-                                    )
+                                    version = package[1].replace(
+                                        ".dist", "").replace(".egg", "")
 
                                 packages[i_item] = {
-                                    "version": version,
-                                    "name": package[0],
+                                    'version': version,
+                                    'name': package[0]
                                 }
     return packages
 
@@ -258,7 +248,12 @@ def get_import_local(imports, encoding=None):
             result.append(local[item.lower()])
 
     # removing duplicates of package/version
-    result_unique = [dict(t) for t in set([tuple(d.items()) for d in result])]
+    result_unique = [
+        dict(t)
+        for t in set([
+            tuple(d.items()) for d in result
+        ])
+    ]
 
     return result_unique
 
@@ -289,7 +284,7 @@ def get_name_without_alias(name):
         match = REGEXP[0].match(name.strip())
         if match:
             name = match.groups(0)[0]
-    return name.partition(" as ")[0].partition(".")[0].strip()
+    return name.partition(' as ')[0].partition('.')[0].strip()
 
 
 def join(f):
@@ -375,8 +370,7 @@ def diff(file_, imports):
 
     logging.info(
         "The following modules are in {} but do not seem to be imported: "
-        "{}".format(file_, ", ".join(x for x in modules_not_imported))
-    )
+        "{}".format(file_, ", ".join(x for x in modules_not_imported)))
 
 
 def clean(file_, imports):
@@ -424,22 +418,30 @@ def dynamic_versioning(scheme, imports):
 
 
 def init(args):
-    encoding = args.get("--encoding")
-    extra_ignore_dirs = args.get("--ignore")
-    follow_links = not args.get("--no-follow-links")
-    input_path = args["<path>"]
+    encoding = args.get('--encoding')
+    extra_ignore_dirs = args.get('--ignore')
+    follow_links = not args.get('--no-follow-links')
+    input_path = args['<path>']
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
 
     if extra_ignore_dirs:
-        extra_ignore_dirs = extra_ignore_dirs.split(",")
+        extra_ignore_dirs = extra_ignore_dirs.split(',')
 
-    candidates = get_all_imports(
-        input_path,
-        encoding=encoding,
-        extra_ignore_dirs=extra_ignore_dirs,
-        follow_links=follow_links,
-    )
+    path = (args["--savepath"] if args["--savepath"] else
+            os.path.join(input_path, "requirements.txt"))
+    if (not args["--print"]
+            and not args["--savepath"]
+            and not args["--force"]
+            and os.path.exists(path)):
+        logging.warning("requirements.txt already exists, "
+                        "use --force to overwrite it")
+        return
+
+    candidates = get_all_imports(input_path,
+                                 encoding=encoding,
+                                 extra_ignore_dirs=extra_ignore_dirs,
+                                 follow_links=follow_links)
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
@@ -449,36 +451,27 @@ def init(args):
         pypi_server = args["--pypi-server"]
 
     if args["--proxy"]:
-        proxy = {"http": args["--proxy"], "https": args["--proxy"]}
+        proxy = {'http': args["--proxy"], 'https': args["--proxy"]}
 
     if args["--verify"]:
         verify = args["--verify"]
 
     if args["--use-local"]:
         logging.debug(
-            "Getting package information ONLY from local installation."
-        )
+            "Getting package information ONLY from local installation.")
         imports = get_import_local(candidates, encoding=encoding)
     else:
         logging.debug("Getting packages information from Local/PyPI")
         local = get_import_local(candidates, encoding=encoding)
         # Get packages that were not found locally
-        difference = [
-            x
-            for x in candidates
-            if x.lower() not in [z["name"].lower() for z in local]
-        ]
-        imports = local + get_imports_info(
-            difference, proxy=proxy, verify=verify, pypi_server=pypi_server
-        )
+        difference = [x for x in candidates
+                      if x.lower() not in [z['name'].lower() for z in local]]
+        imports = local + get_imports_info(difference,
+                                           proxy=proxy,
+                                           verify=verify,
+                                           pypi_server=pypi_server)
     # sort imports based on lowercase name of package, similar to `pip freeze`.
-    imports = sorted(imports, key=lambda x: x["name"].lower())
-
-    path = (
-        args["--savepath"]
-        if args["--savepath"]
-        else os.path.join(input_path, "requirements.txt")
-    )
+    imports = sorted(imports, key=lambda x: x['name'].lower())
 
     if args["--diff"]:
         diff(args["--diff"], imports)
@@ -488,26 +481,13 @@ def init(args):
         clean(args["--clean"], imports)
         return
 
-    if (
-        not args["--print"]
-        and not args["--savepath"]
-        and not args["--force"]
-        and os.path.exists(path)
-    ):
-        logging.warning(
-            "requirements.txt already exists, " "use --force to overwrite it"
-        )
-        return
-
     if args["--mode"]:
         scheme = args.get("--mode")
         if scheme in ["compat", "gt", "no-pin"]:
             imports, symbol = dynamic_versioning(scheme, imports)
         else:
-            raise ValueError(
-                "Invalid argument for mode flag, "
-                "use 'compat', 'gt' or 'no-pin' instead"
-            )
+            raise ValueError("Invalid argument for mode flag, "
+                             "use 'compat', 'gt' or 'no-pin' instead")
     else:
         symbol = "=="
 
@@ -521,8 +501,8 @@ def init(args):
 
 def main():  # pragma: no cover
     args = docopt(__doc__, version=__version__)
-    log_level = logging.DEBUG if args["--debug"] else logging.INFO
-    logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
+    log_level = logging.DEBUG if args['--debug'] else logging.INFO
+    logging.basicConfig(level=log_level, format='%(levelname)s: %(message)s')
 
     try:
         init(args)
@@ -530,5 +510,5 @@ def main():  # pragma: no cover
         sys.exit(0)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()  # pragma: no cover
