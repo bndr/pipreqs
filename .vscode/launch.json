@@ -1,13 +1,104 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // this will only work with a local python environment
+      "name": "L-py-file",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "L-dj-server",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/manage.py",
+      "args": [
+        "runserver",
+      ],
+      "django": true
+    },        
+    {
+      // launch local FastAPI on default port 8000
+      // this will not work with a docker container
+      "name": "L-p8000-api-uvicorn",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "cwd": "${workspaceFolder}/src/api/",
+      "args": [
+        "startup:app",
+        "--reload",
+        "--port",
+        "8000"
+      ],
+      "jinja": true,
+      "justMyCode": false
+    },
+    {
+      //> Set PYDEVD_DISABLE_FILE_VALIDATION=1
+      //> python -m debugpy --listen 8888 --wait-for-client startup.py
+      // then select this script and start debug (F5)
+      // finally, view FastAPI from the browser to hit breakpoints
+      // http://0.0.0.0:8000     
+      // http://0.0.0.0:8000/docs
+      // this is the default port 8000
+      "name": "L-p8888-api-debugpy",
+      "type": "python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 8888
+      },
+      "pathMappings": [
         {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
+          "localRoot": "${workspaceFolder}/src/api/",
+          "remoteRoot": "."
         }
-    ]
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "C-p5678-app-debugpy",
+      "type": "python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src/app",
+          "remoteRoot": "."
+        }
+      ],
+      "justMyCode": false
+    },
+    {
+      //> Set PYDEVD_DISABLE_FILE_VALIDATION=1
+      // run the docker container that has this entrypoint that forwards to our local port 9988
+      // entrypoint: [ "python", "-m", "debugpy", "--listen", "0.0.0.0:$FASTAPI_DOCKER_DEBUG_PORT", "--wait-for-client", "startup.py" ]
+      // then select this script and start debug (F5)
+      // finally, view FastAPI from the browser to hit breakpoints
+      // http://0.0.0.0:8011
+      // http://0.0.0.0:8011/docs
+      // FASTAPI_LOCAL_PORT used to forward to container port to the local port 8011
+      "name": "C-p9988-api-debugpy",
+      "type": "python",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 9988
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/src/api/",
+          "remoteRoot": "."
+        }
+      ],
+      "justMyCode": false
+    },
+  ]
 }

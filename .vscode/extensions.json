@@ -123,14 +123,20 @@
     "redhat.vscode-yaml",
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Markdown
+    // Markdown and reStructured Text
     // -----------------------------------------------------------------------
     // - Markdown All in One
     "yzhang.markdown-all-in-one",
     // - Markdown PDF
     "yzane.markdown-pdf",
     // - markdownlint
-    "davidanson.vscode-markdownlint"
+    "davidanson.vscode-markdownlint",
+    // - Esbonio (conflicts with reStructuredText)
+    //"swyddfa.esbonio",
+    // - reStructuredText
+    "lextudio.restructuredtext",
+    // - reStructuredText Syntax highlighting
+    "trond-snekvik.simple-rst",
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // CSS
