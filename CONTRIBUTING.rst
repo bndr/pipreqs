@@ -85,6 +85,7 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
    You may also need to provide `CA_BUNDLE` as an environment variable or parameter in the `tests/.env.test` file.
 
     $ export CA_BUNDLE="/certs/path/certificates.pem"  # for nix OS
+    
     $ set CA_BUNDLE="C:/certs/path/certificates.pem"   # for win OS
 
 6. Commit your changes and push your branch to GitHub::

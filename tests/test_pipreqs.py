@@ -6,6 +6,11 @@ test_pipreqs
 ----------------------------------
 
 Tests for `pipreqs` module.
+
+Environment variables used to mock arguments
+e.g.,
+$ set CA_BUNDLE="certificates.pem"     # for win OS
+$ export CA_BUNDLE="certificates.pem"  # for nix OS
 """
 
 import os

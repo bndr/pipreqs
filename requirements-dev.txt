@@ -17,6 +17,9 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # fix_SSLError tests.settings (optional) use of .env file
 # alternative would be to set CA_BUNDLE environment variable
+#  $ export CA_BUNDLE="/certs/path/certificates.pem"  # for nix OS
+#  $ set CA_BUNDLE="C:/certs/path/certificates.pem"   # for win OS
+
 python-dotenv
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,8 +28,9 @@ flake8
 tox   # only needed in the environment from which tox is run
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# (optional, personal choice)
+# (optional)
 # vscode settings: "python.formatting.provider": "black",
 #black
+docutils  # reStructured Text support
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
