@@ -12,13 +12,12 @@ See ./env.test.example for details.
 
 import importlib
 import os
+from pathlib import Path
 
 CA_BUNDLE = os.environ.get("CA_BUNDLE")
 
 if CA_BUNDLE is None and importlib.find_loader("dotenv"):
     # optional loading of values from .env.test file
-    from pathlib import Path
-
     import dotenv
 
     env_test_path = Path(os.path.dirname(__file__) + "/.env.test")
@@ -26,3 +25,5 @@ if CA_BUNDLE is None and importlib.find_loader("dotenv"):
 
     if config is not None:
         CA_BUNDLE = config["CA_BUNDLE"]
+elif CA_BUNDLE is not None:
+    CA_BUNDLE = str(Path(CA_BUNDLE))

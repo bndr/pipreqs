@@ -49,6 +49,7 @@ import re
 import sys
 import traceback
 from contextlib import contextmanager
+from pathlib import Path
 
 import requests
 from docopt import docopt
@@ -63,6 +64,9 @@ REGEXP = [
 ]
 
 CA_BUNDLE = os.environ.get("CA_BUNDLE")
+if CA_BUNDLE is not None:
+    CA_BUNDLE = str(Path(CA_BUNDLE))
+
 
 @contextmanager
 def _open(filename=None, mode='r'):
@@ -445,7 +449,7 @@ def init(args):
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
-    verify = None
+    verify = CA_BUNDLE
     proxy = None
     if args["--pypi-server"]:
         pypi_server = args["--pypi-server"]

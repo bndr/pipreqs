@@ -17,13 +17,17 @@ import os
 import unittest
 
 import requests
+from pathlib import Path
 
 from pipreqs import pipreqs
 
 CA_BUNDLE = os.environ.get("CA_BUNDLE")
 
+
 if CA_BUNDLE is None:
     from tests.settings import CA_BUNDLE
+else:
+    CA_BUNDLE = str(Path(CA_BUNDLE))
 
 
 class TestPipreqs(unittest.TestCase):
