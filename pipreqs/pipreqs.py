@@ -217,7 +217,7 @@ def get_locally_installed_packages(encoding=None):
                                     version = package[1].replace(
                                         ".dist", "").replace(".egg", "")
 
-                                packages[i_item] = {
+                                packages[package[0].lower()] = {
                                     'version': version,
                                     'name': package[0]
                                 }
