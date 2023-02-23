@@ -186,9 +186,15 @@ def get_imports_info(
             elif response.status_code >= 300:
                 raise HTTPError(status_code=response.status_code,
                                 reason=response.reason)
-        except HTTPError:
-            logging.debug(
-                'Package %s does not exist or network problems', item)
+        except HTTPError as err:
+            if err.errno == 404:
+                msg = "Package `%s` isn't on pypi, skipping"
+                logging.warning(msg, item)
+                msg = "(possible missing mapping for import name `%s`?)"
+                logging.warning(msg, item)
+            else:
+                msg = "HTTP error %s querying package %s, skipping"
+                logging.warning(msg, err.errno, item)
             continue
         result.append({'name': item, 'version': data.latest_release_id})
     return result
@@ -252,16 +258,26 @@ def get_pkg_names(pkgs):
         List[str]: The corresponding PyPI package names.
 
     """
-    result = set()
+    mapfile = join("mapping")
+    logging.debug("Looking up mappings in %s", mapfile)
     with open(join("mapping"), "r") as f:
-        data = dict(x.strip().split(":") for x in f)
-    for pkg in pkgs:
-        # Look up the mapped requirement. If a mapping isn't found,
-        # simply use the package name.
-        result.add(data.get(pkg, pkg))
-    # Return a sorted list for backward compatibility.
-    return sorted(result, key=lambda s: s.lower())
+        mappings = dict(x.strip().split(":") for x in f)
 
+    # Look up the mapped requirement. If a mapping isn't found,
+    # simply use the package name.
+    names = {pkg: mappings.get(pkg, pkg)
+             for pkg in pkgs}
+
+    # Print mappings to debug logger
+    pkgalign = max(len(s) for s in names.keys())
+    reqalign = max(len(s) for s in names.values())
+    fmt = "[%-{}s] : %-{}s (%s)".format(pkgalign, reqalign)
+    for pkg, name in names.items():
+        note = "mapped" if pkg != name else "default"
+        logging.debug(fmt, pkg, name, note)
+
+    # Return a sorted list for backward compatibility.
+    return sorted(set(names.values()), key=lambda s: s.lower())
 
 def get_name_without_alias(name):
     if "import " in name:
