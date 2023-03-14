@@ -229,7 +229,8 @@ def get_import_local(imports, encoding=None):
     result = []
     for item in imports:
         if item.lower() in local:
-            result.append(local[item.lower()])
+            # append to result a matching package, as well as its exported modules
+            result.append(dict(**local[item.lower()], exports=item.lower()))
 
     # removing duplicates of package/version
     result_unique = [
@@ -443,9 +444,12 @@ def init(args):
     else:
         logging.debug("Getting packages information from Local/PyPI")
         local = get_import_local(candidates, encoding=encoding)
+        
         # Get packages that were not found locally
-        difference = [x for x in candidates
-                      if x.lower() not in [z['name'].lower() for z in local]]
+        difference = [x for x in candidates 
+                        # check if candidate name is found in the list of exported modules, installed locally
+                        if x.lower() not in [y['exports'] for y in local]]
+
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
                                            pypi_server=pypi_server)
