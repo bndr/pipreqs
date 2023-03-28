@@ -176,6 +176,7 @@ def get_imports_info(
 
     for item in imports:
         try:
+            logging.warning('Import "%s" not found locally. Trying to resolve it at the PyPI server.', item)
             response = requests.get(
                 "{0}{1}/json".format(pypi_server, item), proxies=proxy)
             if response.status_code == 200:
@@ -187,9 +188,15 @@ def get_imports_info(
                 raise HTTPError(status_code=response.status_code,
                                 reason=response.reason)
         except HTTPError:
-            logging.debug(
-                'Package %s does not exist or network problems', item)
+            logging.warning(
+                'Package "%s" does not exist or network problems', item)
             continue
+        logging.warning('Import "%s" was resolved to "%s:%s" package (%s).\nPlease, verify manually the final list of requirements.txt to avoid possible dependency confusions.', 
+                        item, 
+                        data.name, 
+                        data.latest_release_id, 
+                        data.pypi_url
+        )
         result.append({'name': item, 'version': data.latest_release_id})
     return result
 
