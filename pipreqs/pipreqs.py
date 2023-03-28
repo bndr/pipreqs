@@ -252,12 +252,6 @@ def get_import_local(imports, encoding=None):
             if item in package['exports'] or item == package['name']:
                 result.append(package)
 
-    # sanity check:
-    # imo we should no longer need the functionality to remove the duplicates
-    # TODO: recheck this
-    # it is possible that the pipreqs will write two packages, using same exported name again (!)
-    # we should log about this in case this happens
-
     # removing duplicates of package/version
     # had to use second method instead of the first, listed here, because we have a list in the 'exports' field
     # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
