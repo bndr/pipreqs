@@ -43,12 +43,24 @@ import re
 import logging
 import ast
 import traceback
+from codecs import open
+
 from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
-from pipreqs import __version__
+if sys.version[0] == "2":
+    from itertools import imap as map, ifilter as filter
+
+with open(os.path.join(os.path.dirname(__file__), "__init__.py"), "rt") as f:
+    __version__ = next(map(
+        lambda buf: next(map(lambda e: e.value.s, ast.parse(buf).body)),
+        filter(
+            lambda line: line.startswith("__version__"),
+            f,
+        ),
+    ))
 
 REGEXP = [
     re.compile(r'^import (.+)$'),
@@ -189,6 +201,10 @@ def get_imports_info(
         except HTTPError:
             logging.debug(
                 'Package %s does not exist or network problems', item)
+            continue
+        except UnicodeDecodeError:
+            logging.debug(
+                'Package %s could not be read from server', item)
             continue
         result.append({'name': item, 'version': data.latest_release_id})
     return result
