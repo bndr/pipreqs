@@ -1064,6 +1064,7 @@ tasksitter:cerebrod
 tastypie:django_tastypie
 teamcity:teamcity_messages
 telebot:pyTelegramBotAPI
+telegram:python-telegram-bot
 tempita:Tempita
 tenjin:Tenjin
 termstyle:python_termstyle
