@@ -176,7 +176,11 @@ def get_imports_info(
 
     for item in imports:
         try:
-            logging.warning('Import named "%s" not found locally. Trying to resolve it at the PyPI server.', item)
+            logging.warning(
+                'Import named "%s" not found locally.'
+                'Trying to resolve it at the PyPI server.',
+                item
+            )
             response = requests.get(
                 "{0}{1}/json".format(pypi_server, item), proxies=proxy)
             if response.status_code == 200:
@@ -191,11 +195,14 @@ def get_imports_info(
             logging.warning(
                 'Package "%s" does not exist or network problems', item)
             continue
-        logging.warning('Import named "%s" was resolved to "%s:%s" package (%s).\nPlease, verify manually the final list of requirements.txt to avoid possible dependency confusions.', 
-                        item, 
-                        data.name, 
-                        data.latest_release_id, 
-                        data.pypi_url
+        logging.warning(
+            'Import named "%s" was resolved to "%s:%s" package (%s).'
+            'Please, verify manually the final list of requirements.txt'
+            'to avoid possible dependency confusions.',
+            item,
+            data.name,
+            data.latest_release_id,
+            data.pypi_url
         )
         result.append({'name': item, 'version': data.latest_release_id})
     return result
@@ -216,22 +223,26 @@ def get_locally_installed_packages(encoding=None):
                         except:  # NOQA
                             # TODO: What errors do we intend to suppress here?
                             continue
-                        
-                        # filter off explicitly ignored top-level modules, such as test, egg, etc.
+
+                        # filter off explicitly ignored top-level modules
+                        # such as test, egg, etc.
                         filtered_top_level_modules = list()
 
                         for module in top_level_modules:
-                            if ((module not in ignore) and
-                                    (package[0] not in ignore)):
-                                        # append valid exported top level modules to the final list
-                                        filtered_top_level_modules.append(module)
-                        
+                            if (
+                                (module not in ignore) and
+                                (package[0] not in ignore)
+                            ):
+                                # append exported top level modules to the list
+                                filtered_top_level_modules.append(module)
+
                         version = None
                         if len(package) > 1:
                             version = package[1].replace(
                                 ".dist", "").replace(".egg", "")
 
-                        # append package: top_level_modules pairs instead of top_level_module: package pairs
+                        # append package: top_level_modules pairs
+                        # instead of top_level_module: package pairs
                         packages.append({
                             'name': package[0],
                             'version': version,
@@ -246,16 +257,17 @@ def get_import_local(imports, encoding=None):
     for item in imports:
         # search through local packages
         for package in local:
-            # if candidate import name matches export name inside the package exports 
+            # if candidate import name matches export name
             # or candidate import name equals to the package name
             # append it to the result
             if item in package['exports'] or item == package['name']:
                 result.append(package)
 
     # removing duplicates of package/version
-    # had to use second method instead of the first, listed here, because we have a list in the 'exports' field
+    # had to use second method instead of the previous one,
+    # because we have a list in the 'exports' field
     # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
-    result_unique = [i for n, i in enumerate(result) if i not in result[n + 1:]]
+    result_unique = [i for n, i in enumerate(result) if i not in result[n+1:]]
 
     return result_unique
 
@@ -461,19 +473,20 @@ def init(args):
     else:
         logging.debug("Getting packages information from Local/PyPI")
         local = get_import_local(candidates, encoding=encoding)
-        
-        # check if candidate name is found in the list of exported modules, installed locally
+
+        # check if candidate name is found in
+        # the list of exported modules, installed locally
         # and the package name is not in the list of local module names
         # it add to difference
-        difference = [x for x in candidates       
-            if  
-                # aggregate all export lists into one
-                # flatten the list
-                x.lower() not in [y for x in local for y in x['exports']]
-            and 
-                x.lower() not in [x['name'] for x in local]
-        ]
-                    
+        difference = [x for x in candidates if
+                      # aggregate all export lists into one
+                      # flatten the list
+                      # check if candidate is in exports
+                      x.lower() not in [y for x in local for y in x['exports']]
+                      and
+                      # check if candidate is package names
+                      x.lower() not in [x['name'] for x in local]]
+
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
                                            pypi_server=pypi_server)
