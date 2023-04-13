@@ -1030,6 +1030,7 @@ skbio:scikit_bio
 sklearn:scikit_learn
 slack:slackclient
 slugify:unicode_slugify
+slugify:python-slugify
 smarkets:smk_python_sdk
 snappy:ctypes_snappy
 socketio:gevent_socketio
