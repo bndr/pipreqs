@@ -177,7 +177,7 @@ def get_imports_info(
     for item in imports:
         try:
             logging.warning(
-                'Import named "%s" not found locally.'
+                'Import named "%s" not found locally. '
                 'Trying to resolve it at the PyPI server.',
                 item
             )
@@ -196,8 +196,8 @@ def get_imports_info(
                 'Package "%s" does not exist or network problems', item)
             continue
         logging.warning(
-            'Import named "%s" was resolved to "%s:%s" package (%s).'
-            'Please, verify manually the final list of requirements.txt'
+            'Import named "%s" was resolved to "%s:%s" package (%s).\n'
+            'Please, verify manually the final list of requirements.txt '
             'to avoid possible dependency confusions.',
             item,
             data.name,
