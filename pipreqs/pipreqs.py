@@ -20,6 +20,7 @@ Options:
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
+    --extra <modules>...  Add extra modules, each separated by a comma
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
@@ -434,6 +435,7 @@ def dynamic_versioning(scheme, imports):
 def init(args):
     encoding = args.get('--encoding')
     extra_ignore_dirs = args.get('--ignore')
+    extra_pkgs = args.get('--extra')
     follow_links = not args.get('--no-follow-links')
     input_path = args['<path>']
     if input_path is None:
@@ -441,6 +443,9 @@ def init(args):
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(',')
+
+    if extra_pkgs:
+        extra_pkgs = extra_pkgs.split(',')
 
     path = (args["--savepath"] if args["--savepath"] else
             os.path.join(input_path, "requirements.txt"))
@@ -457,6 +462,8 @@ def init(args):
                                  extra_ignore_dirs=extra_ignore_dirs,
                                  follow_links=follow_links)
     candidates = get_pkg_names(candidates)
+    if extra_pkgs is not None:
+        candidates = list(set(candidates) | set(extra_pkgs))
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
     proxy = None
