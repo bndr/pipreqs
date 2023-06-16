@@ -46,7 +46,7 @@ Usage
                               $ export HTTPS_PROXY="https://10.10.1.10:1080"
         --debug               Print debug information
         --ignore <dirs>...    Ignore extra directories, each separated by a comma
-        --extra <packages>... Add extra packages, each separated by a comma
+        --extra <modules>...  Add extra modules, each separated by a comma
         --no-follow-links     Do not follow symbolic links in the project
         --encoding <charset>  Use encoding parameter for file open
         --savepath <file>     Save the list of requirements in the given file
