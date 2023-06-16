@@ -462,7 +462,7 @@ def init(args):
                                  extra_ignore_dirs=extra_ignore_dirs,
                                  follow_links=follow_links)
     candidates = get_pkg_names(candidates)
-    if extra_pkgs is not None:
+    if extra_pkgs:
         candidates = list(set(candidates) | set(extra_pkgs))
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
