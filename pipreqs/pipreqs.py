@@ -262,13 +262,18 @@ def get_locally_installed_packages(encoding=None):
                             )
                 if "METADATA" in item:
                     item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
+                    with open(item, "r", encoding=encoding) as file:
                         try:
-                            data = dict(x.strip().split(":") for x in f)
+                            data = {}
+                            for line in file:
+                                if ":" in line:
+                                    key, value = line.split(":", 1)
+                                    data[key.strip()] = value.strip()
+
                             name = data["Name"]
                             version = data["Version"]
 
-                            if name not in unique_package_names:
+                            if name and name not in unique_package_names:
                                 unique_package_names.add(name)
                                 packages.append(
                                     {"name": name, "version": version, "exports": []}
