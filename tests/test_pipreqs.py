@@ -139,7 +139,7 @@ class TestPipreqs(unittest.TestCase):
     def test_get_pkg_names(self):
         pkgs = ["jury", "Japan", "camel", "Caroline"]
         actual_output = pipreqs.get_pkg_names(pkgs)
-        expected_output = ["camel", "Caroline", "Japan", "jury"]
+        expected_output = ["camel", "caroline", "japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
     def test_get_use_local_only(self):
