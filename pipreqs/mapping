@@ -1127,6 +1127,7 @@ wheezy:wheezy.caching
 wheezy:wheezy.core
 wheezy:wheezy.http
 wikklytext:tiddlywebwiki
+win32com:pywin32
 winreg:future
 winrm:pywinrm
 workflow:Alfred_Workflow
