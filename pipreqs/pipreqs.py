@@ -141,6 +141,7 @@ def get_all_imports(
         imports.add(cleaned_name)
 
     packages = imports - (set(candidates) & imports)
+    packages = {p.lower() for p in packages}
     logging.debug('Found packages: {0}'.format(packages))
 
     with open(join("stdlib"), "r") as f:
@@ -234,7 +235,7 @@ def get_locally_installed_packages(encoding=None):
                                 (package[0] not in ignore)
                             ):
                                 # append exported top level modules to the list
-                                filtered_top_level_modules.append(module)
+                                filtered_top_level_modules.append(module.lower())
 
                         version = None
                         if len(package) > 1:
@@ -244,7 +245,7 @@ def get_locally_installed_packages(encoding=None):
                         # append package: top_level_modules pairs
                         # instead of top_level_module: package pairs
                         packages.append({
-                            'name': package[0],
+                            'name': package[0].lower(),
                             'version': version,
                             'exports': filtered_top_level_modules
                         })
@@ -288,7 +289,7 @@ def get_pkg_names(pkgs):
     for pkg in pkgs:
         # Look up the mapped requirement. If a mapping isn't found,
         # simply use the package name.
-        result.add(data.get(pkg, pkg))
+        result.add(data.get(pkg, pkg).lower())
     # Return a sorted list for backward compatibility.
     return sorted(result, key=lambda s: s.lower())
 
