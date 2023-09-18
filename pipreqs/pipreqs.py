@@ -315,7 +315,7 @@ def parse_requirements(file_):
         OSerror: If there's any issues accessing the file.
 
     Returns:
-        tuple: The contents of the file, excluding comments.
+        list: The contents of the file, excluding comments.
     """
     modules = []
     # For the dependency identifier specification, see
@@ -353,7 +353,6 @@ def parse_requirements(file_):
 
     return modules
 
-
 def compare_modules(file_, imports):
     """Compare modules in a file to imported modules in a project.
 
@@ -362,8 +361,8 @@ def compare_modules(file_, imports):
         imports (tuple): Modules being imported in the project.
 
     Returns:
-        tuple: The modules not imported in the project, but do exist in the
-               specified file.
+        set: The modules not imported in the project, but do exist in the
+            specified file.
     """
     modules = parse_requirements(file_)
 
