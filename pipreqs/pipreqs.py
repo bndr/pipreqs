@@ -149,10 +149,6 @@ def get_all_imports(
     return list(packages - data)
 
 
-def filter_line(line):
-    return len(line) > 0 and line[0] != "#"
-
-
 def generate_requirements_file(path, imports, symbol):
     with _open(path, "w") as out_file:
         logging.debug('Writing {num} requirements: {imports} to {file}'.format(
