@@ -11,6 +11,8 @@ Tests for `pipreqs` module.
 import io
 import sys
 import unittest
+from unittest.mock import patch
+import sys
 import os
 import requests
 
@@ -48,7 +50,14 @@ class TestPipreqs(unittest.TestCase):
             os.path.dirname(__file__), "_data_duplicated_deps"
         )
         self.requirements_path = os.path.join(self.project, "requirements.txt")
-        self.alt_requirement_path = os.path.join(self.project, "requirements2.txt")
+        self.alt_requirement_path = os.path.join(
+            self.project,
+            "requirements2.txt"
+            )
+        self.local_packages_path = os.path.join(
+            os.path.dirname(__file__),
+            "_local_packages"
+            )
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -108,6 +117,15 @@ class TestPipreqs(unittest.TestCase):
         imports_with_info = pipreqs.get_import_local(self.modules)
         for item in imports_with_info:
             self.assertTrue(item["name"].lower() in self.local)
+
+    def test_get_locally_installed_packages(self):
+        with patch.object(sys, 'path', new=[self.local_packages_path]):
+            local_installed_packages = pipreqs.get_locally_installed_packages()
+            expected_output = [
+                {'exports': ['valid_package'], 'name': 'valid_package', 'version': '1.0.0'},
+                {'exports': [], 'name': 'EGG', 'version': 'INFO'}
+            ]
+            self.assertEqual(local_installed_packages, expected_output)
 
     def test_init(self):
         """
