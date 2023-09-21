@@ -25,8 +25,18 @@ class TestPipreqs(unittest.TestCase):
             'after_method_is_valid_even_if_not_pep8'
             ]
         self.modules2 = ['beautifulsoup4']
+        self.parsed_packages = [{'name': 'pandas', 'version': '2.0.0'}, {'name': 'numpy', 'version': '1.2.3'}, {'name': 'torch', 'version': '4.0.0'}]
+        self.parsed_packages_no_version = [{'name': 'pandas', 'version': None}, {'name': 'tensorflow', 'version': None}, {'name': 'torch', 'version': None}]
+        self.parsed_packages_any_version = [{'name': 'numpy', 'version': None}, {'name': 'pandas', 'version': "2.0.0"}, {'name': 'tensorflow', 'version': None}, {'name': 'torch', 'version': "4.0.0"}]
+
         self.local = ["docopt", "requests", "nose", 'pyflakes']
         self.project = os.path.join(os.path.dirname(__file__), "_data")
+        self.empty_filepath = os.path.join(self.project, "empty.txt")
+        self.imports_filepath = os.path.join(self.project, "imports.txt")
+        self.imports_no_version_filepath = os.path.join(self.project, "imports_no_version.txt")
+        self.imports_any_version_filepath = os.path.join(self.project, "imports_any_version.txt")
+        self.non_existent_filepath = os.path.join(self.project, "non_existent_file.txt")
+
         self.project_clean = os.path.join(
             os.path.dirname(__file__),
             "_data_clean"
@@ -138,6 +148,7 @@ class TestPipreqs(unittest.TestCase):
             data = f.readlines()
             for item in data:
                 item = item.strip().split("==")
+                breakpoint()
                 self.assertTrue(item[0].lower() in self.local)
 
     def test_init_savepath(self):
@@ -322,6 +333,27 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             self.assertTrue(cleaned_module not in data)
 
+    def test_parse_requirements(self):
+        """
+        Test parse_requirements function
+        """
+        test_cases = [
+            (self.empty_filepath, []),  # empty file
+            (self.imports_filepath, self.parsed_packages),  # imports with versions
+            (self.imports_no_version_filepath, self.parsed_packages_no_version), # imports without versions
+            (self.imports_any_version_filepath, self.parsed_packages_any_version) # imports with and without versions
+        ]
+
+        for test in test_cases:
+            with self.subTest(test):
+                filename, expected_parsed_requirements = test
+
+                parsed_requirements = pipreqs.parse_requirements(filename)
+    
+        # test exception raised by function
+        self.assertRaises( 
+            OSError, pipreqs.parse_requirements, self.non_existent_filepath)
+    
     def tearDown(self):
         """
         Remove requiremnts.txt files that were written
