@@ -1,19 +1,23 @@
 name: Tests and Codecov
-on: pull_request
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
 jobs:
     run_tests:
         runs-on: ubuntu-latest
         strategy:
             fail-fast: false
             matrix:
-                python-version: [3.7, 3.8, 3.9, pypy-3.7]
+                python-version: ['3.8', '3.9', '3.10', '3.11', 'pypy-3.9']
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v4
               with:
                   python-version: ${{ matrix.python-version }}
 
@@ -30,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Install dependencies
               run: |
@@ -44,7 +48,7 @@ jobs:
               run: coverage xml
 
             - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v2
+              uses: codecov/codecov-action@v3
               with:
                   files: coverage.xml
                   fail_ci_if_error: true
