@@ -8,6 +8,8 @@ test_pipreqs
 Tests for `pipreqs` module.
 """
 
+import io
+import sys
 import unittest
 import os
 import requests
@@ -426,6 +428,49 @@ class TestPipreqs(unittest.TestCase):
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
             self.assertTrue(cleaned_module not in data)
+
+    def test_output_requirements(self):
+        """
+        Test --print parameter
+        It should print to stdout the same content as requeriments.txt
+        """
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": True,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+
+        with open(self.requirements_path, "r") as f:
+            file_content = f.read().lower()
+            stdout_content = capturedOutput.getvalue().lower()
+            self.assertTrue(file_content == stdout_content)
 
     def tearDown(self):
         """
