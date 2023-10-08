@@ -21,7 +21,7 @@
 Installation
 ------------
 
-::
+.. code-block:: sh
 
     pip install pipreqs
 
