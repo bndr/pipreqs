@@ -10,6 +10,7 @@ BeautifulSoupTests:BeautifulSoup
 BioSQL:biopython
 BuildbotStatusShields:BuildbotEightStatusShields
 ComputedAttribute:ExtensionClass
+constraint:python-constraint
 Crypto:pycryptodome
 Cryptodome:pycryptodomex
 FSM:pexpect
@@ -129,6 +130,7 @@ aios3:aio_s3
 airbrake:airbrake_flask
 airship:airship_icloud
 airship:airship_steamcloud
+airflow:apache-airflow
 akamai:edgegrid_python
 alation:alation_api
 alba_client:alba_client_python
@@ -1030,9 +1032,10 @@ skbio:scikit_bio
 sklearn:scikit_learn
 slack:slackclient
 slugify:unicode_slugify
+slugify:python-slugify
 smarkets:smk_python_sdk
 snappy:ctypes_snappy
-socketio:gevent_socketio
+socketio:python-socketio
 socketserver:pies2overrides
 sockjs:sockjs_tornado
 socks:SocksiPy_branch
@@ -1061,6 +1064,7 @@ tasksitter:cerebrod
 tastypie:django_tastypie
 teamcity:teamcity_messages
 telebot:pyTelegramBotAPI
+telegram:python-telegram-bot
 tempita:Tempita
 tenjin:Tenjin
 termstyle:python_termstyle
