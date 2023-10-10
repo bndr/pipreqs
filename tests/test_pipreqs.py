@@ -8,6 +8,8 @@ test_pipreqs
 Tests for `pipreqs` module.
 """
 
+import io
+import sys
 import unittest
 import os
 import requests
@@ -37,6 +39,31 @@ class TestPipreqs(unittest.TestCase):
         self.modules2 = ["beautifulsoup4"]
         self.local = ["docopt", "requests", "nose", "pyflakes"]
         self.project = os.path.join(os.path.dirname(__file__), "_data")
+        self.empty_filepath = os.path.join(self.project, "empty.txt")
+        self.imports_filepath = os.path.join(self.project, "imports.txt")
+        self.imports_no_version_filepath = os.path.join(self.project, "imports_no_version.txt")
+        self.imports_any_version_filepath = os.path.join(self.project, "imports_any_version.txt")
+        self.non_existent_filepath = os.path.join(self.project, "non_existent_file.txt")
+
+        self.parsed_packages = [
+            {"name": "pandas", "version": "2.0.0"},
+            {"name": "numpy", "version": "1.2.3"},
+            {"name": "torch", "version": "4.0.0"},
+        ]
+
+        self.parsed_packages_no_version = [
+            {"name": "pandas", "version": None},
+            {"name": "tensorflow", "version": None},
+            {"name": "torch", "version": None},
+        ]
+
+        self.parsed_packages_any_version = [
+            {"name": "numpy", "version": None},
+            {"name": "pandas", "version": "2.0.0"},
+            {"name": "tensorflow", "version": None},
+            {"name": "torch", "version": "4.0.0"},
+        ]
+
         self.project_clean = os.path.join(os.path.dirname(__file__), "_data_clean")
         self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
         self.parsed_packages = [
@@ -46,12 +73,10 @@ class TestPipreqs(unittest.TestCase):
         ]
         self.empty_filepath = os.path.join(self.project, "empty.txt")
         self.imports_filepath = os.path.join(self.project, "imports.txt")
-        self.project_with_ignore_directory = os.path.join(
-            os.path.dirname(__file__), "_data_ignore"
-        )
-        self.project_with_duplicated_deps = os.path.join(
-            os.path.dirname(__file__), "_data_duplicated_deps"
-        )
+
+        self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
+        self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
+        
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(self.project, "requirements2.txt")
 
@@ -228,12 +253,8 @@ class TestPipreqs(unittest.TestCase):
         """
         import_name_with_alias = "requests as R"
         expected_import_name_without_alias = "requests"
-        import_name_without_aliases = pipreqs.get_name_without_alias(
-            import_name_with_alias
-        )
-        self.assertEqual(
-            import_name_without_aliases, expected_import_name_without_alias
-        )
+        import_name_without_aliases = pipreqs.get_name_without_alias(import_name_with_alias)
+        self.assertEqual(import_name_without_aliases, expected_import_name_without_alias)
 
     def test_custom_pypi_server(self):
         """
@@ -272,9 +293,7 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": None,
             }
         )
-        with open(
-            os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r"
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.read().lower()
             for item in ["click", "getpass"]:
                 self.assertFalse(item.lower() in data)
@@ -297,9 +316,7 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": "no-pin",
             }
         )
-        with open(
-            os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r"
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.read().lower()
             for item in ["beautifulsoup4", "boto"]:
                 self.assertTrue(item.lower() in data)
@@ -322,9 +339,7 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": "gt",
             }
         )
-        with open(
-            os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r"
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
             for item in data:
                 symbol = ">="
@@ -349,9 +364,7 @@ class TestPipreqs(unittest.TestCase):
                 "--mode": "compat",
             }
         )
-        with open(
-            os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r"
-        ) as f:
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
             for item in data:
                 symbol = "~="
@@ -458,6 +471,74 @@ class TestPipreqs(unittest.TestCase):
                 modules_not_imported = pipreqs.compare_modules(filename, imports)
 
                 self.assertSetEqual(modules_not_imported, expected_modules_not_imported)
+                
+    def test_output_requirements(self):
+        """
+        Test --print parameter
+        It should print to stdout the same content as requeriments.txt
+        """
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": True,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+
+        with open(self.requirements_path, "r") as f:
+            file_content = f.read().lower()
+            stdout_content = capturedOutput.getvalue().lower()
+            self.assertTrue(file_content == stdout_content)
+
+    def test_parse_requirements(self):
+        """
+        Test parse_requirements function
+        """
+        test_cases = [
+            (self.empty_filepath, []),  # empty file
+            (self.imports_filepath, self.parsed_packages),  # imports with versions
+            (
+                self.imports_no_version_filepath,
+                self.parsed_packages_no_version,
+            ),  # imports without versions
+            (
+                self.imports_any_version_filepath,
+                self.parsed_packages_any_version,
+            ),  # imports with and without versions
+        ]
+
+        for test in test_cases:
+            with self.subTest(test):
+                filename, expected_parsed_requirements = test
+
+                parsed_requirements = pipreqs.parse_requirements(filename)
+
+                self.assertListEqual(parsed_requirements, expected_parsed_requirements)
 
     def tearDown(self):
         """
