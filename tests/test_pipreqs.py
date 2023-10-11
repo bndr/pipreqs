@@ -6,13 +6,24 @@ test_pipreqs
 ----------------------------------
 
 Tests for `pipreqs` module.
+
+Environment variables used to mock arguments
+e.g.,
+$ set CA_BUNDLE="certificates.pem"     # for win OS
+$ export CA_BUNDLE="certificates.pem"  # for nix OS
 """
 
-import unittest
 import os
+import unittest
+
 import requests
 
 from pipreqs import pipreqs
+
+CA_BUNDLE = os.environ.get("CA_BUNDLE")
+
+if CA_BUNDLE is None:
+    from tests.settings import CA_BUNDLE
 
 
 class TestPipreqs(unittest.TestCase):
@@ -49,6 +60,7 @@ class TestPipreqs(unittest.TestCase):
             "requirements2.txt"
             )
 
+
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
         self.assertEqual(len(imports), 15)
@@ -80,7 +92,9 @@ class TestPipreqs(unittest.TestCase):
         Test to see that the right number of packages were found on PyPI
         """
         imports = pipreqs.get_all_imports(self.project)
-        with_info = pipreqs.get_imports_info(imports)
+        with_info = pipreqs.get_imports_info(
+            imports, proxy=None, verify=CA_BUNDLE
+        )
         # Should contain 10 items without the "nonexistendmodule" and
         # "after_method_is_valid_even_if_not_pep8"
         self.assertEqual(len(with_info), 13)
@@ -113,9 +127,21 @@ class TestPipreqs(unittest.TestCase):
         """
         Test that all modules we will test upon are in requirements file
         """
-        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
-                      '--use-local': None, '--force': True, '--proxy':None, '--pypi-server':None,
-                      '--diff': None, '--clean': None, '--mode': None})
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -130,9 +156,21 @@ class TestPipreqs(unittest.TestCase):
         Test that items listed in requirements.text are the same
         as locals expected
         """
-        pipreqs.init({'<path>': self.project, '--savepath': None, '--print': False,
-                      '--use-local': True, '--force': True, '--proxy':None, '--pypi-server':None,
-                      '--diff': None, '--clean': None, '--mode': None})
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": True,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
@@ -145,9 +183,20 @@ class TestPipreqs(unittest.TestCase):
         Test that we can save requirements.txt correctly
         to a different path
         """
-        pipreqs.init({'<path>': self.project, '--savepath': self.alt_requirement_path, 
-                      '--use-local': None, '--proxy':None, '--pypi-server':None,  '--print': False,
-                      '--diff': None, '--clean': None, '--mode': None})
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": self.alt_requirement_path,
+                "--use-local": None,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
         assert os.path.exists(self.alt_requirement_path) == 1
         with open(self.alt_requirement_path, "r") as f:
             data = f.read().lower()
@@ -163,9 +212,21 @@ class TestPipreqs(unittest.TestCase):
         """
         with open(self.requirements_path, "w") as f:
             f.write("should_not_be_overwritten")
-        pipreqs.init({'<path>': self.project, '--savepath': None, '--use-local': None, 
-                      '--force': None, '--proxy':None, '--pypi-server':None, '--print': False,
-                      '--diff': None, '--clean': None, '--mode': None})
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
         assert os.path.exists(self.requirements_path) == 1
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
@@ -192,25 +253,39 @@ class TestPipreqs(unittest.TestCase):
         Test that trying to get a custom pypi sever fails correctly
         """
         self.assertRaises(
-            requests.exceptions.MissingSchema, pipreqs.init,
-            {'<path>': self.project, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True, '--proxy': None,
-             '--pypi-server': 'nonexistent'}
-            )
+            requests.exceptions.MissingSchema,
+            pipreqs.init,
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": "nonexistent",
+            },
+        )
 
     def test_ignored_directory(self):
         """
         Test --ignore parameter
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, 
-                      '--print': False, '--use-local': None, '--force': True,
-                      '--proxy':None, '--pypi-server':None,
-                      '--ignore':'.ignored_dir,.ignore_second',
-                      '--diff': None,
-                      '--clean': None,
-                      '--mode': None
-             }
+            {
+                "<path>": self.project_with_ignore_directory,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--ignore": ".ignored_dir,.ignore_second",
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.read().lower()
@@ -222,13 +297,19 @@ class TestPipreqs(unittest.TestCase):
         Test --mode=no-pin
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, 
-             '--print': False, '--use-local': None, '--force': True,
-             '--proxy': None, '--pypi-server': None,
-             '--diff': None,
-             '--clean': None,
-             '--mode': 'no-pin'
-             }
+            {
+                "<path>": self.project_with_ignore_directory,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": "no-pin",
+            }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.read().lower()
@@ -240,14 +321,19 @@ class TestPipreqs(unittest.TestCase):
         Test --mode=gt
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True,
-             '--proxy': None,
-             '--pypi-server': None,
-             '--diff': None,
-             '--clean': None,
-             '--mode': 'gt'
-             }
+            {
+                "<path>": self.project_with_ignore_directory,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": "gt",
+            }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
@@ -261,14 +347,19 @@ class TestPipreqs(unittest.TestCase):
         Test --mode=compat
         """
         pipreqs.init(
-            {'<path>': self.project_with_ignore_directory, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True,
-             '--proxy': None,
-             '--pypi-server': None,
-             '--diff': None,
-             '--clean': None,
-             '--mode': 'compat'
-             }
+            {
+                "<path>": self.project_with_ignore_directory,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": "compat",
+            }
         )
         with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
             data = f.readlines()
@@ -282,18 +373,36 @@ class TestPipreqs(unittest.TestCase):
         Test --clean parameter
         """
         pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--print': False,
-             '--use-local': None, '--force': True, '--proxy': None,
-             '--pypi-server': None, '--diff': None, '--clean': None,
-             '--mode': None}
-            )
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
         assert os.path.exists(self.requirements_path) == 1
         pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--print': False,
-            '--use-local': None, '--force': None, '--proxy': None,
-            '--pypi-server': None, '--diff': None,
-            '--clean': self.requirements_path, '--mode': 'non-pin'}
-            )
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": self.requirements_path,
+                "--mode": "non-pin",
+            }
+        )
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
             for item in self.modules[:-3]:
@@ -305,19 +414,37 @@ class TestPipreqs(unittest.TestCase):
         """
         cleaned_module = 'sqlalchemy'
         pipreqs.init(
-            {'<path>': self.project, '--savepath': None, '--print': False,
-            '--use-local': None, '--force': True, '--proxy': None,
-            '--pypi-server': None, '--diff': None, '--clean': None,
-            '--mode': None}
-            )
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
         assert os.path.exists(self.requirements_path) == 1
         modules_clean = [m for m in self.modules if m != cleaned_module]
         pipreqs.init(
-            {'<path>': self.project_clean, '--savepath': None,
-            '--print': False, '--use-local': None, '--force': None,
-            '--proxy': None, '--pypi-server': None, '--diff': None,
-            '--clean': self.requirements_path, '--mode': 'non-pin'}
-            )
+            {
+                "<path>": self.project_clean,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--verify": CA_BUNDLE,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": self.requirements_path,
+                "--mode": "non-pin",
+            }
+        )
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
             self.assertTrue(cleaned_module not in data)

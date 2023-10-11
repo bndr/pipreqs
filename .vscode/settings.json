@@ -1,0 +1,37 @@
+{
+    "python.pythonPath": "${workspaceFolder}/.env38/Scripts/python.exe",
+    //
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#1e535f",
+        "activityBar.background": "#1e535f",
+        "activityBar.foreground": "#e7e7e7",
+        "activityBar.inactiveForeground": "#e7e7e799",
+        "activityBarBadge.background": "#300f2a",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "commandCenter.border": "#e7e7e799",
+        "sash.hoverBorder": "#1e535f",
+        "statusBar.background": "#123138",
+        "statusBar.foreground": "#e7e7e7",
+        "statusBarItem.hoverBackground": "#1e535f",
+        "statusBarItem.remoteBackground": "#123138",
+        "statusBarItem.remoteForeground": "#e7e7e7",
+        "titleBar.activeBackground": "#123138",
+        "titleBar.activeForeground": "#e7e7e7",
+        "titleBar.inactiveBackground": "#12313899",
+        "titleBar.inactiveForeground": "#e7e7e799"
+    },
+    //JWL4-BlueGreen
+    "peacock.color": "#123138",
+    //
+    // reStructuredText, root ReadMe.rst
+    //"esbonio.sphinx.confDir": "",
+    //
+    // test
+    "python.testing.pytestArgs": [
+        "src",
+        "tests",
+    ],
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": false,
+    "esbonio.sphinx.confDir": "",
+}

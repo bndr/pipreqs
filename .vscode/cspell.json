@@ -1,0 +1,29 @@
+{
+  "version": "0.2",
+  "ignorePaths": [],
+  "dictionaryDefinitions": [],
+  "dictionaries": [],
+  "words": [
+    "beautifulsoup",
+    "boto",
+    "compat",
+    "docopt",
+    "docstrings",
+    "dotenv",
+    "mkvirtualenv",
+    "nonexistendmodule",
+    "pipreqs",
+    "pymongo",
+    "pypi",
+    "requiremnts",
+    "savepath",
+    "seasurf",
+    "sqlalchemy",
+    "ujson",
+    "virtualenv",
+    "virtualenvwrapper",
+    "Yarg"
+  ],
+  "ignoreWords": [],
+  "import": []
+}
