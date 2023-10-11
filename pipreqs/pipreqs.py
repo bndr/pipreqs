@@ -185,7 +185,16 @@ def get_imports_info(
                 "{0}{1}/json".format(pypi_server, item), proxies=proxy)
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
-                    data = json2package(response.content.decode())
+                    content_decode = ""
+                    try:
+                        content_decode = response.content.decode()
+                    except:
+                        try:
+                            content_decode = response.content.decode(response.apparent_encoding)
+                        except:
+                            logging.error(f"Failed to decode response from {item} pypi query.")
+                            raise
+                    data = json2package(content_decode)
                 else:
                     data = json2package(response.content)
             elif response.status_code >= 300:
