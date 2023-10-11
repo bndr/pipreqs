@@ -217,6 +217,25 @@ class TestPipreqs(unittest.TestCase):
             for item in ['click', 'getpass']:
                 self.assertFalse(item.lower() in data)
 
+    def test_extra_module(self):
+        """
+        Test --extra parameter
+        """
+        pipreqs.init(
+            {'<path>': self.project_with_ignore_directory, '--savepath': None,
+                      '--print': False, '--use-local': None, '--force': True,
+                      '--proxy': None, '--pypi-server': None,
+                      '--extra': 'example,example2',
+                      '--diff': None,
+                      '--clean': None,
+                      '--mode': None
+             }
+        )
+        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
+            data = f.read().lower()
+            for item in ['example,example2']:
+                self.assertFalse(item.lower() in data)
+
     def test_dynamic_version_no_pin_scheme(self):
         """
         Test --mode=no-pin
