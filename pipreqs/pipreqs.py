@@ -18,6 +18,12 @@ Options:
                           parameter in your terminal:
                           $ export HTTP_PROXY="http://10.10.1.10:3128"
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
+    --verify <ca_bundle>  Use verify to provide a CA_BUNDLE file or directory
+                          with certificates of trusted CAs
+                          You can also just set the environment variable in
+                          your terminal: (`export` for nix and `set` for win)
+                          $ export CA_BUNDLE="/certs/path/certificates.pem" #or
+                          $ set CA_BUNDLE="C:/certs/path/certificates.pem"
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
     --no-follow-links     Do not follow symbolic links in the project
@@ -36,15 +42,17 @@ Options:
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
 """
-from contextlib import contextmanager
-import os
-import sys
-import re
-import logging
 import ast
+import logging
+import os
+import re
+import sys
 import traceback
-from docopt import docopt
+from contextlib import contextmanager
+from pathlib import Path
+
 import requests
+from docopt import docopt
 from yarg import json2package
 from yarg.exceptions import HTTPError
 
@@ -54,6 +62,10 @@ REGEXP = [
     re.compile(r'^import (.+)$'),
     re.compile(r'^from ((?!\.+).*?) import (?:.*)$')
 ]
+
+CA_BUNDLE = os.environ.get("CA_BUNDLE")
+if CA_BUNDLE is not None:
+    CA_BUNDLE = str(Path(CA_BUNDLE))
 
 
 @contextmanager
@@ -171,7 +183,12 @@ def output_requirements(imports, symbol):
 
 
 def get_imports_info(
-        imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+    imports,
+    pypi_server="https://pypi.python.org/pypi/",
+    proxy=None,
+    verify=CA_BUNDLE,
+    c=None,
+):
     result = []
 
     for item in imports:
@@ -182,7 +199,10 @@ def get_imports_info(
                 item
             )
             response = requests.get(
-                "{0}{1}/json".format(pypi_server, item), proxies=proxy)
+                "{0}{1}/json".format(pypi_server, item),
+                proxies=proxy,
+                verify=verify,
+            )
             if response.status_code == 200:
                 if hasattr(response.content, 'decode'):
                     data = json2package(response.content.decode())
@@ -459,12 +479,16 @@ def init(args):
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
+    verify = CA_BUNDLE
     proxy = None
     if args["--pypi-server"]:
         pypi_server = args["--pypi-server"]
 
     if args["--proxy"]:
         proxy = {'http': args["--proxy"], 'https': args["--proxy"]}
+
+    if args["--verify"]:
+        verify = args["--verify"]
 
     if args["--use-local"]:
         logging.debug(
@@ -489,6 +513,7 @@ def init(args):
 
         imports = local + get_imports_info(difference,
                                            proxy=proxy,
+                                           verify=verify,
                                            pypi_server=pypi_server)
     # sort imports based on lowercase name of package, similar to `pip freeze`.
     imports = sorted(imports, key=lambda x: x['name'].lower())

@@ -7,7 +7,6 @@ except ImportError:
 
 from pipreqs import __version__
 
-
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
@@ -15,7 +14,10 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-    'docopt', 'yarg'
+    'docopt', 'yarg', 'requests'
+]
+tests_requirements = [
+    'python-dotenv', 'flake8'
 ]
 
 setup(
@@ -49,6 +51,7 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
     ],
+    tests_require=tests_requirements,
     test_suite='tests',
     entry_points={
         'console_scripts': [

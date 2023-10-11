@@ -1,0 +1,14 @@
+asposestorage
+beautifulsoup4
+boto
+click
+docopt
+Flask
+ipython
+nose
+pattern
+peewee
+pyflakes
+requests
+SQLAlchemy
+ujson

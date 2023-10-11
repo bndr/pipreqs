@@ -1,0 +1,36 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# > python39 -m venv .env39
+# # activate (.env39) virtual environment
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# upgrade pip (21.1.1 -> 22.3.1)
+# (.env39)> python.exe -m pip install --upgrade pip
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# development packages
+# (.env39)> pip install -r requirements-dev.txt
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# development mode installation of `pipreqs`
+# (.env39)> pip install -e .
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# fix_SSLError tests.settings (optional) use of .env file
+# alternative would be to set CA_BUNDLE environment variable
+#  $ export CA_BUNDLE="/certs/path/certificates.pem"  # for nix OS
+#  $ set CA_BUNDLE="C:/certs/path/certificates.pem"   # for win OS
+
+python-dotenv
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# required per CONTRIBUTING workflow
+flake8
+tox   # only needed in the environment from which tox is run
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# (optional)
+# vscode settings: "python.formatting.provider": "black",
+#black
+docutils  # reStructured Text support
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
