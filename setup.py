@@ -15,7 +15,7 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-    'docopt', 'yarg'
+    'yarg'
 ]
 
 setup(
@@ -34,6 +34,9 @@ setup(
     include_package_data=True,
     package_data={'': ['stdlib', 'mapping']},
     install_requires=requirements,
+    extras_require = {
+        'cli':  ["docopt"]
+    },
     license='Apache License',
     zip_safe=False,
     keywords='pip requirements imports',
