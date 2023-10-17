@@ -15,7 +15,11 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 requirements = [
-    'docopt', 'yarg', 'nbconvert', 'ipython'
+    'docopt', 'yarg'
+]
+
+jupyter_requirements = [
+    'nbconvert', 'ipython'
 ]
 
 setup(
@@ -34,6 +38,7 @@ setup(
     include_package_data=True,
     package_data={'': ['stdlib', 'mapping']},
     install_requires=requirements,
+    extras_require={"jupyter":jupyter_requirements},
     license='Apache License',
     zip_safe=False,
     keywords='pip requirements imports',
