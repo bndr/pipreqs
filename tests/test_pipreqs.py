@@ -8,11 +8,12 @@ test_pipreqs
 Tests for `pipreqs` module.
 """
 
-import io
-import sys
+from io import StringIO
+from unittest.mock import patch
 import unittest
 import os
 import requests
+import sys
 
 from pipreqs import pipreqs
 
@@ -76,9 +77,10 @@ class TestPipreqs(unittest.TestCase):
 
         self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
         self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
-        
+
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(self.project, "requirements2.txt")
+        self.non_existing_filepath = "xpto"
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -471,14 +473,14 @@ class TestPipreqs(unittest.TestCase):
                 modules_not_imported = pipreqs.compare_modules(filename, imports)
 
                 self.assertSetEqual(modules_not_imported, expected_modules_not_imported)
-                
+
     def test_output_requirements(self):
         """
         Test --print parameter
         It should print to stdout the same content as requeriments.txt
         """
 
-        capturedOutput = io.StringIO()
+        capturedOutput = StringIO()
         sys.stdout = capturedOutput
 
         pipreqs.init(
@@ -539,6 +541,23 @@ class TestPipreqs(unittest.TestCase):
                 parsed_requirements = pipreqs.parse_requirements(filename)
 
                 self.assertListEqual(parsed_requirements, expected_parsed_requirements)
+
+    @patch("sys.exit")
+    def test_parse_requirements_handles_file_not_found(self, exit_mock):
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        # This assertion is needed, because since "sys.exit" is mocked, the program won't end,
+        # and the code that is after the except block will be run
+        with self.assertRaises(UnboundLocalError):
+            pipreqs.parse_requirements(self.non_existing_filepath)
+
+            exit_mock.assert_called_once_with(1)
+
+            printed_text = captured_output.getvalue().strip()
+            sys.stdout = sys.__stdout__
+
+            self.assertEqual(printed_text, "File xpto was not found. Please, fix it and run again.")
 
     def tearDown(self):
         """
