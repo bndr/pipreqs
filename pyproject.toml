@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "pipreqs"
-version = "0.4.13"
+name = "pipreqs-test"
+version = "45.1.47"
 description = "Pip requirements.txt generator based on imports in project"
 authors = ["Vadim Kravcenko <vadim.kravcenko@gmail.com>"]
 license = "Apache-2.0"
