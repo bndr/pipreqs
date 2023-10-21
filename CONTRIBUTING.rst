@@ -61,12 +61,11 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 2. Clone your fork locally::
 
     $ git clone git@github.com:your_name_here/pipreqs.git
-
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
-
-    $ mkvirtualenv pipreqs
     $ cd pipreqs/
-    $ python setup.py develop
+
+3. Pipreqs is developed using Poetry. Refer to the `documentation <https://python-poetry.org/docs/>`_ to install Poetry in your local environment. Next, you should install pipreqs's dependencies::
+
+    $ poetry install --with dev
 
 4. Create a branch for local development::
 
@@ -76,11 +75,11 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
-    $ flake8 pipreqs tests
-    $ python setup.py test
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
+    $ poetry run flake8 pipreqs tests
+    $ poetry run python -m unittest discover
+    $ poetry run tox
+    
+    To test all versions of python using tox you need to have them installed and for this two options are recommended: `pyenv` or `asdf`.
 
 6. Commit your changes and push your branch to GitHub::
 
@@ -99,7 +98,7 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 3.7 to 3.11, and PyPy. Check
+3. The pull request should work for currently supported Python and PyPy versions. Check
    https://travis-ci.org/bndr/pipreqs/pull_requests and make sure that the
    tests pass for all supported Python versions.
 
@@ -108,4 +107,4 @@ Tips
 
 To run a subset of tests::
 
-    $ python -m unittest tests.test_pipreqs
+    $ poetry run python -m unittest tests.test_pipreqs
