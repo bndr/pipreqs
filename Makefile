@@ -6,13 +6,14 @@ help:
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "clean-test - remove test and coverage artifacts"
 	@echo "lint - check style with flake8"
-	@echo "test - run tests quickly with the default Python"
+	@echo "test - run tests quickly using the default Python"
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - package and upload a release"
-	@echo "dist - package"
-	@echo "install - install the package to the active Python's site-packages"
+	@echo "publish - package and upload a release"
+	@echo "publish-to-test - package and upload a release to test-pypi"
+	@echo "build - build the package"
+	@echo "install - install the dependencies into the Poetry virtual environment"
 
 clean: clean-build clean-pyc clean-test
 
@@ -35,14 +36,13 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 pipreqs tests
+	poetry run flake8 pipreqs tests
 
 test:
-	pip install -r requirements.txt
-	python setup.py test
+	poetry run python -m unittest discover 
 
 test-all:
-	tox
+	poetry run tox
 
 coverage:
 	coverage run --source pipreqs setup.py test
@@ -58,13 +58,14 @@ docs:
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
 
-release: clean
-	python setup.py sdist bdist_wheel upload -r pypi
+publish: build
+	poetry publish
 
-dist: clean
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
+publish-to-test: build
+	poetry publish --repository test-pypi
+
+build: clean
+	poetry build
 
 install: clean
-	python setup.py install
+	poetry install --with dev
