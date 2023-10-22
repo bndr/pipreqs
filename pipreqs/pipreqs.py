@@ -170,10 +170,6 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
     return list(packages - data)
 
 
-def filter_line(line):
-    return len(line) > 0 and line[0] != "#"
-
-
 def filter_ext(file_name, acceptable):
     return os.path.splitext(file_name)[1] in acceptable
 

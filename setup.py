@@ -38,7 +38,7 @@ setup(
     include_package_data=True,
     package_data={'': ['stdlib', 'mapping']},
     install_requires=requirements,
-    extras_require={"jupyter":jupyter_requirements},
+    extras_require={"jupyter": jupyter_requirements},
     license='Apache License',
     zip_safe=False,
     keywords='pip requirements imports',
