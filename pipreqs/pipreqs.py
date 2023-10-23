@@ -47,7 +47,12 @@ from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
-from nbconvert import PythonExporter
+
+try:
+    PythonExporter = None
+    from nbconvert import PythonExporter
+except ImportError:
+    pass
 
 from pipreqs import __version__
 
@@ -115,7 +120,10 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        files = [fn for fn in files if filter_ext(fn, [".py", ".ipynb"])]
+        if PythonExporter:
+            files = [fn for fn in files if filter_ext(fn, [".py", ".ipynb"])]
+        else:
+            files = [fn for fn in files if filter_ext(fn, [".py"])]
 
         candidates = list(
             map(
@@ -130,7 +138,7 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
             if filter_ext(file_name, [".py"]):
                 with open(file_name, "r", encoding=encoding) as f:
                     contents = f.read()
-            elif filter_ext(file_name, [".ipynb"]):
+            elif filter_ext(file_name, [".ipynb"]) and PythonExporter:
                 contents = ipynb_2_py(file_name, encoding=encoding)
             try:
                 tree = ast.parse(contents)
@@ -147,7 +155,7 @@ def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=Tr
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
-                    if filter_ext(file_name, [".ipynb"]):
+                    if filter_ext(file_name, [".ipynb"]) and PythonExporter:
                         logging.error("Magic command without % might be failed")
                     raise exc
 
