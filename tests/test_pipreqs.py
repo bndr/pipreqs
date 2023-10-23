@@ -8,11 +8,12 @@ test_pipreqs
 Tests for `pipreqs` module.
 """
 
-import io
-import sys
+from io import StringIO
+from unittest.mock import patch
 import unittest
 import os
 import requests
+import sys
 
 from pipreqs import pipreqs
 
@@ -80,6 +81,8 @@ class TestPipreqs(unittest.TestCase):
             "original": os.path.join(os.path.dirname(__file__), "_data/test.py"),
             "notebook": os.path.join(os.path.dirname(__file__), "_data_notebook/test.ipynb"),
         }
+        self.non_existing_filepath = "xpto"
+
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -479,7 +482,7 @@ class TestPipreqs(unittest.TestCase):
         It should print to stdout the same content as requeriments.txt
         """
 
-        capturedOutput = io.StringIO()
+        capturedOutput = StringIO()
         sys.stdout = capturedOutput
 
         pipreqs.init(
@@ -582,6 +585,23 @@ class TestPipreqs(unittest.TestCase):
                 parsed_requirements = pipreqs.parse_requirements(filename)
 
                 self.assertListEqual(parsed_requirements, expected_parsed_requirements)
+
+    @patch("sys.exit")
+    def test_parse_requirements_handles_file_not_found(self, exit_mock):
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        # This assertion is needed, because since "sys.exit" is mocked, the program won't end,
+        # and the code that is after the except block will be run
+        with self.assertRaises(UnboundLocalError):
+            pipreqs.parse_requirements(self.non_existing_filepath)
+
+            exit_mock.assert_called_once_with(1)
+
+            printed_text = captured_output.getvalue().strip()
+            sys.stdout = sys.__stdout__
+
+            self.assertEqual(printed_text, "File xpto was not found. Please, fix it and run again.")
 
     def tearDown(self):
         """

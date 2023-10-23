@@ -61,7 +61,6 @@ REGEXP = [
     re.compile(r"^from ((?!\.+).*?) import (?:.*)$"),
 ]
 
-
 @contextmanager
 def _open(filename=None, mode="r"):
     """Open a file or ``sys.stdout`` depending on the provided filename.
@@ -211,7 +210,11 @@ def generate_requirements_file(path, imports, symbol):
         )
         fmt = "{name}" + symbol + "{version}"
         out_file.write(
-            "\n".join(fmt.format(**item) if item["version"] else "{name}".format(**item) for item in imports) + "\n"
+            "\n".join(
+                fmt.format(**item) if item["version"] else "{name}".format(**item)
+                for item in imports
+            )
+            + "\n"
         )
 
 
@@ -309,7 +312,7 @@ def get_import_local(imports, encoding=None):
     # had to use second method instead of the previous one,
     # because we have a list in the 'exports' field
     # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
-    result_unique = [i for n, i in enumerate(result) if i not in result[n + 1 :]]
+    result_unique = [i for n, i in enumerate(result) if i not in result[n + 1:]]
 
     return result_unique
 
@@ -354,6 +357,9 @@ def parse_requirements(file_):
     delimiter, get module name by element index, create a dict consisting of
     module:version, and add dict to list of parsed modules.
 
+    If file ´file_´ is not found in the system, the program will print a
+    helpful message and end its execution immediately.
+
     Args:
         file_: File to parse.
 
@@ -370,9 +376,12 @@ def parse_requirements(file_):
 
     try:
         f = open(file_, "r")
-    except OSError:
-        logging.error("Failed on file: {}".format(file_))
-        raise
+    except FileNotFoundError:
+        print(f"File {file_} was not found. Please, fix it and run again.")
+        sys.exit(1)
+    except OSError as error:
+        logging.error(f"There was an error opening the file {file_}: {str(error)}")
+        raise error
     else:
         try:
             data = [x.strip() for x in f.readlines() if x != "\n"]
@@ -485,8 +494,15 @@ def init(args):
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(",")
 
-    path = args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
-    if not args["--print"] and not args["--savepath"] and not args["--force"] and os.path.exists(path):
+    path = (
+        args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
+    )
+    if (
+        not args["--print"]
+        and not args["--savepath"]
+        and not args["--force"]
+        and os.path.exists(path)
+    ):
         logging.warning("requirements.txt already exists, " "use --force to overwrite it")
         return
 
@@ -546,7 +562,9 @@ def init(args):
         if scheme in ["compat", "gt", "no-pin"]:
             imports, symbol = dynamic_versioning(scheme, imports)
         else:
-            raise ValueError("Invalid argument for mode flag, " "use 'compat', 'gt' or 'no-pin' instead")
+            raise ValueError(
+                "Invalid argument for mode flag, " "use 'compat', 'gt' or 'no-pin' instead"
+            )
     else:
         symbol = "=="
 
