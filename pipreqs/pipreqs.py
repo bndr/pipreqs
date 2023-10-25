@@ -92,7 +92,7 @@ def _open(filename=None, mode="r"):
             file.close()
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -181,7 +181,7 @@ def filter_ext(file_name, acceptable):
     return os.path.splitext(file_name)[1] in acceptable
 
 
-def ipynb_2_py(file_name, encoding=None):
+def ipynb_2_py(file_name, encoding="utf-8"):
     """
 
     Args:
@@ -196,7 +196,7 @@ def ipynb_2_py(file_name, encoding=None):
     exporter = PythonExporter()
     (body, _) = exporter.from_filename(file_name)
 
-    return body.encode(encoding if encoding is not None else "utf-8")
+    return body.encode(encoding)
 
 
 def generate_requirements_file(path, imports, symbol):
@@ -255,7 +255,7 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
     return result
 
 
-def get_locally_installed_packages(encoding=None):
+def get_locally_installed_packages(encoding="utf-8"):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
@@ -296,7 +296,7 @@ def get_locally_installed_packages(encoding=None):
     return packages
 
 
-def get_import_local(imports, encoding=None):
+def get_import_local(imports, encoding="utf-8"):
     local = get_locally_installed_packages()
     result = []
     for item in imports:
@@ -488,6 +488,9 @@ def init(args):
     extra_ignore_dirs = args.get("--ignore")
     follow_links = not args.get("--no-follow-links")
     input_path = args["<path>"]
+    
+    if encoding is None:
+        encoding = "utf-8"
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
 
