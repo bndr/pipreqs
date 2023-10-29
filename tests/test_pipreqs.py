@@ -81,8 +81,8 @@ class TestPipreqs(unittest.TestCase):
             "original": os.path.join(os.path.dirname(__file__), "_data/test.py"),
             "notebook": os.path.join(os.path.dirname(__file__), "_data_notebook/test.ipynb"),
         }
+        self.requirements_notebook_path = os.path.join(self.project_with_notebooks, "requirements.txt")
         self.non_existing_filepath = "xpto"
-
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -602,6 +602,28 @@ class TestPipreqs(unittest.TestCase):
             sys.stdout = sys.__stdout__
 
             self.assertEqual(printed_text, "File xpto was not found. Please, fix it and run again.")
+
+    def test_ignore_notebooks(self):
+        """
+        Test the --ignore-notebooks parameter
+        """
+        pipreqs.init(
+            {
+                "<path>": self.project_with_notebooks,
+                "--savepath": None,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+                "--ignore-notebooks": True,
+            }
+        )
+        assert os.path.exists(self.requirements_notebook_path) == 1
+        assert os.path.getsize(self.requirements_notebook_path) <= 1
 
     def tearDown(self):
         """

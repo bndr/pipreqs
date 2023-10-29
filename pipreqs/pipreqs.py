@@ -35,6 +35,7 @@ Options:
                           <compat> | e.g. Flask~=1.1.2
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
+    --ignore-notebooks    Ignore jupyter notebook files.
 """
 from contextlib import contextmanager
 import os
@@ -50,6 +51,7 @@ from yarg.exceptions import HTTPError
 
 try:
     PythonExporter = None
+    ignore_notebooks = False
     from nbconvert import PythonExporter
 except ImportError:
     pass
@@ -60,6 +62,7 @@ REGEXP = [
     re.compile(r"^import (.+)$"),
     re.compile(r"^from ((?!\.+).*?) import (?:.*)$"),
 ]
+
 
 @contextmanager
 def _open(filename=None, mode="r"):
@@ -119,7 +122,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        if PythonExporter:
+        if PythonExporter and not ignore_notebooks:
             files = [fn for fn in files if filter_ext(fn, [".py", ".ipynb"])]
         else:
             files = [fn for fn in files if filter_ext(fn, [".py"])]
@@ -137,7 +140,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
             if filter_ext(file_name, [".py"]):
                 with open(file_name, "r", encoding=encoding) as f:
                     contents = f.read()
-            elif filter_ext(file_name, [".ipynb"]) and PythonExporter:
+            elif filter_ext(file_name, [".ipynb"]) and PythonExporter and not ignore_notebooks:
                 contents = ipynb_2_py(file_name, encoding=encoding)
             try:
                 tree = ast.parse(contents)
@@ -154,7 +157,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
-                    if filter_ext(file_name, [".ipynb"]) and PythonExporter:
+                    if filter_ext(file_name, [".ipynb"]) and PythonExporter and not ignore_notebooks:
                         logging.error("Magic command without % might be failed")
                     raise exc
 
@@ -484,11 +487,13 @@ def dynamic_versioning(scheme, imports):
 
 
 def init(args):
+    global ignore_notebooks
     encoding = args.get("--encoding")
     extra_ignore_dirs = args.get("--ignore")
     follow_links = not args.get("--no-follow-links")
+    ignore_notebooks = args.get("--ignore-notebooks")
     input_path = args["<path>"]
-    
+
     if encoding is None:
         encoding = "utf-8"
     if input_path is None:
