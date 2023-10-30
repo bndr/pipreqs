@@ -539,17 +539,14 @@ def init(args):
         # the list of exported modules, installed locally
         # and the package name is not in the list of local module names
         # it add to difference
-        difference = [
-            x
-            for x in candidates
-            if
-            # aggregate all export lists into one
-            # flatten the list
-            # check if candidate is in exports
-            x.lower() not in [y for x in local for y in x["exports"]] and
-            # check if candidate is package names
-            x.lower() not in [x["name"] for x in local]
-        ]
+        difference = [x for x in candidates if
+                      # aggregate all export lists into one
+                      # flatten the list
+                      # check if candidate is in exports
+                      x.lower() not in [y for x in local for y in x['exports']]
+                      and
+                      # check if candidate is package names
+                      x.lower() not in [x['name'] for x in local]]
 
         imports = local + get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
     # sort imports based on lowercase name of package, similar to `pip freeze`.
