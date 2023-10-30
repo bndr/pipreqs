@@ -157,8 +157,6 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
-                    if filter_ext(file_name, [".ipynb"]) and PythonExporter and not ignore_notebooks:
-                        logging.error("Magic command without % might be failed")
                     raise exc
 
     # Clean up imports
