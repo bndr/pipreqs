@@ -1,2 +1,2 @@
 # Everything in here should be ignored
-import click
+import click  # noqa:F401
