@@ -88,11 +88,10 @@ def _open(filename=None, mode='r'):
 
 
 def get_all_imports(
-        path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+        path, encoding=None, extra_ignore_dirs=None, follow_links=True, ignore_errors=False):
     imports = set()
     raw_imports = set()
     candidates = []
-    ignore_errors = False
     ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv"]
 
     if extra_ignore_dirs:
