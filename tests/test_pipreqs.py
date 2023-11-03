@@ -543,13 +543,13 @@ class TestPipreqs(unittest.TestCase):
         parsed = pipreqs.get_all_imports(self.compatible_files["notebook"], encoding="utf-8")
         self.assertEqual(expected, parsed)
 
-    def test_filter_ext(self):
+    def test_file_ext_is_allowed(self):
         """
-        Test the  function filter_ext()
+        Test the  function file_ext_is_allowed()
         """
-        self.assertTrue(pipreqs.filter_ext("main.py", [".py"]))
-        self.assertTrue(pipreqs.filter_ext("main.py", [".py", ".ipynb"]))
-        self.assertFalse(pipreqs.filter_ext("main.py", [".ipynb"]))
+        self.assertTrue(pipreqs.file_ext_is_allowed("main.py", [".py"]))
+        self.assertTrue(pipreqs.file_ext_is_allowed("main.py", [".py", ".ipynb"]))
+        self.assertFalse(pipreqs.file_ext_is_allowed("main.py", [".ipynb"]))
 
     def test_parse_requirements(self):
         """
