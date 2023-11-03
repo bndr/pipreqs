@@ -67,12 +67,8 @@ class TestPipreqs(unittest.TestCase):
 
         self.project_clean = os.path.join(os.path.dirname(__file__), "_data_clean")
         self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
-        self.project_with_ignore_directory = os.path.join(
-            os.path.dirname(__file__), "_data_ignore"
-        )
-        self.project_with_duplicated_deps = os.path.join(
-            os.path.dirname(__file__), "_data_duplicated_deps"
-        )
+        self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
+        self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
         self.requirements_path = os.path.join(self.project, "requirements.txt")
         self.alt_requirement_path = os.path.join(self.project, "requirements2.txt")
         self.project_with_notebooks = os.path.join(os.path.dirname(__file__), "_data_notebook")
@@ -527,14 +523,8 @@ class TestPipreqs(unittest.TestCase):
         self.assertEqual(len(imports), 13)
         for item in imports:
             self.assertTrue(item.lower() in self.modules, "Import is missing: " + item)
-        self.assertFalse("time" in imports)
-        self.assertFalse("logging" in imports)
-        self.assertFalse("curses" in imports)
-        self.assertFalse("__future__" in imports)
-        self.assertFalse("django" in imports)
-        self.assertFalse("models" in imports)
-        self.assertFalse("FastAPI" in imports)
-        self.assertFalse("sklearn" in imports)
+        not_desired_imports = ["time", "logging", "curses", "__future__", "django", "models", "FastAPI", "sklearn"]
+        self.assertTrue(all(_import not in imports for _import in not_desired_imports))
 
     def test_invalid_notebook(self):
         """
