@@ -179,7 +179,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
 
 def notebooks_are_enabled():
-   return PythonExporter and not ignore_notebooks
+    return PythonExporter and not ignore_notebooks
 
 
 def file_ext_is_allowed(file_name, acceptable):
@@ -317,7 +317,7 @@ def get_import_local(imports, encoding="utf-8"):
     # had to use second method instead of the previous one,
     # because we have a list in the 'exports' field
     # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
-    result_unique = [i for n, i in enumerate(result) if i not in result[n + 1 :]]
+    result_unique = [i for n, i in enumerate(result) if i not in result[n + 1:]]
 
     return result_unique
 
