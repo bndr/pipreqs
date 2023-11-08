@@ -23,6 +23,21 @@ jobs:
             - name: Create XML report
               run: coverage xml
 
+            - name: Produce the coverage report
+              uses: insightsengineering/coverage-action@v2
+              with:
+                  path: coverage.xml
+                  # Publish the rendered output as a PR comment
+                  publish: true
+                  # Create a coverage diff report.
+                  diff: true
+                  # Branch to diff against.
+                  diff-branch: next
+                  # This is where the coverage reports for the
+                  # `diff-branch` are stored.
+                  diff-storage: _xml_coverage_reports
+                  togglable-report: true
+
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v3
               with:
