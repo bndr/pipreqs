@@ -1,14 +1,28 @@
-name: Python package
+name: Deploy to PyPI
+
 on:
   release:
-    types: [published]
+    types: [created]
+
 jobs:
-  build_and_publish:
+  deploy:
     runs-on: ubuntu-latest
+    env:
+      POETRY_VIRTUALENVS_CREATE: "false"
     steps:
       - uses: actions/checkout@v3
-      - name: Build and publish to pypi
-        uses: JRubics/poetry-publish@v1.17
-        with:
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
-          ignore_dev_requirements: "yes"
+
+      - name: Install poetry with bumpversion plugin
+        run: |
+          pipx install poetry
+          pipx inject poetry poetry-bumpversion
+
+      - name: Build the package and bump version
+        run: |
+          poetry version ${{ github.ref_name }}
+          poetry build
+
+      - name: Publish to PyPI
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+          poetry publish --repository test-pypi

@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "pipreqs"
-version = "0.4.13"
+name = "pipreqs-build-test"
+version = "0.4.19"
 description = "Pip requirements.txt generator based on imports in project"
 authors = ["Vadim Kravcenko <vadim.kravcenko@gmail.com>"]
 license = "Apache-2.0"
@@ -33,6 +33,8 @@ flake8 = "^6.1.0"
 tox = "^4.11.3"
 coverage = "^7.3.2"
 sphinx = { version = "^7.2.6", python = ">=3.9" }
+
+[tool.poetry_bumpversion.file."pipreqs/__init__.py"]
 
 [build-system]
 requires = ["poetry-core"]
