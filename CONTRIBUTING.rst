@@ -67,6 +67,10 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 
     $ poetry install --with dev
 
+3.1. Pipreqs is using pre-commits
+
+    $ poetry run pre-commit install
+
 4. Create a branch for local development::
 
     $ git checkout -b name-of-your-bugfix-or-feature
@@ -78,7 +82,7 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
     $ poetry run flake8 pipreqs tests
     $ poetry run python -m unittest discover
     $ poetry run tox
-    
+
     To test all versions of python using tox you need to have them installed and for this two options are recommended: `pyenv` or `asdf`.
 
 6. Commit your changes and push your branch to GitHub::

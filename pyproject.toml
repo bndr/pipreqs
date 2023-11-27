@@ -34,7 +34,33 @@ flake8 = "^6.1.0"
 tox = "^4.11.3"
 coverage = "^7.3.2"
 sphinx = { version = "^7.2.6", python = ">=3.9" }
+darker = "^1.7.2"
+pre-commit = "^3.5.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.darker]
+src = [
+    ".",
+]
+revision = "master"
+diff = true
+check = true
+isort = true
+flynt = true
+lint = [
+    "flake8",
+]
+line-length = 120
+log_level = "INFO"
+
+[tool.black]
+exclude = [
+    "tests/_data/",
+    "tests/_data_clean/",
+    "tests/_data_duplicated_deps/",
+    "tests/_data_ignore/",
+    "tests/_invalid_data/",
+]

@@ -1,0 +1,17 @@
+---
+# See https://pre-commit.com for more information
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+  - repo: https://github.com/akaihola/darker
+    rev: 1.7.2
+    hooks:
+      - id: darker
+        args: [--isort, --skip-string-normalization]
+        additional_dependencies:
+          - black~=23.11.0
+          - isort~=5.9
