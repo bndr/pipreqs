@@ -5,6 +5,8 @@ on:
 
 name: Create releases on tag push
 
+permissions: write-all
+
 jobs:
   build:
     name: Create release
