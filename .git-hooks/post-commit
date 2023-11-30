@@ -1,0 +1,10 @@
+#! /bin/bash
+version=`git diff HEAD^..HEAD -- "$(git rev-parse --show-toplevel)"/pyproject.toml | grep -m 1 '^\+.*version' | sed -s 's/[^A-Z0-9\.\-]//g'`
+
+if [[ ! $version =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(\-[A-Z]+\.[0-9]+)?$ ]]; then
+    echo -e "Skip tag: invalid version '$version'"
+    exit 1
+fi
+
+git tag -a "v$version" -m "`git log -1 --format=%s`"
+echo "Created a new tag, $version"
