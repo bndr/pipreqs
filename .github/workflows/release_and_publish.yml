@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ncipollo/release-action@v1
         with:
-          name: Release ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
           makeLatest: true
   
   publish_to_pypi:
