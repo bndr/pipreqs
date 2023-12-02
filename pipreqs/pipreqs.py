@@ -84,7 +84,7 @@ def _open(filename=None, mode="r"):
             file.close()
 
 
-def get_all_imports(path, encoding=None, extra_ignore_dirs=None, follow_links=True):
+def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True):
     imports = set()
     raw_imports = set()
     candidates = []
@@ -199,7 +199,7 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
     return result
 
 
-def get_locally_installed_packages(encoding=None):
+def get_locally_installed_packages(encoding="utf-8"):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
@@ -240,7 +240,7 @@ def get_locally_installed_packages(encoding=None):
     return packages
 
 
-def get_import_local(imports, encoding=None):
+def get_import_local(imports, encoding="utf-8"):
     local = get_locally_installed_packages()
     result = []
     for item in imports:
@@ -432,6 +432,9 @@ def init(args):
     extra_ignore_dirs = args.get("--ignore")
     follow_links = not args.get("--no-follow-links")
     input_path = args["<path>"]
+
+    if encoding is None:
+        encoding = "utf-8"
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
 
