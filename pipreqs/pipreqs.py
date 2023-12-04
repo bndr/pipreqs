@@ -35,6 +35,7 @@ Options:
                           <compat> | e.g. Flask~=1.1.2
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
+    --scan-notebooks      Look for imports in jupyter notebook files.
 """
 from contextlib import contextmanager
 import os
@@ -51,6 +52,18 @@ from yarg.exceptions import HTTPError
 from pipreqs import __version__
 
 REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
+
+
+scan_noteboooks = False
+
+
+class NbconvertNotInstalled(ImportError):
+    default_message = (
+        "In order to scan jupyter notebooks, please install the nbconvert and ipython libraries"
+    )
+
+    def __init__(self, message=default_message):
+        super().__init__(message)
 
 
 @contextmanager
@@ -89,7 +102,16 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
     raw_imports = set()
     candidates = []
     ignore_errors = False
-    ignore_dirs = [".hg", ".svn", ".git", ".tox", "__pycache__", "env", "venv"]
+    ignore_dirs = [
+        ".hg",
+        ".svn",
+        ".git",
+        ".tox",
+        "__pycache__",
+        "env",
+        "venv",
+        ".ipynb_checkpoints",
+    ]
 
     if extra_ignore_dirs:
         ignore_dirs_parsed = []
@@ -97,18 +119,22 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
             ignore_dirs_parsed.append(os.path.basename(os.path.realpath(e)))
         ignore_dirs.extend(ignore_dirs_parsed)
 
+    extensions = get_file_extensions()
+
     walk = os.walk(path, followlinks=follow_links)
     for root, dirs, files in walk:
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        files = [fn for fn in files if os.path.splitext(fn)[1] == ".py"]
+        py_files = [file for file in files if file_ext_is_allowed(file, [".py"])]
+        candidates.extend([os.path.splitext(filename)[0] for filename in py_files])
 
-        candidates += [os.path.splitext(fn)[0] for fn in files]
+        files = [fn for fn in files if file_ext_is_allowed(fn, extensions)]
+
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            with open(file_name, "r", encoding=encoding) as f:
-                contents = f.read()
+            contents = read_file_content(file_name, encoding)
+
             try:
                 tree = ast.parse(contents)
                 for node in ast.walk(tree):
@@ -143,6 +169,40 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         data = {x.strip() for x in f}
 
     return list(packages - data)
+
+
+def get_file_extensions():
+    return [".py", ".ipynb"] if scan_noteboooks else [".py"]
+
+
+def read_file_content(file_name: str, encoding="utf-8"):
+    if file_ext_is_allowed(file_name, [".py"]):
+        with open(file_name, "r", encoding=encoding) as f:
+            contents = f.read()
+    elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
+        contents = ipynb_2_py(file_name, encoding=encoding)
+    return contents
+
+
+def file_ext_is_allowed(file_name, acceptable):
+    return os.path.splitext(file_name)[1] in acceptable
+
+
+def ipynb_2_py(file_name, encoding="utf-8"):
+    """
+
+    Args:
+        file_name (str): notebook file path to parse as python script
+        encoding  (str): encoding of file
+
+    Returns:
+        str: parsed string
+
+    """
+    exporter = PythonExporter()
+    (body, _) = exporter.from_filename(file_name)
+
+    return body.encode(encoding)
 
 
 def generate_requirements_file(path, imports, symbol):
@@ -427,10 +487,27 @@ def dynamic_versioning(scheme, imports):
     return imports, symbol
 
 
+def handle_scan_noteboooks():
+    if not scan_noteboooks:
+        logging.info("Not scanning for jupyter notebooks.")
+        return
+
+    try:
+        global PythonExporter
+        from nbconvert import PythonExporter
+    except ImportError:
+        raise NbconvertNotInstalled()
+
+
 def init(args):
+    global scan_noteboooks
     encoding = args.get("--encoding")
     extra_ignore_dirs = args.get("--ignore")
     follow_links = not args.get("--no-follow-links")
+
+    scan_noteboooks = args.get("--scan-notebooks", False)
+    handle_scan_noteboooks()
+
     input_path = args["<path>"]
 
     if encoding is None:
