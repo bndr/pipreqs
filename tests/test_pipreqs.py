@@ -10,7 +10,7 @@ Tests for `pipreqs` module.
 
 from io import StringIO
 import logging
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import unittest
 import os
 import requests
@@ -48,7 +48,7 @@ class TestPipreqs(unittest.TestCase):
             "after_method_is_valid_even_if_not_pep8",
         ]
         cls.modules2 = ["beautifulsoup4"]
-        cls.local = ["docopt", "requests", "nose", "pyflakes"]
+        cls.local = ["docopt", "requests", "nose", "pyflakes", "ipython"]
         cls.project = os.path.join(os.path.dirname(__file__), "_data")
         cls.empty_filepath = os.path.join(cls.project, "empty.txt")
         cls.imports_filepath = os.path.join(cls.project, "imports.txt")
@@ -83,6 +83,12 @@ class TestPipreqs(unittest.TestCase):
         cls.requirements_path = os.path.join(cls.project, "requirements.txt")
         cls.alt_requirement_path = os.path.join(cls.project, "requirements2.txt")
         cls.non_existing_filepath = "xpto"
+
+        cls.project_with_notebooks = os.path.join(os.path.dirname(__file__), "_data_notebook")
+        cls.project_with_invalid_notebooks = os.path.join(os.path.dirname(__file__), "_invalid_data_notebook")
+
+        cls.python_path_same_imports = os.path.join(os.path.dirname(__file__), "_data/test.py")
+        cls.notebook_path_same_imports = os.path.join(os.path.dirname(__file__), "_data_notebook/test.ipynb")
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -519,6 +525,44 @@ class TestPipreqs(unittest.TestCase):
             stdout_content = capturedOutput.getvalue().lower()
             self.assertTrue(file_content == stdout_content)
 
+    def test_import_notebooks(self):
+        """
+        Test the function get_all_imports() using .ipynb file
+        """
+        self.mock_scan_notebooks()
+        imports = pipreqs.get_all_imports(self.project_with_notebooks)
+        for item in imports:
+            self.assertTrue(item.lower() in self.modules, "Import is missing: " + item)
+        not_desired_imports = ["time", "logging", "curses", "__future__", "django", "models", "FastAPI", "sklearn"]
+        for not_desired_import in not_desired_imports:
+            self.assertFalse(
+                not_desired_import in imports,
+                f"{not_desired_import} was imported, but it should not have been."
+            )
+
+    def test_invalid_notebook(self):
+        """
+        Test that invalid notebook files cannot be imported.
+        """
+        self.mock_scan_notebooks()
+        self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_with_invalid_notebooks)
+
+    def test_ipynb_2_py(self):
+        """
+        Test the function ipynb_2_py() which converts .ipynb file to .py format
+        """
+        python_imports = pipreqs.get_all_imports(self.python_path_same_imports)
+        notebook_imports = pipreqs.get_all_imports(self.notebook_path_same_imports)
+        self.assertEqual(python_imports, notebook_imports)
+
+    def test_file_ext_is_allowed(self):
+        """
+        Test the  function file_ext_is_allowed()
+        """
+        self.assertTrue(pipreqs.file_ext_is_allowed("main.py", [".py"]))
+        self.assertTrue(pipreqs.file_ext_is_allowed("main.py", [".py", ".ipynb"]))
+        self.assertFalse(pipreqs.file_ext_is_allowed("main.py", [".ipynb"]))
+
     def test_parse_requirements(self):
         """
         Test parse_requirements function
@@ -560,6 +604,34 @@ class TestPipreqs(unittest.TestCase):
             sys.stdout = sys.__stdout__
 
             self.assertEqual(printed_text, "File xpto was not found. Please, fix it and run again.")
+
+    def test_ignore_notebooks(self):
+        """
+        Test if notebooks are ignored when the scan-notebooks parameter is False
+        """
+        notebook_requirement_path = os.path.join(self.project_with_notebooks, "requirements.txt")
+
+        pipreqs.init(
+            {
+                "<path>": self.project_with_notebooks,
+                "--savepath": None,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+                "--scan-notebooks": False,
+            }
+        )
+        assert os.path.exists(notebook_requirement_path) == 1
+        assert os.path.getsize(notebook_requirement_path) == 1    # file only has a "\n", meaning it's empty
+
+    def mock_scan_notebooks(self):
+        pipreqs.scan_noteboooks = Mock(return_value=True)
+        pipreqs.handle_scan_noteboooks()
 
     def tearDown(self):
         """
