@@ -9,18 +9,28 @@ Tests for `pipreqs` module.
 """
 
 from io import StringIO
+import logging
 from unittest.mock import patch
 import unittest
 import os
 import requests
 import sys
+import warnings
 
 from pipreqs import pipreqs
 
 
 class TestPipreqs(unittest.TestCase):
-    def setUp(self):
-        self.modules = [
+
+    @classmethod
+    def setUpClass(cls):
+        # Disable all logs for not spamming the terminal when running tests.
+        logging.disable(logging.CRITICAL)
+
+        # Specific warning not covered by the above command:
+        warnings.filterwarnings("ignore", category=DeprecationWarning, module="jupyter_client")
+
+        cls.modules = [
             "flask",
             "requests",
             "sqlalchemy",
@@ -37,50 +47,42 @@ class TestPipreqs(unittest.TestCase):
             "bs4",
             "after_method_is_valid_even_if_not_pep8",
         ]
-        self.modules2 = ["beautifulsoup4"]
-        self.local = ["docopt", "requests", "nose", "pyflakes"]
-        self.project = os.path.join(os.path.dirname(__file__), "_data")
-        self.empty_filepath = os.path.join(self.project, "empty.txt")
-        self.imports_filepath = os.path.join(self.project, "imports.txt")
-        self.imports_no_version_filepath = os.path.join(self.project, "imports_no_version.txt")
-        self.imports_any_version_filepath = os.path.join(self.project, "imports_any_version.txt")
-        self.non_existent_filepath = os.path.join(self.project, "non_existent_file.txt")
+        cls.modules2 = ["beautifulsoup4"]
+        cls.local = ["docopt", "requests", "nose", "pyflakes"]
+        cls.project = os.path.join(os.path.dirname(__file__), "_data")
+        cls.empty_filepath = os.path.join(cls.project, "empty.txt")
+        cls.imports_filepath = os.path.join(cls.project, "imports.txt")
+        cls.imports_no_version_filepath = os.path.join(cls.project, "imports_no_version.txt")
+        cls.imports_any_version_filepath = os.path.join(cls.project, "imports_any_version.txt")
+        cls.non_existent_filepath = os.path.join(cls.project, "non_existent_file.txt")
 
-        self.parsed_packages = [
+        cls.parsed_packages = [
             {"name": "pandas", "version": "2.0.0"},
             {"name": "numpy", "version": "1.2.3"},
             {"name": "torch", "version": "4.0.0"},
         ]
 
-        self.parsed_packages_no_version = [
+        cls.parsed_packages_no_version = [
             {"name": "pandas", "version": None},
             {"name": "tensorflow", "version": None},
             {"name": "torch", "version": None},
         ]
 
-        self.parsed_packages_any_version = [
+        cls.parsed_packages_any_version = [
             {"name": "numpy", "version": None},
             {"name": "pandas", "version": "2.0.0"},
             {"name": "tensorflow", "version": None},
             {"name": "torch", "version": "4.0.0"},
         ]
 
-        self.project_clean = os.path.join(os.path.dirname(__file__), "_data_clean")
-        self.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
-        self.parsed_packages = [
-            {"name": "pandas", "version": "2.0.0"},
-            {"name": "numpy", "version": "1.2.3"},
-            {"name": "torch", "version": "4.0.0"},
-        ]
-        self.empty_filepath = os.path.join(self.project, "empty.txt")
-        self.imports_filepath = os.path.join(self.project, "imports.txt")
+        cls.project_clean = os.path.join(os.path.dirname(__file__), "_data_clean")
+        cls.project_invalid = os.path.join(os.path.dirname(__file__), "_invalid_data")
+        cls.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
+        cls.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
 
-        self.project_with_ignore_directory = os.path.join(os.path.dirname(__file__), "_data_ignore")
-        self.project_with_duplicated_deps = os.path.join(os.path.dirname(__file__), "_data_duplicated_deps")
-
-        self.requirements_path = os.path.join(self.project, "requirements.txt")
-        self.alt_requirement_path = os.path.join(self.project, "requirements2.txt")
-        self.non_existing_filepath = "xpto"
+        cls.requirements_path = os.path.join(cls.project, "requirements.txt")
+        cls.alt_requirement_path = os.path.join(cls.project, "requirements2.txt")
+        cls.non_existing_filepath = "xpto"
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
