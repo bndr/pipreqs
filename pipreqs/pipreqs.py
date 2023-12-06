@@ -52,7 +52,7 @@ from yarg.exceptions import HTTPError
 from pipreqs import __version__
 
 REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
-
+DEFAULT_EXTENSIONS = [".py", ".pyw"]
 
 scan_noteboooks = False
 
@@ -126,7 +126,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
         candidates.append(os.path.basename(root))
-        py_files = [file for file in files if file_ext_is_allowed(file, [".py"])]
+        py_files = [file for file in files if file_ext_is_allowed(file, DEFAULT_EXTENSIONS)]
         candidates.extend([os.path.splitext(filename)[0] for filename in py_files])
 
         files = [fn for fn in files if file_ext_is_allowed(fn, extensions)]
@@ -172,11 +172,11 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
 
 def get_file_extensions():
-    return [".py", ".ipynb"] if scan_noteboooks else [".py"]
+    return DEFAULT_EXTENSIONS + [".ipynb"] if scan_noteboooks else DEFAULT_EXTENSIONS
 
 
 def read_file_content(file_name: str, encoding="utf-8"):
-    if file_ext_is_allowed(file_name, [".py"]):
+    if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
         with open(file_name, "r", encoding=encoding) as f:
             contents = f.read()
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
