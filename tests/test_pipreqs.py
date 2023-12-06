@@ -629,6 +629,45 @@ class TestPipreqs(unittest.TestCase):
         assert os.path.exists(notebook_requirement_path) == 1
         assert os.path.getsize(notebook_requirement_path) == 1    # file only has a "\n", meaning it's empty
 
+    def test_pipreqs_get_imports_from_pyw_file(self):
+        pyw_test_dirpath = os.path.join(os.path.dirname(__file__), "_data_pyw")
+        requirements_path = os.path.join(pyw_test_dirpath, "requirements.txt")
+
+        pipreqs.init(
+            {
+                "<path>": pyw_test_dirpath,
+                "--savepath": None,
+                "--print": False,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+
+        self.assertTrue(os.path.exists(requirements_path))
+
+        expected_imports = [
+            "airflow",
+            "matplotlib",
+            "numpy",
+            "pandas",
+            "tensorflow",
+        ]
+
+        with open(requirements_path, "r") as f:
+            imports_data = f.read().lower()
+            for _import in expected_imports:
+                self.assertTrue(
+                    _import.lower() in imports_data,
+                    f"'{_import}' import was expected but not found.",
+                )
+
+        os.remove(requirements_path)
+
     def mock_scan_notebooks(self):
         pipreqs.scan_noteboooks = Mock(return_value=True)
         pipreqs.handle_scan_noteboooks()
