@@ -13,6 +13,5 @@ repos:
       - id: darker
         args: [--isort, --skip-string-normalization]
         additional_dependencies:
-          - black~=23.11.0
-          - isort~=5.9
-          - flynt~=0.78
+          - isort==5.9
+          - flynt==0.76

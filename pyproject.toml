@@ -45,7 +45,6 @@ build-backend = "poetry.core.masonry.api"
 src = [
     ".",
 ]
-revision = "master"
 diff = true
 check = true
 isort = true
@@ -57,10 +56,12 @@ line-length = 120
 log_level = "INFO"
 
 [tool.black]
-exclude = [
-    "tests/_data/",
-    "tests/_data_clean/",
-    "tests/_data_duplicated_deps/",
-    "tests/_data_ignore/",
-    "tests/_invalid_data/",
-]
+exclude = '''
+/(
+    tests/_data/
+  | tests/_data_clean/
+  | tests/_data_duplicated_deps/
+  | tests/_data_ignore/
+  | tests/_invalid_data/
+)/
+'''
