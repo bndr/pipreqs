@@ -67,17 +67,17 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 
     $ poetry install --with dev
 
-3.1. Pipreqs is using pre-commits
+4. Pipreqs is using pre-commits::
 
     $ poetry run pre-commit install
 
-4. Create a branch for local development::
+5. Create a branch for local development::
 
     $ git checkout -b name-of-your-bugfix-or-feature
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+6. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
     $ poetry run flake8 pipreqs tests
     $ poetry run python -m unittest discover
@@ -85,13 +85,13 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 
     To test all versions of python using tox you need to have them installed and for this two options are recommended: `pyenv` or `asdf`.
 
-6. Commit your changes and push your branch to GitHub::
+7. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 -----------------------
