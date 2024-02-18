@@ -36,6 +36,7 @@ Pyxides:astro_pyxis
 QtCore:PySide
 S3:s3cmd
 SCons:pystick
+speech_recognition:SpeechRecognition
 Shared:Zope2
 Signals:Zope2
 Stemmer:PyStemmer
