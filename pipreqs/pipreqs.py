@@ -36,6 +36,7 @@ Options:
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
     --scan-notebooks      Look for imports in jupyter notebook files.
+    --venv <dirs>...      Look for imports in the specified virtualenv
 """
 from contextlib import contextmanager
 import os
@@ -109,7 +110,9 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         ".tox",
         "__pycache__",
         "env",
+        ".env",
         "venv",
+        ".venv",
         ".ipynb_checkpoints",
     ]
 
@@ -259,10 +262,10 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
     return result
 
 
-def get_locally_installed_packages(encoding="utf-8"):
+def get_locally_installed_packages(encoding="utf-8", paths: list = sys.path):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    for path in sys.path:
+    for path in paths:
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
@@ -300,8 +303,8 @@ def get_locally_installed_packages(encoding="utf-8"):
     return packages
 
 
-def get_import_local(imports, encoding="utf-8"):
-    local = get_locally_installed_packages()
+def get_import_local(imports, encoding="utf-8", paths: list = sys.path):
+    local = get_locally_installed_packages(encoding=encoding, paths=paths)
     result = []
     for item in imports:
         # search through local packages
@@ -503,6 +506,7 @@ def init(args):
     global scan_noteboooks
     encoding = args.get("--encoding")
     extra_ignore_dirs = args.get("--ignore")
+    venv_dirs = args.get("--venv")
     follow_links = not args.get("--no-follow-links")
 
     scan_noteboooks = args.get("--scan-notebooks", False)
@@ -517,6 +521,9 @@ def init(args):
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(",")
+
+    if venv_dirs:
+        venv_dirs = venv_dirs.split(",")
 
     path = (
         args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
@@ -551,7 +558,10 @@ def init(args):
         imports = get_import_local(candidates, encoding=encoding)
     else:
         logging.debug("Getting packages information from Local/PyPI")
-        local = get_import_local(candidates, encoding=encoding)
+        if venv_dirs:
+            local = get_import_local(candidates, encoding=encoding, paths=venv_dirs)
+        else:
+            local = get_import_local(candidates, encoding=encoding)
 
         # check if candidate name is found in
         # the list of exported modules, installed locally
