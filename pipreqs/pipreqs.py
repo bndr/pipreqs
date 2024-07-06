@@ -54,7 +54,7 @@ from pipreqs import __version__
 REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
 DEFAULT_EXTENSIONS = [".py", ".pyw"]
 
-scan_noteboooks = False
+scan_notebooks = False
 
 
 class NbconvertNotInstalled(ImportError):
@@ -172,14 +172,14 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
 
 def get_file_extensions():
-    return DEFAULT_EXTENSIONS + [".ipynb"] if scan_noteboooks else DEFAULT_EXTENSIONS
+    return DEFAULT_EXTENSIONS + [".ipynb"] if scan_notebooks else DEFAULT_EXTENSIONS
 
 
 def read_file_content(file_name: str, encoding="utf-8"):
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
         with open(file_name, "r", encoding=encoding) as f:
             contents = f.read()
-    elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
+    elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_notebooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
     return contents
 
@@ -487,8 +487,8 @@ def dynamic_versioning(scheme, imports):
     return imports, symbol
 
 
-def handle_scan_noteboooks():
-    if not scan_noteboooks:
+def handle_scan_notebooks():
+    if not scan_notebooks:
         logging.info("Not scanning for jupyter notebooks.")
         return
 
@@ -500,13 +500,13 @@ def handle_scan_noteboooks():
 
 
 def init(args):
-    global scan_noteboooks
+    global scan_notebooks
     encoding = args.get("--encoding")
     extra_ignore_dirs = args.get("--ignore")
     follow_links = not args.get("--no-follow-links")
 
-    scan_noteboooks = args.get("--scan-notebooks", False)
-    handle_scan_noteboooks()
+    scan_notebooks = args.get("--scan-notebooks", False)
+    handle_scan_notebooks()
 
     input_path = args["<path>"]
 

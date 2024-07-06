@@ -669,8 +669,8 @@ class TestPipreqs(unittest.TestCase):
         os.remove(requirements_path)
 
     def mock_scan_notebooks(self):
-        pipreqs.scan_noteboooks = Mock(return_value=True)
-        pipreqs.handle_scan_noteboooks()
+        pipreqs.scan_notebooks = Mock(return_value=True)
+        pipreqs.handle_scan_notebooks()
 
     def tearDown(self):
         """
