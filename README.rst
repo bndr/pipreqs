@@ -21,9 +21,17 @@
 Installation
 ------------
 
-::
+.. code-block:: sh
 
     pip install pipreqs
+
+Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it. 
+To do so, run:
+
+.. code-block:: sh
+
+    pip install --no-deps pipreqs
+    pip install yarg==0.1.9 docopt==0.6.2
 
 Usage
 -----
@@ -57,6 +65,7 @@ Usage
                               <compat> | e.g. Flask~=1.1.2
                               <gt>     | e.g. Flask>=1.1.2
                               <no-pin> | e.g. Flask
+        --scan-notebooks      Look for imports in jupyter notebook files.
 
 Example
 -------

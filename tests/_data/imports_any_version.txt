@@ -1,0 +1,4 @@
+numpy
+pandas==2.0.0
+tensorflow
+torch<4.0.0
