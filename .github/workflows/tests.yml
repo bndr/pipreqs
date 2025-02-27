@@ -6,18 +6,18 @@ on:
 
 jobs:
     run_tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         strategy:
             fail-fast: false
             matrix:
-                python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', 'pypy-3.9-7.3.12']
+                python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', 'pypy-3.10']
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python-version }}
 
@@ -31,10 +31,10 @@ jobs:
 
     coverage_report:
         needs: run_tests
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Install dependencies
               run: |
@@ -49,7 +49,8 @@ jobs:
               run: poetry run coverage xml
 
             - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v3
+              uses: codecov/codecov-action@v5
               with:
                   files: coverage.xml
-                  fail_ci_if_error: true
+                  token: ${{ secrets.CODECOV_TOKEN }}                  
+                  fail_ci_if_error: false
