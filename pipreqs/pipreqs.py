@@ -31,7 +31,7 @@ Options:
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project
     --mode <scheme>       Enables dynamic versioning with <compat>,
-                          <gt> or <non-pin> schemes.
+                          <gt> or <no-pin> schemes.
                           <compat> | e.g. Flask~=1.1.2
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
