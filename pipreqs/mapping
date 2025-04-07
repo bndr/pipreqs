@@ -721,6 +721,7 @@ jaraco:jaraco.util
 jinja2:Jinja2
 jiracli:jira_cli
 johnny:johnny_cache
+jose:python_jose
 jpgrid:python_geohash
 jpiarea:python_geohash
 jpype:JPype1
