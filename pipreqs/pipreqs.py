@@ -110,6 +110,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         "__pycache__",
         "env",
         "venv",
+        ".venv",
         ".ipynb_checkpoints",
     ]
 
