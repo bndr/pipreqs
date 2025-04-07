@@ -978,6 +978,7 @@ pysynth_samp:PySynth
 pythongettext:python_gettext
 pythonjsonlogger:python_json_logger
 pyutilib:PyUtilib
+pywintypes:pywin32
 pyximport:Cython
 qs:qserve
 quadtree:python_geohash
