@@ -8,9 +8,9 @@ jobs:
         name: Lint
         steps:
             - name: Check out source repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
             - name: Set up Python environment
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v5
               with:
                   python-version: "3.9"
             - name: flake8 Lint
