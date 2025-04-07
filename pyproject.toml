@@ -37,6 +37,8 @@ tox = "^4.11.3"
 coverage = "^7.3.2"
 sphinx = { version = "^7.2.6", python = ">=3.9" }
 
+[tool.poetry_bumpversion.file."pipreqs/__init__.py"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

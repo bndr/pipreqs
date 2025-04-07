@@ -66,14 +66,19 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
 3. Pipreqs is developed using Poetry. Refer to the `documentation <https://python-poetry.org/docs/>`_ to install Poetry in your local environment. Next, you should install pipreqs's dependencies::
 
     $ poetry install --with dev
+    $ poetry self add poetry-bumpversion
 
-4. Create a branch for local development::
+4. Configure `./git-hooks/` directory so that it becomes visible to git hooks (this hook depends on `bash`, `sed` and `grep` - tools usually included in any linux distribution)::
+
+    $ git config core.hooksPath .git-hooks
+
+5. Create a branch for local development::
 
     $ git checkout -b name-of-your-bugfix-or-feature
 
    Now you can make your changes locally.
 
-5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+6. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
     $ poetry run flake8 pipreqs tests
     $ poetry run python -m unittest discover
@@ -81,13 +86,13 @@ Ready to contribute? Here's how to set up `pipreqs` for local development.
     
     To test all versions of python using tox you need to have them installed and for this two options are recommended: `pyenv` or `asdf`.
 
-6. Commit your changes and push your branch to GitHub::
+7. Commit your changes and push your branch to GitHub::
 
     $ git add .
     $ git commit -m "Your detailed description of your changes."
     $ git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+8. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 -----------------------
