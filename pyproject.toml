@@ -2,9 +2,14 @@
 name = "pipreqs"
 version = "0.5.0"
 description = "Pip requirements.txt generator based on imports in project"
-authors = ["Vadim Kravcenko <vadim.kravcenko@gmail.com>"]
+authors = [
+    { name = "Vadim Kravcenko", email = "vadim.kravcenko@gmail.com" }
+]
+maintainers = [
+    {name = "Jonas Eschle", email = "jonas.eschle@gmail.com"}
+]
 license = "Apache-2.0"
-readme = ["README.rst", "HISTORY.rst"]
+readme = "README.rst"
 packages = [{ include = "pipreqs" }]
 repository = "https://github.com/bndr/pipreqs"
 keywords = ["pip", "requirements", "imports"]
@@ -20,9 +25,8 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12"
 ]
-
+requires-python = ">=3.8, <3.13"
 dependencies = [
-    "python>=3.8.1,<3.13",
     "yarg>=0.1.9",
     "docopt>=0.6.2",
     "nbconvert>=7.11.0",
@@ -33,7 +37,7 @@ dev = [
     "flake8>=6.1.0",
     "tox>=4.11.3",
     "coverage>=7.3.2",
-    "sphinx>=7.2.6;python_version>=3.9",
+    "sphinx>=7.2.6;python_version>='3.9'",
 ]
 
 
