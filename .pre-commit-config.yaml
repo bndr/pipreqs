@@ -1,0 +1,96 @@
+ci:
+    autoupdate_commit_msg: "chore: update pre-commit hooks"
+    autofix_commit_msg: "style: pre-commit fixes"
+    autoupdate_schedule: quarterly
+
+repos:
+    -   repo: https://github.com/pre-commit/pre-commit-hooks
+        rev: v5.0.0
+        hooks:
+            -   id: check-added-large-files
+                args: [ '--maxkb=1000' ]
+            -   id: check-case-conflict
+            -   id: check-merge-conflict
+            -   id: check-symlinks
+            -   id: check-yaml
+            -   id: check-toml
+            -   id: check-json
+            -   id: debug-statements
+            -   id: end-of-file-fixer
+            -   id: mixed-line-ending
+            -   id: requirements-txt-fixer
+            -   id: trailing-whitespace
+                files: ".*\\.(?:tex|py)$"
+                args: [ --markdown-linebreak-ext=md ]
+                exclude: (^notebooks/|^tests/truth/)
+            -   id: detect-private-key
+            -   id: fix-byte-order-marker
+            -   id: check-ast
+            -   id: check-docstring-first
+            -   id: debug-statements
+
+    -   repo: https://github.com/pre-commit/pygrep-hooks
+        rev: v1.10.0
+        hooks:
+            -   id: python-use-type-annotations
+            -   id: python-check-mock-methods
+            -   id: python-no-eval
+            -   id: rst-backticks
+            -   id: rst-directive-colons
+
+    -   repo: https://github.com/asottile/pyupgrade
+        rev: v3.3.1
+        hooks:
+            -   id: pyupgrade
+                args: [ --py38-plus ]
+
+    # Notebook formatting
+    -   repo: https://github.com/nbQA-dev/nbQA
+        rev: 1.9.1
+        hooks:
+            -   id: nbqa-isort
+                additional_dependencies: [ isort ]
+
+            -   id: nbqa-pyupgrade
+                additional_dependencies: [ pyupgrade ]
+                args: [ --py38-plus ]
+
+
+    -   repo: https://github.com/kynan/nbstripout
+        rev: 0.8.1
+        hooks:
+            -   id: nbstripout
+
+    -   repo: https://github.com/sondrelg/pep585-upgrade
+        rev: 'v1.0'
+        hooks:
+            -   id: upgrade-type-hints
+                args: [ '--futures=true' ]
+
+    -   repo: https://github.com/MarcoGorelli/auto-walrus
+        rev: 0.3.4
+        hooks:
+            -   id: auto-walrus
+
+    -   repo: https://github.com/python-jsonschema/check-jsonschema
+        rev: 0.30.0
+        hooks:
+            -   id: check-github-workflows
+            -   id: check-github-actions
+            -   id: check-dependabot
+            -   id: check-readthedocs
+
+    -   repo: https://github.com/dannysepler/rm_unneeded_f_str
+        rev: v0.2.0
+        hooks:
+            -   id: rm-unneeded-f-str
+
+    -   repo: https://github.com/astral-sh/ruff-pre-commit
+        rev: "v0.8.6"
+        hooks:
+            -   id: ruff
+                types_or: [ python, pyi, jupyter ]
+                args: [ --fix, --show-fixes , --line-length=120 ]  # --unsafe-fixes,
+            # Run the formatter.
+            -   id: ruff-format
+                types_or: [ python, pyi, jupyter ]
