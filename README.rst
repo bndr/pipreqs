@@ -25,7 +25,7 @@ Installation
 
     pip install pipreqs
 
-Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it. 
+Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it.
 To do so, run:
 
 .. code-block:: sh
@@ -66,6 +66,7 @@ Usage
                               <gt>     | e.g. Flask>=1.1.2
                               <no-pin> | e.g. Flask
         --scan-notebooks      Look for imports in jupyter notebook files.
+        --venv <dirs>...      Look for imports in the specified virtualenv
 
 Example
 -------
