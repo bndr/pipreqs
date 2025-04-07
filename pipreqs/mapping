@@ -582,6 +582,7 @@ ctff:tff
 cups:pycups
 curator:elasticsearch_curator
 curl:pycurl
+cv2:opencv-python
 daemon:python_daemon
 dare:DARE
 dateutil:python_dateutil
