@@ -1,9 +1,20 @@
 name: flake8
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+      - master
+      - develop
+      - "release/*"
+  pull_request:
 
 jobs:
     flake8-lint:
