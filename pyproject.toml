@@ -39,9 +39,13 @@ dev = [
     "coverage>=7.3.2",
     "sphinx>=7.2.6;python_version>='3.9'",
 ]
+[tool.poetry.group.dev.dependencies]  # for legacy usage
+flake8 = "^6.1.0"
+tox = "^4.11.3"
+coverage = "^7.3.2"
+sphinx = { version = "^7.2.6", python = ">=3.9" }
 
-
-[tool.poetry.scripts]
+[project.scripts]
 pipreqs = "pipreqs.pipreqs:main"
 
 [build-system]
