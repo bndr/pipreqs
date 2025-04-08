@@ -36,6 +36,7 @@ Pyxides:astro_pyxis
 QtCore:PySide
 S3:s3cmd
 SCons:pystick
+speech_recognition:SpeechRecognition
 Shared:Zope2
 Signals:Zope2
 Stemmer:PyStemmer
@@ -582,6 +583,7 @@ ctff:tff
 cups:pycups
 curator:elasticsearch_curator
 curl:pycurl
+cv2:opencv-python
 daemon:python_daemon
 dare:DARE
 dateutil:python_dateutil
@@ -720,6 +722,7 @@ jaraco:jaraco.util
 jinja2:Jinja2
 jiracli:jira_cli
 johnny:johnny_cache
+jose:python_jose
 jpgrid:python_geohash
 jpiarea:python_geohash
 jpype:JPype1
@@ -975,6 +978,7 @@ pysynth_samp:PySynth
 pythongettext:python_gettext
 pythonjsonlogger:python_json_logger
 pyutilib:PyUtilib
+pywintypes:pywin32
 pyximport:Cython
 qs:qserve
 quadtree:python_geohash

@@ -31,7 +31,7 @@ Options:
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project
     --mode <scheme>       Enables dynamic versioning with <compat>,
-                          <gt> or <non-pin> schemes.
+                          <gt> or <no-pin> schemes.
                           <compat> | e.g. Flask~=1.1.2
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
@@ -110,6 +110,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         "__pycache__",
         "env",
         "venv",
+        ".venv",
         ".ipynb_checkpoints",
     ]
 
