@@ -10,11 +10,11 @@ on:
 
 jobs:
     run_tests:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         strategy:
             fail-fast: false
             matrix:
-                python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', 'pypy-3.9-7.3.13']
+                python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', 'pypy-3.10']
 
         steps:
             - name: Checkout repository
@@ -35,7 +35,7 @@ jobs:
 
     coverage_report:
         needs: run_tests
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - name: Checkout repository
               uses: actions/checkout@v4
@@ -55,4 +55,5 @@ jobs:
               uses: codecov/codecov-action@v5
               with:
                   files: coverage.xml
-                  fail_ci_if_error: true
+                  token: ${{ secrets.CODECOV_TOKEN }}                  
+                  fail_ci_if_error: false
