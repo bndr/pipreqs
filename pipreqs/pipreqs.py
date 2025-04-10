@@ -49,6 +49,7 @@ from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
+from typing import Optional
 
 from pipreqs import __version__
 
@@ -317,9 +318,8 @@ def get_locally_installed_packages(use_venv_packages: bool, encoding="utf-8"):
     return packages
 
 
-def get_import_local(imports, use_venv_packages: bool, encoding="utf-8"):
+def get_import_local(imports, use_venv_packages: Optional[bool]=False, encoding="utf-8"):
     local = get_locally_installed_packages(use_venv_packages=use_venv_packages)
-    print('LOCAL: ', local)
     result = []
     for item in imports:
         # search through local packages
@@ -330,7 +330,6 @@ def get_import_local(imports, use_venv_packages: bool, encoding="utf-8"):
             if item in package["exports"] or item == package["name"]:
                 result.append(package)
 
-    print(result)
     # removing duplicates of package/version
     # had to use second method instead of the previous one,
     # because we have a list in the 'exports' field
