@@ -12,6 +12,7 @@ Arguments:
 
 Options:
     --use-local           Use ONLY local package info instead of querying PyPI.
+    --only-venv           Use ONLY venv packages instead local system.
     --pypi-server <url>   Use custom PyPi server.
     --proxy <url>         Use Proxy, parameter will be passed to requests
                           library. You can also just set the environments
@@ -259,10 +260,26 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
     return result
 
 
-def get_locally_installed_packages(encoding="utf-8"):
+def get_locally_installed_packages(use_venv_packages: bool, encoding="utf-8"):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    for path in sys.path:
+
+    venv_path = os.environ.get("VIRTUAL_ENV")
+    paths_to_search = []
+    if use_venv_packages and venv_path:
+        lib_path = os.path.join(venv_path, "lib")
+        if os.path.isdir(lib_path):
+            for entry in os.listdir(lib_path):
+                site_packages = os.path.join(lib_path, entry, "site-packages")
+                if os.path.isdir(site_packages):
+                    paths_to_search.append(site_packages)
+                    break
+    else:
+        if use_venv_packages and not venv_path:
+            logging.warning("You specified to use only the virtual environment packages, but no virtual environment is currently active.")
+        paths_to_search = sys.path
+
+    for path in paths_to_search:
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
@@ -300,8 +317,9 @@ def get_locally_installed_packages(encoding="utf-8"):
     return packages
 
 
-def get_import_local(imports, encoding="utf-8"):
-    local = get_locally_installed_packages()
+def get_import_local(imports, use_venv_packages: bool, encoding="utf-8"):
+    local = get_locally_installed_packages(use_venv_packages=use_venv_packages)
+    print('LOCAL: ', local)
     result = []
     for item in imports:
         # search through local packages
@@ -312,6 +330,7 @@ def get_import_local(imports, encoding="utf-8"):
             if item in package["exports"] or item == package["name"]:
                 result.append(package)
 
+    print(result)
     # removing duplicates of package/version
     # had to use second method instead of the previous one,
     # because we have a list in the 'exports' field
@@ -548,7 +567,9 @@ def init(args):
 
     if args["--use-local"]:
         logging.debug("Getting package information ONLY from local installation.")
-        imports = get_import_local(candidates, encoding=encoding)
+        print(candidates)
+        imports = get_import_local(candidates, args["--only-venv"], encoding=encoding)
+        print(imports)
     else:
         logging.debug("Getting packages information from Local/PyPI")
         local = get_import_local(candidates, encoding=encoding)
