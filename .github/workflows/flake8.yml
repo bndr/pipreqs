@@ -1,18 +1,32 @@
 name: flake8
 
-on: pull_request
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*"
+    branches:
+      - main
+      - master
+      - develop
+      - "release/*"
+  pull_request:
 
 jobs:
     flake8-lint:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         name: Lint
         steps:
             - name: Check out source repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
             - name: Set up Python environment
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v5
               with:
-                  python-version: "3.9"
+                  python-version: "3.13"
             - name: flake8 Lint
               uses: reviewdog/action-flake8@v3
               with:

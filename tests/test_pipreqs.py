@@ -114,6 +114,13 @@ class TestPipreqs(unittest.TestCase):
         """
         self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_invalid)
 
+    def test_ignore_errors(self):
+        """
+        Test that invalid python files do not raise an exception when ignore_errors is True.
+        """
+        imports = pipreqs.get_all_imports(self.project_invalid, ignore_errors=True)
+        self.assertEqual(len(imports), 0)
+
     def test_get_imports_info(self):
         """
         Test to see that the right number of packages were found on PyPI

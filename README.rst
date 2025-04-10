@@ -2,8 +2,8 @@
 ``pipreqs`` - Generate requirements.txt file for any project based on imports
 =============================================================================
 
-.. image:: https://img.shields.io/travis/bndr/pipreqs.svg
-        :target: https://travis-ci.org/bndr/pipreqs
+.. image:: https://github.com/bndr/pipreqs/actions/workflows/tests.yml/badge.svg
+        :target: https://github.com/bndr/pipreqs/actions/workflows/tests.yml
 
 
 .. image:: https://img.shields.io/pypi/v/pipreqs.svg
@@ -56,6 +56,7 @@ Usage
         --debug               Print debug information
         --ignore <dirs>...    Ignore extra directories, each separated by a comma
         --no-follow-links     Do not follow symbolic links in the project
+        --ignore-errors       Ignore errors while scanning files
         --encoding <charset>  Use encoding parameter for file open
         --savepath <file>     Save the list of requirements in the given file
         --print               Output the list of requirements in the standard output

@@ -21,6 +21,7 @@ Options:
                           $ export HTTPS_PROXY="https://10.10.1.10:1080"
     --debug               Print debug information
     --ignore <dirs>...    Ignore extra directories, each separated by a comma
+    --ignore-errors       Ignore errors while scanning files
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
@@ -32,7 +33,7 @@ Options:
     --clean <file>        Clean up requirements.txt by removing modules
                           that are not imported in project
     --mode <scheme>       Enables dynamic versioning with <compat>,
-                          <gt> or <non-pin> schemes.
+                          <gt> or <no-pin> schemes.
                           <compat> | e.g. Flask~=1.1.2
                           <gt>     | e.g. Flask>=1.1.2
                           <no-pin> | e.g. Flask
@@ -99,11 +100,10 @@ def _open(filename=None, mode="r"):
             file.close()
 
 
-def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True):
+def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links=True, ignore_errors=False):
     imports = set()
     raw_imports = set()
     candidates = []
-    ignore_errors = False
     ignore_dirs = [
         ".hg",
         ".svn",
@@ -112,6 +112,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         "__pycache__",
         "env",
         "venv",
+        ".venv",
         ".ipynb_checkpoints",
     ]
 
@@ -135,9 +136,9 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
         for file_name in files:
             file_name = os.path.join(root, file_name)
-            contents = read_file_content(file_name, encoding)
 
             try:
+                contents = read_file_content(file_name, encoding)
                 tree = ast.parse(contents)
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
@@ -147,7 +148,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
                         raw_imports.add(node.module)
             except Exception as exc:
                 if ignore_errors:
-                    traceback.print_exc(exc)
+                    traceback.print_exc()
                     logging.warn("Failed on file: %s" % file_name)
                     continue
                 else:
@@ -525,6 +526,7 @@ def init(args):
     encoding = args.get("--encoding")
     extra_ignore_dirs = args.get("--ignore")
     follow_links = not args.get("--no-follow-links")
+    ignore_errors = args.get("--ignore-errors")
 
     scan_noteboooks = args.get("--scan-notebooks", False)
     handle_scan_noteboooks()
@@ -556,6 +558,7 @@ def init(args):
         encoding=encoding,
         extra_ignore_dirs=extra_ignore_dirs,
         follow_links=follow_links,
+        ignore_errors=ignore_errors,
     )
     candidates = get_pkg_names(candidates)
     logging.debug("Found imports: " + ", ".join(candidates))
