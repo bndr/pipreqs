@@ -277,7 +277,10 @@ def get_locally_installed_packages(use_venv_packages: bool, encoding="utf-8"):
                     break
     else:
         if use_venv_packages and not venv_path:
-            logging.warning("You specified to use only the virtual environment packages, but no virtual environment is currently active.")
+            logging.warning(
+                "You specified to use only the virtual environment packages, "
+                "but no virtual environment is currently active."
+            )
         paths_to_search = sys.path
 
     for path in paths_to_search:
@@ -318,7 +321,7 @@ def get_locally_installed_packages(use_venv_packages: bool, encoding="utf-8"):
     return packages
 
 
-def get_import_local(imports, use_venv_packages: Optional[bool]=False, encoding="utf-8"):
+def get_import_local(imports, use_venv_packages: Optional[bool] = False, encoding="utf-8"):
     local = get_locally_installed_packages(use_venv_packages=use_venv_packages)
     result = []
     for item in imports:
