@@ -147,7 +147,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
             except Exception as exc:
                 if ignore_errors:
                     traceback.print_exc()
-                    logging.warn("Failed on file: %s" % file_name)
+                    logging.warning("Failed on file: %s" % file_name)
                     continue
                 else:
                     logging.error("Failed on file: %s" % file_name)
