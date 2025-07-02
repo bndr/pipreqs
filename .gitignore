@@ -53,3 +53,5 @@ Session.vim
 *~
 
 /pipreqs/*.bak
+
+.venv
