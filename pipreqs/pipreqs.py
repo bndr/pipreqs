@@ -38,6 +38,7 @@ Options:
                           <no-pin> | e.g. Flask
     --scan-notebooks      Look for imports in jupyter notebook files.
 """
+import asyncio
 from contextlib import contextmanager
 import os
 import sys
@@ -46,10 +47,9 @@ import logging
 import ast
 import traceback
 from docopt import docopt
-import requests
+import httpx
 from yarg import json2package
 from yarg.exceptions import HTTPError
-
 from pipreqs import __version__
 
 REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
@@ -227,37 +227,50 @@ def output_requirements(imports, symbol):
     generate_requirements_file("-", imports, symbol)
 
 
-def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
-    result = []
+async def _get_response(client, url):
+    try:
+        response = await client.get(url)
+        if response.status_code == 200:
+            if hasattr(response.content, "decode"):
+                data = json2package(response.content.decode())
+            else:
+                data = json2package(response.content)
 
-    for item in imports:
-        try:
+            return data
+        elif response.status_code >= 300:
+            raise HTTPError(status_code=response.status_code, url=url)
+    except HTTPError as e:
+        logging.error(
+            'Failed to get package information for "%s" from PyPI: %s',
+            url,
+            e,
+        )
+        return None
+
+
+async def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
+    requests = []
+
+    async with httpx.AsyncClient(
+        base_url=pypi_server,
+        headers={"User-Agent": "pipreqs/{}".format(__version__)},
+        proxy=proxy,
+        timeout=60.0,
+        follow_redirects=True
+    ) as client:
+        for item in imports:
             logging.warning(
                 'Import named "%s" not found locally. ' "Trying to resolve it at the PyPI server.",
                 item,
             )
-            response = requests.get("{0}{1}/json".format(pypi_server, item), proxies=proxy)
-            if response.status_code == 200:
-                if hasattr(response.content, "decode"):
-                    data = json2package(response.content.decode())
-                else:
-                    data = json2package(response.content)
-            elif response.status_code >= 300:
-                raise HTTPError(status_code=response.status_code, reason=response.reason)
-        except HTTPError:
-            logging.warning('Package "%s" does not exist or network problems', item)
-            continue
-        logging.warning(
-            'Import named "%s" was resolved to "%s:%s" package (%s).\n'
-            "Please, verify manually the final list of requirements.txt "
-            "to avoid possible dependency confusions.",
-            item,
-            data.name,
-            data.latest_release_id,
-            data.pypi_url,
-        )
-        result.append({"name": item, "version": data.latest_release_id})
-    return result
+            requests.append(asyncio.create_task(_get_response(client, f"{item}/json")))
+
+        responses = await asyncio.gather(*requests)
+
+    return [
+        {"name": data.name, "version": data.latest_release_id}
+        for data in responses if data is not None
+    ]
 
 
 def get_locally_installed_packages(encoding="utf-8"):
@@ -500,7 +513,7 @@ def handle_scan_noteboooks():
         raise NbconvertNotInstalled()
 
 
-def init(args):
+async def init(args):
     global scan_noteboooks
     encoding = args.get("--encoding")
     extra_ignore_dirs = args.get("--ignore")
@@ -572,7 +585,7 @@ def init(args):
             x.lower() not in [x["name"] for x in local]
         ]
 
-        imports = local + get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
+        imports = local + await get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
     # sort imports based on lowercase name of package, similar to `pip freeze`.
     imports = sorted(imports, key=lambda x: x["name"].lower())
 
@@ -609,7 +622,7 @@ def main():  # pragma: no cover
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
 
     try:
-        init(args)
+        asyncio.run(init(args))
     except KeyboardInterrupt:
         sys.exit(0)
 
