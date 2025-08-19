@@ -73,8 +73,8 @@ Example
 
 ::
 
-    $ pipreqs /home/project/location
-    Successfully saved requirements file in /home/project/location/requirements.txt
+    $ pipreqs home/project/location
+    Successfully saved requirements file in home/project/location/requirements.txt
 
 Contents of requirements.txt
 
