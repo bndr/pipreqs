@@ -1,17 +1,14 @@
 [project]
-name = "pipreqs"
-version = "0.5.0"
+name = "pipreqs-fivetran"
+version = "1.0.0"
 description = "Pip requirements.txt generator based on imports in project"
 authors = [
-    { name = "Vadim Kravcenko", email = "vadim.kravcenko@gmail.com" }
-]
-maintainers = [
-    {name = "Jonas Eschle", email = "jonas.eschle@gmail.com"}
+    { name="Fivetran", email="developers@fivetran.com" },
 ]
 license = "Apache-2.0"
 readme = "README.rst"
 packages = [{ include = "pipreqs" }]
-repository = "https://github.com/bndr/pipreqs"
+repository = "https://github.com/fivetran/pipreqs"
 keywords = ["pip", "requirements", "imports"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -39,6 +36,10 @@ dev = [
     "coverage>=7.3.2",
     "sphinx>=7.2.6;python_version>='3.9'",
 ]
+
+[tool.poetry]
+packages = [{ include = "pipreqs" }]
+
 [tool.poetry.group.dev.dependencies]  # for legacy usage
 flake8 = "^6.1.0"
 tox = "^4.11.3"
