@@ -6,10 +6,10 @@
         :target: https://github.com/fivetran/pipreqs/actions/workflows/tests.yml
 
 
-.. image:: https://img.shields.io/pypi/v/pipreqs.svg
+.. image:: https://img.shields.io/pypi/v/pipreqs-fivetran.svg
         :target: https://pypi.org/project/pipreqs-fivetran/
 
-.. image:: https://img.shields.io/pypi/l/pipreqs.svg
+.. image:: https://img.shields.io/pypi/l/pipreqs-fivetran.svg
         :target: https://pypi.org/project/pipreqs-fivetran/
 
 
