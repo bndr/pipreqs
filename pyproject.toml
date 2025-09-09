@@ -1,6 +1,6 @@
 [project]
 name = "pipreqs-fivetran"
-version = "1.0.0"
+version = "1.0.1"
 description = "Pip requirements.txt generator based on imports in project"
 authors = [
     { name="Fivetran", email="developers@fivetran.com" },
