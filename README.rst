@@ -19,7 +19,7 @@ Installation
 
 .. code-block:: sh
 
-    pip install pipreqs
+    pip install pipreqs-fivetran
 
 Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it.
 To do so, run:
