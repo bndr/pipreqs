@@ -7,7 +7,6 @@ authors = [
 ]
 license = "Apache-2.0"
 readme = "README.rst"
-packages = [{ include = "pipreqs" }]
 repository = "https://github.com/fivetran/pipreqs"
 keywords = ["pip", "requirements", "imports"]
 classifiers = [
