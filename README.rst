@@ -26,7 +26,7 @@ To do so, run:
 
 .. code-block:: sh
 
-    pip install --no-deps pipreqs
+    pip install --no-deps pipreqs-fivetran
     pip install yarg==0.1.9 docopt==0.6.2
 
 Usage
