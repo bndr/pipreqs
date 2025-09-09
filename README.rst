@@ -2,19 +2,15 @@
 ``pipreqs`` - Generate requirements.txt file for any project based on imports
 =============================================================================
 
-.. image:: https://github.com/bndr/pipreqs/actions/workflows/tests.yml/badge.svg
-        :target: https://github.com/bndr/pipreqs/actions/workflows/tests.yml
+.. image:: https://github.com/fivetran/pipreqs/actions/workflows/tests.yml/badge.svg
+        :target: https://github.com/fivetran/pipreqs/actions/workflows/tests.yml
 
 
 .. image:: https://img.shields.io/pypi/v/pipreqs.svg
-        :target: https://pypi.python.org/pypi/pipreqs
-
-
-.. image:: https://codecov.io/gh/bndr/pipreqs/branch/master/graph/badge.svg?token=0rfPfUZEAX
-        :target: https://codecov.io/gh/bndr/pipreqs
+        :target: https://pypi.org/project/pipreqs-fivetran/
 
 .. image:: https://img.shields.io/pypi/l/pipreqs.svg
-        :target: https://pypi.python.org/pypi/pipreqs
+        :target: https://pypi.org/project/pipreqs-fivetran/
 
 
 
@@ -25,7 +21,7 @@ Installation
 
     pip install pipreqs
 
-Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it. 
+Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it.
 To do so, run:
 
 .. code-block:: sh
