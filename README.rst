@@ -7,10 +7,10 @@
 
 
 .. image:: https://img.shields.io/pypi/v/pipreqs-fivetran.svg
-        :target: https://pypi.org/project/pipreqs-fivetran/
+        :target: https://pypi.python.org/pypi/pipreqs-fivetran
 
 .. image:: https://img.shields.io/pypi/l/pipreqs-fivetran.svg
-        :target: https://pypi.org/project/pipreqs-fivetran/
+        :target: https://pypi.python.org/pypi/pipreqs-fivetran
 
 
 
