@@ -1,6 +1,6 @@
 [project]
 name = "pipreqs-fivetran"
-version = "1.0.1"
+version = "1.1.0"
 description = "Pip requirements.txt generator based on imports in project"
 authors = [
     { name="Fivetran", email="developers@fivetran.com" },
@@ -20,6 +20,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 requires-python = ">=3.9, <3.14"
 dependencies = [
