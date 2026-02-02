@@ -1,6 +1,6 @@
 [project]
 name = "pipreqs-fivetran"
-version = "1.1.1"
+version = "1.1.2"
 description = "Pip requirements.txt generator based on imports in project"
 authors = [
     { name="Fivetran", email="developers@fivetran.com" },
@@ -26,7 +26,7 @@ requires-python = ">=3.9, <3.15"
 dependencies = [
     "yarg>=0.1.9",
     "docopt>=0.6.2",
-    "nbconvert>=7.11.0",
+    "nbconvert>=7.17.0",
     "ipython>=8.12.3",
 ]
 [project.optional-dependencies]
