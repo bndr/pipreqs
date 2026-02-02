@@ -1,3 +1,3 @@
-__author__ = 'Vadim Kravcenko'
-__email__ = 'vadim.kravcenko@gmail.com'
-__version__ = '0.4.13'
+__author__ = 'Fivetran Developers'
+__email__ = 'developers@fivetran.com'
+__version__ = '1.1.1'
