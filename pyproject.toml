@@ -28,7 +28,6 @@ classifiers = [
 requires-python = ">=3.9, <3.14"
 dependencies = [
     "yarg>=0.1.9",
-    "docopt>=0.6.2",
     "nbconvert>=7.11.0",
     "ipython>=8.12.3",
 ]
@@ -39,6 +38,10 @@ dev = [
     "coverage>=7.3.2",
     "sphinx>=7.2.6;python_version>='3.9'",
 ]
+cli = [
+    "docopt>=0.6.2",
+]
+
 [tool.poetry.group.dev.dependencies]  # for legacy usage
 flake8 = "^6.1.0"
 tox = "^4.11.3"

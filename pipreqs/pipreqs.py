@@ -45,7 +45,6 @@ import re
 import logging
 import ast
 import traceback
-from docopt import docopt
 import requests
 from yarg import json2package
 from yarg.exceptions import HTTPError
@@ -604,6 +603,11 @@ def init(args):
 
 
 def main():  # pragma: no cover
+    try:
+        from docopt import docopt
+    except (ImportError, ModuleNotFoundError):
+        sys.exit("Please install docopt to use the command line")
+
     args = docopt(__doc__, version=__version__)
     log_level = logging.DEBUG if args["--debug"] else logging.INFO
     logging.basicConfig(level=log_level, format="%(levelname)s: %(message)s")
