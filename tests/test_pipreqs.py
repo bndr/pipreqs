@@ -156,6 +156,22 @@ class TestPipreqs(unittest.TestCase):
         for item in imports_with_info:
             self.assertTrue(item["name"].lower() in self.local)
 
+    @patch("pipreqs.pipreqs.get_locally_installed_packages")
+    def test_get_import_local_only_from_venv(self, mock_get_local_packages):
+        mock_get_local_packages.return_value = [
+            {"name": "requests", "version": "2.31.0", "exports": ["requests"]},
+            {"name": "docopt", "version": "0.6.2", "exports": ["docopt"]},
+        ]
+
+        imports = {"requests": "2.31.0", "docopt": "0.6.2", "flask": "3.0.2"}
+
+        result = pipreqs.get_import_local(imports, use_venv_packages=True)
+
+        self.assertEqual(result, [
+            {"name": "requests", "version": "2.31.0", "exports": ["requests"]},
+            {"name": "docopt", "version": "0.6.2", "exports": ["docopt"]},
+        ])
+
     def test_init(self):
         """
         Test that all modules we will test upon are in requirements file
@@ -194,6 +210,7 @@ class TestPipreqs(unittest.TestCase):
                 "--savepath": None,
                 "--print": False,
                 "--use-local": True,
+                "--only-venv": False,
                 "--force": True,
                 "--proxy": None,
                 "--pypi-server": None,
