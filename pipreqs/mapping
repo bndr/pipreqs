@@ -2,6 +2,7 @@ AFQ:pyAFQ
 AG_fft_tools:agpy
 ANSI:pexpect
 Adafruit:Adafruit_Libraries
+apache-airflow:airflow
 App:Zope2
 Asterisk:py_Asterisk
 BB_jekyll_hook:bitbucket_jekyll_hook
