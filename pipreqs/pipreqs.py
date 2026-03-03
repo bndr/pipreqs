@@ -516,6 +516,9 @@ def init(args):
         encoding = "utf-8"
     if input_path is None:
         input_path = os.path.abspath(os.curdir)
+    if not os.path.isdir(input_path):
+        logging.error(f"The path '{input_path}' is not a directory. Please provide a directory path.")
+        sys.exit(1)
 
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(",")
