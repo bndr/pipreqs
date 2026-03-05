@@ -1,3 +1,7 @@
+
+.. note::
+   Community Maintained Fork: https://github.com/KushalLukhi/pipreqs-maintained
+
 =============================================================================
 ``pipreqs`` - Generate requirements.txt file for any project based on imports
 =============================================================================
