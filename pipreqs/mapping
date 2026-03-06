@@ -1155,3 +1155,4 @@ z3c:z3c.traverser
 z3c:z3c.zcmlhook
 zmq:pyzmq
 zopyx:zopyx.textindexng3
+fastapi:fastapi

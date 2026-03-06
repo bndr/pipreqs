@@ -329,7 +329,7 @@ def get_pkg_names(pkgs):
         pkgs (List[str]): List of import names.
 
     Returns:
-        List[str]: The corresponding PyPI package names.
+        List[str]: The corresponding PyPI package names (normalized to lowercase).
 
     """
     result = set()
@@ -338,9 +338,12 @@ def get_pkg_names(pkgs):
     for pkg in pkgs:
         # Look up the mapped requirement. If a mapping isn't found,
         # simply use the package name.
-        result.add(data.get(pkg, pkg))
+        mapped = data.get(pkg, pkg)
+        # Normalize to lowercase for consistent output
+        # This fixes issues like "Requests" -> "requests"
+        result.add(mapped.lower())
     # Return a sorted list for backward compatibility.
-    return sorted(result, key=lambda s: s.lower())
+    return sorted(result)
 
 
 def get_name_without_alias(name):
