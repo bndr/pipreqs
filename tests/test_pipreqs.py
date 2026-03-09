@@ -139,8 +139,69 @@ class TestPipreqs(unittest.TestCase):
     def test_get_pkg_names(self):
         pkgs = ["jury", "Japan", "camel", "Caroline"]
         actual_output = pipreqs.get_pkg_names(pkgs)
-        expected_output = ["camel", "Caroline", "Japan", "jury"]
+        expected_output = ["camel", "caroline", "japan", "jury"]
         self.assertEqual(actual_output, expected_output)
+
+    def test_get_pkg_names_normalization(self):
+        """
+        Test that package names are normalized to lowercase.
+        This fixes issue #500 where package names like 'Requests' were
+        output instead of 'requests'.
+        """
+        pkgs = ["Requests", "Flask", "SQLAlchemy", "NumPy"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        # All should be lowercase
+        for pkg in actual_output:
+            self.assertEqual(pkg, pkg.lower(), f"Package name {pkg} is not lowercase")
+
+    def test_get_pkg_names_fastapi_mapping(self):
+        """
+        Test that FastAPI is correctly mapped.
+        This addresses issue #515 where FastAPI resolution failed.
+        """
+        pkgs = ["fastapi"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        self.assertIn("fastapi", actual_output)
+
+    def test_requirements_output_format(self):
+        """
+        Test that generated requirements.txt has proper formatting.
+        This addresses issue #504 where malformed output occurred.
+        """
+        import tempfile
+        import os
+
+        test_packages = [
+            {"name": "requests", "version": "2.31.0"},
+            {"name": "flask", "version": "2.3.0"},
+            {"name": "fastapi", "version": "0.100.0"},
+        ]
+
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            temp_path = f.name
+
+        try:
+            pipreqs.generate_requirements_file(temp_path, test_packages, "==")
+
+            with open(temp_path, 'r') as f:
+                lines = f.readlines()
+
+            # Check each line is properly formatted: package==version
+            for i, line in enumerate(lines):
+                line = line.strip()
+                if line:  # Skip empty lines
+                    # Should have exactly one == separator
+                    self.assertEqual(line.count("=="), 1,
+                                    f"Line {i+1} has malformed version spec: {line}")
+                    # Should not have leading/trailing whitespace
+                    self.assertEqual(line, line.strip(),
+                                    f"Line {i+1} has leading/trailing whitespace")
+                    # Package name should be lowercase
+                    pkg_name = line.split("==")[0]
+                    self.assertEqual(pkg_name, pkg_name.lower(),
+                                    f"Package name {pkg_name} is not lowercase")
+        finally:
+            os.unlink(temp_path)
 
     def test_get_use_local_only(self):
         """
