@@ -137,7 +137,18 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
             try:
                 contents = read_file_content(file_name, encoding)
-                tree = ast.parse(contents)
+                # Handle both Python 2 and Python 3 syntax
+                # Python 2 files with 'print "msg"' will raise SyntaxError
+                try:
+                    tree = ast.parse(contents)
+                except SyntaxError as syntax_err:
+                    # Try to handle Python 2 syntax by skipping file or logging
+                    logging.warning(
+                        "SyntaxError in %s: %s. "
+                        "File may contain Python 2 syntax (e.g., print statements). "
+                        "Use --ignore-errors to skip this file." % (file_name, syntax_err)
+                    )
+                    raise
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
                         for subnode in node.names:
@@ -182,6 +193,8 @@ def read_file_content(file_name: str, encoding="utf-8"):
             contents = f.read()
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
+        if contents is None:
+            raise ValueError(f"Failed to parse notebook: {file_name}")
     return contents
 
 
@@ -197,13 +210,16 @@ def ipynb_2_py(file_name, encoding="utf-8"):
         encoding  (str): encoding of file
 
     Returns:
-        str: parsed string
+        str: parsed string, or None if parsing failed
 
     """
-    exporter = PythonExporter()
-    (body, _) = exporter.from_filename(file_name)
-
-    return body.encode(encoding)
+    try:
+        exporter = PythonExporter()
+        (body, _) = exporter.from_filename(file_name)
+        return body.encode(encoding)
+    except Exception as e:
+        logging.warning(f"Failed to convert notebook {file_name}: {e}")
+        return None
 
 
 def generate_requirements_file(path, imports, symbol):
