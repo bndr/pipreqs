@@ -996,7 +996,7 @@ recaptcha_works:django_recaptcha_works
 relstorage:RelStorage
 reportapi:django_reportapi
 reprlib:pies2overrides
-requests:Requests
+brkt_requests:brkt_sdk
 requirements:requirements_parser
 rest_framework:djangorestframework
 restclient:py_restclient
