@@ -161,7 +161,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
         # Ex: from django.conf --> django.conf. But we only want django
         # as an import.
         cleaned_name, _, _ = name.partition(".")
-        imports.add(cleaned_name)
+        imports.add(cleaned_name.lower())
 
     packages = imports - (set(candidates) & imports)
     logging.debug("Found packages: {0}".format(packages))
