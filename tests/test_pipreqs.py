@@ -801,6 +801,32 @@ class TestPipreqs(unittest.TestCase):
             contents = pipreqs.read_file_content(latin_file, encoding="utf-8")
             self.assertIn("import os", contents)
 
+    def test_open_creates_directory(self):
+        """
+        Test that _open creates parent directories when writing files.
+        Fixes issue #496 - requirements.txt File not found when parent
+        directory doesn't exist.
+        """
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a nested path that doesn't exist
+            nested_dir = os.path.join(tmpdir, "nonexistent", "nested")
+            file_path = os.path.join(nested_dir, "requirements.txt")
+
+            # Should create the directory and file without error
+            with pipreqs._open(file_path, "w") as f:
+                f.write("requests==2.0.0\n")
+
+            # Verify file was created
+            self.assertTrue(os.path.exists(file_path))
+
+            # Verify content
+            with open(file_path, "r") as f:
+                content = f.read()
+                self.assertEqual(content, "requests==2.0.0\n")
+
     def tearDown(self):
         """
         Remove requiremnts.txt files that were written

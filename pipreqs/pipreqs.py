@@ -89,6 +89,11 @@ def _open(filename=None, mode="r"):
         else:
             raise ValueError("Invalid mode for file: {}".format(mode))
     else:
+        # Create parent directory if it doesn't exist (for write modes)
+        if "w" in mode:
+            parent_dir = os.path.dirname(os.path.abspath(filename))
+            if parent_dir and not os.path.exists(parent_dir):
+                os.makedirs(parent_dir, exist_ok=True)
         file = open(filename, mode)
 
     try:
