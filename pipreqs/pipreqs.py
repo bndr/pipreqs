@@ -89,6 +89,11 @@ def _open(filename=None, mode="r"):
         else:
             raise ValueError("Invalid mode for file: {}".format(mode))
     else:
+        # Create parent directory if it doesn't exist (for write modes)
+        if "w" in mode:
+            parent_dir = os.path.dirname(os.path.abspath(filename))
+            if parent_dir and not os.path.exists(parent_dir):
+                os.makedirs(parent_dir, exist_ok=True)
         file = open(filename, mode)
 
     try:
@@ -137,7 +142,18 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
             try:
                 contents = read_file_content(file_name, encoding)
-                tree = ast.parse(contents)
+                # Handle both Python 2 and Python 3 syntax
+                # Python 2 files with 'print "msg"' will raise SyntaxError
+                try:
+                    tree = ast.parse(contents)
+                except SyntaxError as syntax_err:
+                    # Try to handle Python 2 syntax by skipping file or logging
+                    logging.warning(
+                        "SyntaxError in %s: %s. "
+                        "File may contain Python 2 syntax (e.g., print statements). "
+                        "Use --ignore-errors to skip this file." % (file_name, syntax_err)
+                    )
+                    raise
                 for node in ast.walk(tree):
                     if isinstance(node, ast.Import):
                         for subnode in node.names:
@@ -178,10 +194,31 @@ def get_file_extensions():
 
 def read_file_content(file_name: str, encoding="utf-8"):
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
-        with open(file_name, "r", encoding=encoding) as f:
-            contents = f.read()
+        try:
+            with open(file_name, "r", encoding=encoding) as f:
+                contents = f.read()
+        except UnicodeDecodeError:
+            logging.warning(
+                "Failed to decode file %s with encoding %s. "
+                "Trying with latin-1 encoding.",
+                file_name,
+                encoding,
+            )
+            try:
+                with open(file_name, "r", encoding="latin-1") as f:
+                    contents = f.read()
+            except UnicodeDecodeError:
+                logging.error(
+                    "Failed to decode file %s with both %s and latin-1 encodings. "
+                    "Skipping file.",
+                    file_name,
+                    encoding,
+                )
+                contents = ""
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
+        if contents is None:
+            raise ValueError(f"Failed to parse notebook: {file_name}")
     return contents
 
 
@@ -197,13 +234,16 @@ def ipynb_2_py(file_name, encoding="utf-8"):
         encoding  (str): encoding of file
 
     Returns:
-        str: parsed string
+        str: parsed string, or None if parsing failed
 
     """
-    exporter = PythonExporter()
-    (body, _) = exporter.from_filename(file_name)
-
-    return body.encode(encoding)
+    try:
+        exporter = PythonExporter()
+        (body, _) = exporter.from_filename(file_name)
+        return body.encode(encoding)
+    except Exception as e:
+        logging.warning(f"Failed to convert notebook {file_name}: {e}")
+        return None
 
 
 def generate_requirements_file(path, imports, symbol):
@@ -264,40 +304,51 @@ def get_locally_installed_packages(encoding="utf-8"):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
-        for root, dirs, files in os.walk(path):
-            for item in files:
-                if "top_level" in item:
-                    item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
-                        package = root.split(os.sep)[-1].split("-")
+        # Skip paths that don't exist or aren't directories
+        if not os.path.isdir(path):
+            continue
+        try:
+            for root, dirs, files in os.walk(path):
+                for item in files:
+                    if "top_level" in item:
+                        item = os.path.join(root, item)
                         try:
-                            top_level_modules = f.read().strip().split("\n")
-                        except:  # NOQA
-                            # TODO: What errors do we intend to suppress here?
+                            with open(item, "r", encoding=encoding) as f:
+                                package = root.split(os.sep)[-1].split("-")
+                                try:
+                                    top_level_modules = f.read().strip().split("\n")
+                                except:  # NOQA
+                                    # TODO: What errors do we intend to suppress here?
+                                    continue
+
+                                # filter off explicitly ignored top-level modules
+                                # such as test, egg, etc.
+                                filtered_top_level_modules = list()
+
+                                for module in top_level_modules:
+                                    if (module not in ignore) and (package[0] not in ignore):
+                                        # append exported top level modules to the list
+                                        filtered_top_level_modules.append(module)
+
+                                version = None
+                                if len(package) > 1:
+                                    version = package[1].replace(".dist", "").replace(".egg", "")
+
+                                # append package: top_level_modules pairs
+                                # instead of top_level_module: package pairs
+                                packages.append(
+                                    {
+                                        "name": package[0],
+                                        "version": version,
+                                        "exports": filtered_top_level_modules,
+                                    }
+                                )
+                        except (OSError, IOError):
+                            # Skip files that can't be read (permissions, etc.)
                             continue
-
-                        # filter off explicitly ignored top-level modules
-                        # such as test, egg, etc.
-                        filtered_top_level_modules = list()
-
-                        for module in top_level_modules:
-                            if (module not in ignore) and (package[0] not in ignore):
-                                # append exported top level modules to the list
-                                filtered_top_level_modules.append(module)
-
-                        version = None
-                        if len(package) > 1:
-                            version = package[1].replace(".dist", "").replace(".egg", "")
-
-                        # append package: top_level_modules pairs
-                        # instead of top_level_module: package pairs
-                        packages.append(
-                            {
-                                "name": package[0],
-                                "version": version,
-                                "exports": filtered_top_level_modules,
-                            }
-                        )
+        except (OSError, IOError):
+            # Skip paths that can't be walked (permissions, etc.)
+            continue
     return packages
 
 

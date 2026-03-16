@@ -142,6 +142,19 @@ class TestPipreqs(unittest.TestCase):
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_pkg_names_mapping_hyphens(self):
+        """
+        Test that package names with hyphens are correctly mapped.
+        Fixes issue #491 - libraries with hyphens in the name.
+        """
+        pkgs = ["sklearn", "skimage"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        # sklearn should map to scikit-learn (with hyphen, not underscore)
+        # skimage should map to scikit-image (with hyphen)
+        self.assertIn("scikit-learn", actual_output)
+        self.assertIn("scikit-image", actual_output)
+        self.assertNotIn("scikit_learn", actual_output)
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local
@@ -678,6 +691,172 @@ class TestPipreqs(unittest.TestCase):
     def mock_scan_notebooks(self):
         pipreqs.scan_noteboooks = Mock(return_value=True)
         pipreqs.handle_scan_noteboooks()
+
+    def test_ignore_errors_with_invalid_notebook(self):
+        """
+        Test that --ignore-errors flag works when scanning invalid notebooks.
+        Addresses issue #485.
+        """
+        import tempfile
+        import json
+
+        # Create a temp directory with an invalid notebook
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create an invalid notebook file (not valid JSON)
+            invalid_notebook = os.path.join(tmpdir, "invalid.ipynb")
+            with open(invalid_notebook, "w") as f:
+                f.write("Not valid JSON content")
+
+            # Create a valid Python file
+            valid_py = os.path.join(tmpdir, "valid.py")
+            with open(valid_py, "w") as f:
+                f.write("import requests\n")
+
+            requirements_path = os.path.join(tmpdir, "requirements.txt")
+
+            # Should not raise exception when ignore_errors=True
+            try:
+                pipreqs.init(
+                    {
+                        "<path>": tmpdir,
+                        "--savepath": requirements_path,
+                        "--use-local": None,
+                        "--force": True,
+                        "--proxy": None,
+                        "--pypi-server": None,
+                        "--print": False,
+                        "--diff": None,
+                        "--clean": None,
+                        "--mode": None,
+                        "--scan-notebooks": True,
+                        "--ignore-errors": True,
+                    }
+                )
+                # If we get here, ignore_errors worked
+                self.assertTrue(True)
+            except Exception as e:
+                self.fail(f"ignore_errors should have caught the exception, but got: {e}")
+
+    def test_ignore_errors_with_syntax_error(self):
+        """
+        Test that --ignore-errors flag works when encountering Python 2 syntax.
+        Addresses issue #494.
+        """
+        import tempfile
+
+        # Create a temp directory with Python 2 style file
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a file with Python 2 print syntax
+            py2_file = os.path.join(tmpdir, "legacy.py")
+            with open(py2_file, "w") as f:
+                f.write('#!/usr/bin/env python\nprint "Hello World"\n')
+
+            # Create a valid Python 3 file
+            valid_py = os.path.join(tmpdir, "valid.py")
+            with open(valid_py, "w") as f:
+                f.write("import requests\n")
+
+            requirements_path = os.path.join(tmpdir, "requirements.txt")
+
+            # Should not raise exception when ignore_errors=True
+            try:
+                pipreqs.init(
+                    {
+                        "<path>": tmpdir,
+                        "--savepath": requirements_path,
+                        "--use-local": None,
+                        "--force": True,
+                        "--proxy": None,
+                        "--pypi-server": None,
+                        "--print": False,
+                        "--diff": None,
+                        "--clean": None,
+                        "--mode": None,
+                        "--scan-notebooks": False,
+                        "--ignore-errors": True,
+                    }
+                )
+                # If we get here, ignore_errors worked
+                self.assertTrue(True)
+            except Exception as e:
+                self.fail(f"ignore_errors should have caught the SyntaxError, but got: {e}")
+
+    def test_read_file_content_unicode_error(self):
+        """
+        Test that read_file_content handles UnicodeDecodeError gracefully.
+        Fixes issue #469 - Unicode Decode Error when scanning files with
+        non-utf-8 encodings.
+        """
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a file with latin-1 encoding (non-utf-8)
+            latin_file = os.path.join(tmpdir, "latin_encoded.py")
+            with open(latin_file, "wb") as f:
+                # Write some valid Python code with a latin-1 character
+                f.write(b"import os\n# Comment with latin-1 char: \xb1\n")
+
+            # Should not raise UnicodeDecodeError
+            contents = pipreqs.read_file_content(latin_file, encoding="utf-8")
+            self.assertIn("import os", contents)
+
+    def test_open_creates_directory(self):
+        """
+        Test that _open creates parent directories when writing files.
+        Fixes issue #496 - requirements.txt File not found when parent
+        directory doesn't exist.
+        """
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a nested path that doesn't exist
+            nested_dir = os.path.join(tmpdir, "nonexistent", "nested")
+            file_path = os.path.join(nested_dir, "requirements.txt")
+
+            # Should create the directory and file without error
+            with pipreqs._open(file_path, "w") as f:
+                f.write("requests==2.0.0\n")
+
+            # Verify file was created
+            self.assertTrue(os.path.exists(file_path))
+
+            # Verify content
+            with open(file_path, "r") as f:
+                content = f.read()
+                self.assertEqual(content, "requests==2.0.0\n")
+
+    def test_get_locally_installed_packages_handles_errors(self):
+        """
+        Test that get_locally_installed_packages handles paths that don't exist
+        or can't be accessed. Fixes issue #497 - Windows paths with spaces.
+        """
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a fake site-packages structure
+            site_packages = os.path.join(tmpdir, "site-packages")
+            os.makedirs(site_packages)
+
+            # Create a package with top_level.txt
+            pkg_dir = os.path.join(site_packages, "requests-2.0.0.dist-info")
+            os.makedirs(pkg_dir)
+            with open(os.path.join(pkg_dir, "top_level.txt"), "w") as f:
+                f.write("requests\n")
+
+            # Temporarily modify sys.path to include our test directory
+            original_path = sys.path[:]
+            try:
+                sys.path = [site_packages, "/nonexistent/path/with spaces"]
+                packages = pipreqs.get_locally_installed_packages()
+                # Should not crash and should find the requests package
+                self.assertTrue(len(packages) > 0)
+                package_names = [p["name"] for p in packages]
+                self.assertIn("requests", package_names)
+            finally:
+                sys.path = original_path
 
     def tearDown(self):
         """
