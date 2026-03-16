@@ -304,40 +304,51 @@ def get_locally_installed_packages(encoding="utf-8"):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
-        for root, dirs, files in os.walk(path):
-            for item in files:
-                if "top_level" in item:
-                    item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
-                        package = root.split(os.sep)[-1].split("-")
+        # Skip paths that don't exist or aren't directories
+        if not os.path.isdir(path):
+            continue
+        try:
+            for root, dirs, files in os.walk(path):
+                for item in files:
+                    if "top_level" in item:
+                        item = os.path.join(root, item)
                         try:
-                            top_level_modules = f.read().strip().split("\n")
-                        except:  # NOQA
-                            # TODO: What errors do we intend to suppress here?
+                            with open(item, "r", encoding=encoding) as f:
+                                package = root.split(os.sep)[-1].split("-")
+                                try:
+                                    top_level_modules = f.read().strip().split("\n")
+                                except:  # NOQA
+                                    # TODO: What errors do we intend to suppress here?
+                                    continue
+
+                                # filter off explicitly ignored top-level modules
+                                # such as test, egg, etc.
+                                filtered_top_level_modules = list()
+
+                                for module in top_level_modules:
+                                    if (module not in ignore) and (package[0] not in ignore):
+                                        # append exported top level modules to the list
+                                        filtered_top_level_modules.append(module)
+
+                                version = None
+                                if len(package) > 1:
+                                    version = package[1].replace(".dist", "").replace(".egg", "")
+
+                                # append package: top_level_modules pairs
+                                # instead of top_level_module: package pairs
+                                packages.append(
+                                    {
+                                        "name": package[0],
+                                        "version": version,
+                                        "exports": filtered_top_level_modules,
+                                    }
+                                )
+                        except (OSError, IOError):
+                            # Skip files that can't be read (permissions, etc.)
                             continue
-
-                        # filter off explicitly ignored top-level modules
-                        # such as test, egg, etc.
-                        filtered_top_level_modules = list()
-
-                        for module in top_level_modules:
-                            if (module not in ignore) and (package[0] not in ignore):
-                                # append exported top level modules to the list
-                                filtered_top_level_modules.append(module)
-
-                        version = None
-                        if len(package) > 1:
-                            version = package[1].replace(".dist", "").replace(".egg", "")
-
-                        # append package: top_level_modules pairs
-                        # instead of top_level_module: package pairs
-                        packages.append(
-                            {
-                                "name": package[0],
-                                "version": version,
-                                "exports": filtered_top_level_modules,
-                            }
-                        )
+        except (OSError, IOError):
+            # Skip paths that can't be walked (permissions, etc.)
+            continue
     return packages
 
 

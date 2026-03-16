@@ -827,6 +827,37 @@ class TestPipreqs(unittest.TestCase):
                 content = f.read()
                 self.assertEqual(content, "requests==2.0.0\n")
 
+    def test_get_locally_installed_packages_handles_errors(self):
+        """
+        Test that get_locally_installed_packages handles paths that don't exist
+        or can't be accessed. Fixes issue #497 - Windows paths with spaces.
+        """
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a fake site-packages structure
+            site_packages = os.path.join(tmpdir, "site-packages")
+            os.makedirs(site_packages)
+
+            # Create a package with top_level.txt
+            pkg_dir = os.path.join(site_packages, "requests-2.0.0.dist-info")
+            os.makedirs(pkg_dir)
+            with open(os.path.join(pkg_dir, "top_level.txt"), "w") as f:
+                f.write("requests\n")
+
+            # Temporarily modify sys.path to include our test directory
+            original_path = sys.path[:]
+            try:
+                sys.path = [site_packages, "/nonexistent/path/with spaces"]
+                packages = pipreqs.get_locally_installed_packages()
+                # Should not crash and should find the requests package
+                self.assertTrue(len(packages) > 0)
+                package_names = [p["name"] for p in packages]
+                self.assertIn("requests", package_names)
+            finally:
+                sys.path = original_path
+
     def tearDown(self):
         """
         Remove requiremnts.txt files that were written
