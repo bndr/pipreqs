@@ -142,6 +142,19 @@ class TestPipreqs(unittest.TestCase):
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_pkg_names_mapping_hyphens(self):
+        """
+        Test that package names with hyphens are correctly mapped.
+        Fixes issue #491 - libraries with hyphens in the name.
+        """
+        pkgs = ["sklearn", "skimage"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        # sklearn should map to scikit-learn (with hyphen, not underscore)
+        # skimage should map to scikit-image (with hyphen)
+        self.assertIn("scikit-learn", actual_output)
+        self.assertIn("scikit-image", actual_output)
+        self.assertNotIn("scikit_learn", actual_output)
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local

@@ -1034,7 +1034,8 @@ sika:ahonya_sika
 singleton:pysingleton
 sittercommon:cerebrod
 skbio:scikit_bio
-sklearn:scikit_learn
+sklearn:scikit-learn
+skimage:scikit-image
 slack:slackclient
 slugify:unicode_slugify
 slugify:python-slugify
