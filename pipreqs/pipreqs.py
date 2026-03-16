@@ -189,8 +189,27 @@ def get_file_extensions():
 
 def read_file_content(file_name: str, encoding="utf-8"):
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
-        with open(file_name, "r", encoding=encoding) as f:
-            contents = f.read()
+        try:
+            with open(file_name, "r", encoding=encoding) as f:
+                contents = f.read()
+        except UnicodeDecodeError:
+            logging.warning(
+                "Failed to decode file %s with encoding %s. "
+                "Trying with latin-1 encoding.",
+                file_name,
+                encoding,
+            )
+            try:
+                with open(file_name, "r", encoding="latin-1") as f:
+                    contents = f.read()
+            except UnicodeDecodeError:
+                logging.error(
+                    "Failed to decode file %s with both %s and latin-1 encodings. "
+                    "Skipping file.",
+                    file_name,
+                    encoding,
+                )
+                contents = ""
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
         if contents is None:

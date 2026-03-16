@@ -781,6 +781,26 @@ class TestPipreqs(unittest.TestCase):
             except Exception as e:
                 self.fail(f"ignore_errors should have caught the SyntaxError, but got: {e}")
 
+    def test_read_file_content_unicode_error(self):
+        """
+        Test that read_file_content handles UnicodeDecodeError gracefully.
+        Fixes issue #469 - Unicode Decode Error when scanning files with
+        non-utf-8 encodings.
+        """
+        import tempfile
+        import os
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a file with latin-1 encoding (non-utf-8)
+            latin_file = os.path.join(tmpdir, "latin_encoded.py")
+            with open(latin_file, "wb") as f:
+                # Write some valid Python code with a latin-1 character
+                f.write(b"import os\n# Comment with latin-1 char: \xb1\n")
+
+            # Should not raise UnicodeDecodeError
+            contents = pipreqs.read_file_content(latin_file, encoding="utf-8")
+            self.assertIn("import os", contents)
+
     def tearDown(self):
         """
         Remove requiremnts.txt files that were written
