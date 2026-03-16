@@ -142,6 +142,19 @@ class TestPipreqs(unittest.TestCase):
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_pkg_names_mapping_hyphens(self):
+        """
+        Test that package names with hyphens are correctly mapped.
+        Fixes issue #491 - libraries with hyphens in the name.
+        """
+        pkgs = ["sklearn", "skimage"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        # sklearn should map to scikit-learn (with hyphen, not underscore)
+        # skimage should map to scikit-image (with hyphen)
+        self.assertIn("scikit-learn", actual_output)
+        self.assertIn("scikit-image", actual_output)
+        self.assertNotIn("scikit_learn", actual_output)
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local
@@ -678,6 +691,95 @@ class TestPipreqs(unittest.TestCase):
     def mock_scan_notebooks(self):
         pipreqs.scan_noteboooks = Mock(return_value=True)
         pipreqs.handle_scan_noteboooks()
+
+    def test_ignore_errors_with_invalid_notebook(self):
+        """
+        Test that --ignore-errors flag works when scanning invalid notebooks.
+        Addresses issue #485.
+        """
+        import tempfile
+        import json
+
+        # Create a temp directory with an invalid notebook
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create an invalid notebook file (not valid JSON)
+            invalid_notebook = os.path.join(tmpdir, "invalid.ipynb")
+            with open(invalid_notebook, "w") as f:
+                f.write("Not valid JSON content")
+
+            # Create a valid Python file
+            valid_py = os.path.join(tmpdir, "valid.py")
+            with open(valid_py, "w") as f:
+                f.write("import requests\n")
+
+            requirements_path = os.path.join(tmpdir, "requirements.txt")
+
+            # Should not raise exception when ignore_errors=True
+            try:
+                pipreqs.init(
+                    {
+                        "<path>": tmpdir,
+                        "--savepath": requirements_path,
+                        "--use-local": None,
+                        "--force": True,
+                        "--proxy": None,
+                        "--pypi-server": None,
+                        "--print": False,
+                        "--diff": None,
+                        "--clean": None,
+                        "--mode": None,
+                        "--scan-notebooks": True,
+                        "--ignore-errors": True,
+                    }
+                )
+                # If we get here, ignore_errors worked
+                self.assertTrue(True)
+            except Exception as e:
+                self.fail(f"ignore_errors should have caught the exception, but got: {e}")
+
+    def test_ignore_errors_with_syntax_error(self):
+        """
+        Test that --ignore-errors flag works when encountering Python 2 syntax.
+        Addresses issue #494.
+        """
+        import tempfile
+
+        # Create a temp directory with Python 2 style file
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create a file with Python 2 print syntax
+            py2_file = os.path.join(tmpdir, "legacy.py")
+            with open(py2_file, "w") as f:
+                f.write('#!/usr/bin/env python\nprint "Hello World"\n')
+
+            # Create a valid Python 3 file
+            valid_py = os.path.join(tmpdir, "valid.py")
+            with open(valid_py, "w") as f:
+                f.write("import requests\n")
+
+            requirements_path = os.path.join(tmpdir, "requirements.txt")
+
+            # Should not raise exception when ignore_errors=True
+            try:
+                pipreqs.init(
+                    {
+                        "<path>": tmpdir,
+                        "--savepath": requirements_path,
+                        "--use-local": None,
+                        "--force": True,
+                        "--proxy": None,
+                        "--pypi-server": None,
+                        "--print": False,
+                        "--diff": None,
+                        "--clean": None,
+                        "--mode": None,
+                        "--scan-notebooks": False,
+                        "--ignore-errors": True,
+                    }
+                )
+                # If we get here, ignore_errors worked
+                self.assertTrue(True)
+            except Exception as e:
+                self.fail(f"ignore_errors should have caught the SyntaxError, but got: {e}")
 
     def tearDown(self):
         """
