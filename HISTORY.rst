@@ -3,6 +3,11 @@
 History
 -------
 
+0.5.0 (Unreleased)
+--------------------
+
+* Fix local package detection for packages without top_level.txt (Andrew Schell, datatalking) (scipy, seaborn, etc.) (#374)
+
 0.4.11 (2020-03-29)
 --------------------
 

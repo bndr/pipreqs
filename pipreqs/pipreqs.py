@@ -262,6 +262,7 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
 
 def get_locally_installed_packages(encoding="utf-8"):
     packages = []
+    seen_packages = set()
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
         for root, dirs, files in os.walk(path):
@@ -289,6 +290,7 @@ def get_locally_installed_packages(encoding="utf-8"):
                         if len(package) > 1:
                             version = package[1].replace(".dist", "").replace(".egg", "")
 
+                        seen_packages.add(package[0].lower())
                         # append package: top_level_modules pairs
                         # instead of top_level_module: package pairs
                         packages.append(
@@ -298,6 +300,23 @@ def get_locally_installed_packages(encoding="utf-8"):
                                 "exports": filtered_top_level_modules,
                             }
                         )
+
+            # Fallback: detect dist-info directories without top_level.txt
+            # Fixes issue #374 - packages like scipy/seaborn missing top_level.txt
+            dir_name = root.split(os.sep)[-1]
+            if dir_name.endswith(".dist-info") and "top_level.txt" not in files:
+                parts = dir_name[:-10].split("-")
+                pkg_name = parts[0]
+                if pkg_name.lower() not in seen_packages and pkg_name not in ignore:
+                    version = parts[1] if len(parts) > 1 else None
+                    seen_packages.add(pkg_name.lower())
+                    packages.append(
+                        {
+                            "name": pkg_name,
+                            "version": version,
+                            "exports": [pkg_name],
+                        }
+                    )
     return packages
 
 
