@@ -39,6 +39,7 @@ Options:
     --scan-notebooks      Look for imports in jupyter notebook files.
 """
 from contextlib import contextmanager
+from email.parser import Parser
 import os
 import sys
 import re
@@ -260,6 +261,36 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
     return result
 
 
+def get_package_name_and_version(metadata_dir, encoding="utf-8"):
+    package_dir = os.path.basename(metadata_dir)
+
+    for metadata_file in ("METADATA", "PKG-INFO"):
+        metadata_path = os.path.join(metadata_dir, metadata_file)
+        if not os.path.exists(metadata_path):
+            continue
+
+        try:
+            with open(metadata_path, "r", encoding=encoding) as f:
+                metadata = Parser().parsestr(f.read())
+        except OSError:
+            continue
+
+        package = metadata.get("Name")
+        if package:
+            return package, metadata.get("Version")
+
+    for suffix in (".dist-info", ".egg-info"):
+        if package_dir.endswith(suffix):
+            package_dir = package_dir[: -len(suffix)]
+            break
+
+    package, separator, version = package_dir.rpartition("-")
+    if separator and version[:1].isdigit():
+        return package, version
+
+    return package_dir, None
+
+
 def get_locally_installed_packages(encoding="utf-8"):
     packages = []
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
@@ -269,7 +300,7 @@ def get_locally_installed_packages(encoding="utf-8"):
                 if "top_level" in item:
                     item = os.path.join(root, item)
                     with open(item, "r", encoding=encoding) as f:
-                        package = root.split(os.sep)[-1].split("-")
+                        package, version = get_package_name_and_version(root, encoding)
                         try:
                             top_level_modules = f.read().strip().split("\n")
                         except:  # NOQA
@@ -281,19 +312,15 @@ def get_locally_installed_packages(encoding="utf-8"):
                         filtered_top_level_modules = list()
 
                         for module in top_level_modules:
-                            if (module not in ignore) and (package[0] not in ignore):
+                            if (module not in ignore) and (package not in ignore):
                                 # append exported top level modules to the list
                                 filtered_top_level_modules.append(module)
-
-                        version = None
-                        if len(package) > 1:
-                            version = package[1].replace(".dist", "").replace(".egg", "")
 
                         # append package: top_level_modules pairs
                         # instead of top_level_module: package pairs
                         packages.append(
                             {
-                                "name": package[0],
+                                "name": package,
                                 "version": version,
                                 "exports": filtered_top_level_modules,
                             }
