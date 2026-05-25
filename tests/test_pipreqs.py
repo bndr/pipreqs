@@ -10,6 +10,7 @@ Tests for `pipreqs` module.
 
 from io import StringIO
 import logging
+import tempfile
 from unittest.mock import patch, Mock
 import unittest
 import os
@@ -674,6 +675,50 @@ class TestPipreqs(unittest.TestCase):
                 )
 
         os.remove(requirements_path)
+
+    def test_get_locally_installed_packages_ignores_egg_info_suffix(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            package_dir = os.path.join(tmpdir, "example_pkg-1.2.3.egg-info")
+            os.mkdir(package_dir)
+            with open(os.path.join(package_dir, "top_level.txt"), "w") as f:
+                f.write("example_pkg\n")
+
+            with patch.object(sys, "path", [tmpdir]):
+                packages = pipreqs.get_locally_installed_packages()
+
+        self.assertEqual(len(packages), 1)
+        self.assertEqual(packages[0]["name"], "example_pkg")
+        self.assertEqual(packages[0]["version"], "1.2.3")
+        self.assertEqual(packages[0]["exports"], ["example_pkg"])
+
+    def test_get_package_name_and_version_preserves_regular_version(self):
+        package, version = pipreqs.get_package_name_and_version("example_pkg-1.2.3")
+
+        self.assertEqual(package, "example_pkg")
+        self.assertEqual(version, "1.2.3")
+
+    def test_get_package_name_and_version_keeps_hyphenated_name_without_version(self):
+        package, version = pipreqs.get_package_name_and_version("example-pkg.egg-info")
+
+        self.assertEqual(package, "example-pkg")
+        self.assertIsNone(version)
+
+    def test_get_locally_installed_packages_prefers_metadata_name(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            package_dir = os.path.join(tmpdir, "example_pkg-1.2.3.dist-info")
+            os.mkdir(package_dir)
+            with open(os.path.join(package_dir, "METADATA"), "w") as f:
+                f.write("Name: example-pkg\nVersion: 1.2.3\n")
+            with open(os.path.join(package_dir, "top_level.txt"), "w") as f:
+                f.write("example_pkg\n")
+
+            with patch.object(sys, "path", [tmpdir]):
+                packages = pipreqs.get_locally_installed_packages()
+
+        self.assertEqual(len(packages), 1)
+        self.assertEqual(packages[0]["name"], "example-pkg")
+        self.assertEqual(packages[0]["version"], "1.2.3")
+        self.assertEqual(packages[0]["exports"], ["example_pkg"])
 
     def mock_scan_notebooks(self):
         pipreqs.scan_noteboooks = Mock(return_value=True)
