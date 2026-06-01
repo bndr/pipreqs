@@ -15,6 +15,7 @@ import unittest
 import os
 import requests
 import sys
+import tempfile
 import warnings
 
 from pipreqs import pipreqs
@@ -113,6 +114,19 @@ class TestPipreqs(unittest.TestCase):
         Test that invalid python files cannot be imported.
         """
         self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_invalid)
+
+    def test_python_source_encoding_cookie(self):
+        """
+        Test that PEP 263 source encoding declarations are honored.
+        """
+        source = b"# -*- coding: cp1252 -*-\nimport requests\nlabel = 'caf\xe9'\n"
+        with tempfile.TemporaryDirectory() as project:
+            with open(os.path.join(project, "encoded.py"), "wb") as f:
+                f.write(source)
+
+            imports = pipreqs.get_all_imports(project)
+
+        self.assertIn("requests", imports)
 
     def test_ignore_errors(self):
         """

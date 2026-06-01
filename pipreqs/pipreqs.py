@@ -45,6 +45,7 @@ import re
 import logging
 import ast
 import traceback
+import tokenize
 from docopt import docopt
 import requests
 from yarg import json2package
@@ -178,7 +179,11 @@ def get_file_extensions():
 
 def read_file_content(file_name: str, encoding="utf-8"):
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
-        with open(file_name, "r", encoding=encoding) as f:
+        if encoding == "utf-8":
+            f = tokenize.open(file_name)
+        else:
+            f = open(file_name, "r", encoding=encoding)
+        with f:
             contents = f.read()
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
