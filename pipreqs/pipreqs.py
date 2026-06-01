@@ -305,12 +305,16 @@ def get_import_local(imports, encoding="utf-8"):
     local = get_locally_installed_packages()
     result = []
     for item in imports:
+        normalized_item = _normalize_distribution_name(item)
         # search through local packages
         for package in local:
             # if candidate import name matches export name
             # or candidate import name equals to the package name
             # append it to the result
-            if item in package["exports"] or item == package["name"]:
+            if (
+                item in package["exports"]
+                or normalized_item == _normalize_distribution_name(package["name"])
+            ):
                 result.append(package)
 
     # removing duplicates of package/version
@@ -320,6 +324,21 @@ def get_import_local(imports, encoding="utf-8"):
     result_unique = [i for n, i in enumerate(result) if i not in result[n + 1:]]
 
     return result_unique
+
+
+def _normalize_distribution_name(name):
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _get_missing_imports(candidates, local):
+    local_exports = {module.lower() for package in local for module in package["exports"]}
+    local_names = {_normalize_distribution_name(package["name"]) for package in local}
+    return [
+        candidate
+        for candidate in candidates
+        if candidate.lower() not in local_exports
+        and _normalize_distribution_name(candidate) not in local_names
+    ]
 
 
 def get_pkg_names(pkgs):
@@ -560,17 +579,7 @@ def init(args):
         # the list of exported modules, installed locally
         # and the package name is not in the list of local module names
         # it add to difference
-        difference = [
-            x
-            for x in candidates
-            if
-            # aggregate all export lists into one
-            # flatten the list
-            # check if candidate is in exports
-            x.lower() not in [y for x in local for y in x["exports"]] and
-            # check if candidate is package names
-            x.lower() not in [x["name"] for x in local]
-        ]
+        difference = _get_missing_imports(candidates, local)
 
         imports = local + get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
     # sort imports based on lowercase name of package, similar to `pip freeze`.

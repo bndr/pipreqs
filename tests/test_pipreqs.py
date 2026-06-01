@@ -142,6 +142,40 @@ class TestPipreqs(unittest.TestCase):
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_pkg_names_maps_google_scholar(self):
+        pkgs = ["google_scholar_py"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        expected_output = ["scrape-google-scholar-py"]
+        self.assertEqual(actual_output, expected_output)
+
+    @patch("pipreqs.pipreqs.get_locally_installed_packages")
+    def test_get_import_local_matches_normalized_distribution_names(self, local_packages_mock):
+        local_packages_mock.return_value = [
+            {
+                "name": "scrape_google_scholar_py",
+                "version": "0.3.1",
+                "exports": ["google_scholar_py"],
+            }
+        ]
+
+        imports = pipreqs.get_import_local(["scrape-google-scholar-py"])
+
+        self.assertEqual(local_packages_mock.return_value, imports)
+
+    def test_get_missing_imports_matches_normalized_distribution_names(self):
+        candidates = ["scrape-google-scholar-py"]
+        local = [
+            {
+                "name": "scrape_google_scholar_py",
+                "version": "0.3.1",
+                "exports": ["google_scholar_py"],
+            }
+        ]
+
+        missing = pipreqs._get_missing_imports(candidates, local)
+
+        self.assertEqual([], missing)
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local
