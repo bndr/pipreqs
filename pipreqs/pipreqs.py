@@ -54,6 +54,30 @@ from pipreqs import __version__
 
 REGEXP = [re.compile(r"^import (.+)$"), re.compile(r"^from ((?!\.+).*?) import (?:.*)$")]
 DEFAULT_EXTENSIONS = [".py", ".pyw"]
+DEFAULT_IGNORE_DIRS = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pycache__",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "env",
+    "node_modules",
+    "venv",
+]
 
 scan_noteboooks = False
 
@@ -102,17 +126,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
     imports = set()
     raw_imports = set()
     candidates = []
-    ignore_dirs = [
-        ".hg",
-        ".svn",
-        ".git",
-        ".tox",
-        "__pycache__",
-        "env",
-        "venv",
-        ".venv",
-        ".ipynb_checkpoints",
-    ]
+    ignore_dirs = DEFAULT_IGNORE_DIRS[:]
 
     if extra_ignore_dirs:
         ignore_dirs_parsed = []
