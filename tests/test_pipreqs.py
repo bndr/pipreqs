@@ -261,6 +261,110 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             self.assertEqual(data, "should_not_be_overwritten")
 
+    def test_init_savepath_does_not_overwrite_existing_file_without_force(self):
+        """
+        Test that custom save paths are protected from accidental overwrite.
+        """
+        with open(self.alt_requirement_path, "w") as f:
+            f.write("should_not_be_overwritten")
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": self.alt_requirement_path,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+        assert os.path.exists(self.alt_requirement_path) == 1
+        with open(self.alt_requirement_path, "r") as f:
+            data = f.read().lower()
+            self.assertEqual(data, "should_not_be_overwritten")
+
+    def test_init_savepath_force_overwrites_existing_file(self):
+        """
+        Test that --force still allows overwriting a custom save path.
+        """
+        with open(self.alt_requirement_path, "w") as f:
+            f.write("should_be_overwritten")
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": self.alt_requirement_path,
+                "--use-local": None,
+                "--force": True,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+        assert os.path.exists(self.alt_requirement_path) == 1
+        with open(self.alt_requirement_path, "r") as f:
+            data = f.read().lower()
+            self.assertNotEqual(data, "should_be_overwritten")
+            for item in self.modules[:-3]:
+                self.assertTrue(item.lower() in data)
+            for item in self.modules2:
+                self.assertTrue(item.lower() in data)
+
+    @patch("pipreqs.pipreqs.diff")
+    @patch("pipreqs.pipreqs.get_all_imports", return_value=[])
+    def test_init_savepath_existing_file_does_not_block_diff(self, get_all_imports_mock, diff_mock):
+        """
+        Test that --savepath protection does not block --diff mode.
+        """
+        with open(self.alt_requirement_path, "w") as f:
+            f.write("already_exists")
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": self.alt_requirement_path,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": self.alt_requirement_path,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+        get_all_imports_mock.assert_called_once()
+        diff_mock.assert_called_once()
+
+    @patch("pipreqs.pipreqs.clean")
+    @patch("pipreqs.pipreqs.get_all_imports", return_value=[])
+    def test_init_savepath_existing_file_does_not_block_clean(self, get_all_imports_mock, clean_mock):
+        """
+        Test that --savepath protection does not block --clean mode.
+        """
+        with open(self.alt_requirement_path, "w") as f:
+            f.write("already_exists")
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": self.alt_requirement_path,
+                "--use-local": None,
+                "--force": None,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": self.alt_requirement_path,
+                "--mode": None,
+            }
+        )
+        get_all_imports_mock.assert_called_once()
+        clean_mock.assert_called_once()
+
     def test_get_import_name_without_alias(self):
         """
         Test that function get_name_without_alias()
