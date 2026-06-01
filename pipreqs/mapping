@@ -719,6 +719,7 @@ inmemorystorage:ambition_inmemorystorage
 ipaddress:backport_ipaddress
 jaraco:jaraco.timing
 jaraco:jaraco.util
+janitor:pyjanitor
 jinja2:Jinja2
 jiracli:jira_cli
 johnny:johnny_cache
@@ -731,6 +732,7 @@ jsonfield:django_jsonfield
 jstools:aino_jstools
 jupyterpip:jupyter_pip
 jwt:PyJWT
+kafka:kafka-python
 kazoo:asana_kazoo
 kernprof:line_profiler
 keyczar:python_keyczar
@@ -1034,7 +1036,8 @@ sika:ahonya_sika
 singleton:pysingleton
 sittercommon:cerebrod
 skbio:scikit_bio
-sklearn:scikit_learn
+skimage:scikit-image
+sklearn:scikit-learn
 slack:slackclient
 slugify:unicode_slugify
 slugify:python-slugify

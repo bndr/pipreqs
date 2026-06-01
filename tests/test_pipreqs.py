@@ -142,6 +142,17 @@ class TestPipreqs(unittest.TestCase):
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_pkg_names_maps_common_import_aliases(self):
+        pkgs = ["janitor", "kafka", "skimage", "sklearn"]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        expected_output = [
+            "kafka-python",
+            "pyjanitor",
+            "scikit-image",
+            "scikit-learn",
+        ]
+        self.assertEqual(actual_output, expected_output)
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local
