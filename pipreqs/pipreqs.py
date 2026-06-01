@@ -26,7 +26,7 @@ Options:
     --savepath <file>     Save the list of requirements in the given file
     --print               Output the list of requirements in the standard
                           output
-    --force               Overwrite existing requirements.txt
+    --force               Overwrite existing requirements file
     --diff <file>         Compare modules in requirements.txt to project
                           imports
     --clean <file>        Clean up requirements.txt by removing modules
@@ -520,16 +520,17 @@ def init(args):
     if extra_ignore_dirs:
         extra_ignore_dirs = extra_ignore_dirs.split(",")
 
-    path = (
-        args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
-    )
+    savepath = args.get("--savepath")
+    path = savepath if savepath else os.path.join(input_path, "requirements.txt")
     if (
-        not args["--print"]
-        and not args["--savepath"]
-        and not args["--force"]
+        not args.get("--print")
+        and not args.get("--diff")
+        and not args.get("--clean")
+        and path != "-"
+        and not args.get("--force")
         and os.path.exists(path)
     ):
-        logging.warning("requirements.txt already exists, " "use --force to overwrite it")
+        logging.warning("%s already exists, use --force to overwrite it", path)
         return
 
     candidates = get_all_imports(
