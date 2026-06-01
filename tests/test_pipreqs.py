@@ -142,6 +142,9 @@ class TestPipreqs(unittest.TestCase):
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
 
+    def test_get_pkg_names_keeps_requests_lowercase(self):
+        self.assertEqual(pipreqs.get_pkg_names(["requests"]), ["requests"])
+
     def test_get_use_local_only(self):
         """
         Test without checking PyPI, check to see if names of local
