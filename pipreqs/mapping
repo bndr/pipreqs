@@ -688,6 +688,7 @@ gitpy:git_py
 globusonline:globusonline_transfer_api_client
 google:protobuf
 googleapiclient:google_api_python_client
+google_scholar_py:scrape-google-scholar-py
 grace-dizmo:grace_dizmo
 grammar:anovelmous_grammar
 grapheneapi:graphenelib
