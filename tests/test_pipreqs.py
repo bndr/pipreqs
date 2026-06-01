@@ -554,6 +554,12 @@ class TestPipreqs(unittest.TestCase):
         self.mock_scan_notebooks()
         self.assertRaises(SyntaxError, pipreqs.get_all_imports, self.project_with_invalid_notebooks)
 
+    def test_missing_notebook_extra_message(self):
+        """
+        Test the missing optional dependency message for notebook scanning.
+        """
+        self.assertIn("pipreqs[notebook]", str(pipreqs.NbconvertNotInstalled()))
+
     def test_ipynb_2_py(self):
         """
         Test the function ipynb_2_py() which converts .ipynb file to .py format

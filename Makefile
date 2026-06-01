@@ -68,4 +68,4 @@ build: clean
 	poetry build
 
 install: clean
-	poetry install --with dev
+	poetry install --with dev --extras notebook
