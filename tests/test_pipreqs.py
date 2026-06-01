@@ -10,6 +10,7 @@ Tests for `pipreqs` module.
 
 from io import StringIO
 import logging
+import tempfile
 from unittest.mock import patch, Mock
 import unittest
 import os
@@ -314,6 +315,25 @@ class TestPipreqs(unittest.TestCase):
             data = f.read().lower()
             for item in ["click", "getpass"]:
                 self.assertFalse(item.lower() in data)
+
+    def test_get_all_imports_skips_default_ignored_directories(self):
+        """
+        Test that generated and environment directories are ignored by default.
+        """
+        with tempfile.TemporaryDirectory() as project:
+            with open(os.path.join(project, "main.py"), "w") as f:
+                f.write("import requests\n")
+
+            for directory in pipreqs.DEFAULT_IGNORE_DIRS:
+                ignored_path = os.path.join(project, directory)
+                os.makedirs(ignored_path)
+                with open(os.path.join(ignored_path, "ignored.py"), "w") as f:
+                    f.write("import click\n")
+
+            imports = pipreqs.get_all_imports(project)
+
+        self.assertIn("requests", imports)
+        self.assertNotIn("click", imports)
 
     def test_dynamic_version_no_pin_scheme(self):
         """
