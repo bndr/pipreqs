@@ -227,6 +227,29 @@ def output_requirements(imports, symbol):
     generate_requirements_file("-", imports, symbol)
 
 
+def _normalize_package_name(name):
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _deduplicate_imports(imports):
+    result = []
+    seen = {}
+
+    for item in imports:
+        name = item["name"]
+        key = _normalize_package_name(name)
+        if key in seen:
+            existing = result[seen[key]]
+            if not existing["version"] and item["version"]:
+                result[seen[key]] = item
+            continue
+
+        seen[key] = len(result)
+        result.append(item)
+
+    return result
+
+
 def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy=None):
     result = []
 
@@ -583,6 +606,8 @@ def init(args):
     if args["--clean"]:
         clean(args["--clean"], imports)
         return
+
+    imports = _deduplicate_imports(imports)
 
     if args["--mode"]:
         scheme = args.get("--mode")
