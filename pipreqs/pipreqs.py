@@ -24,6 +24,8 @@ Options:
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
+    --output <file>       Save the list of requirements in the given file, or
+                          use - for standard output
     --print               Output the list of requirements in the standard
                           output
     --force               Overwrite existing requirements.txt
@@ -509,6 +511,12 @@ def init(args):
 
     scan_noteboooks = args.get("--scan-notebooks", False)
     handle_scan_noteboooks()
+
+    output_path = args.get("--output")
+    if output_path == "-":
+        args["--print"] = True
+    elif output_path:
+        args["--savepath"] = output_path
 
     input_path = args["<path>"]
 
