@@ -235,6 +235,61 @@ class TestPipreqs(unittest.TestCase):
             for item in self.modules2:
                 self.assertTrue(item.lower() in data)
 
+    def test_init_output_path(self):
+        """
+        Test that --output can save requirements.txt to a different path
+        """
+        pipreqs.init(
+            {
+                "<path>": self.project,
+                "--savepath": None,
+                "--output": self.alt_requirement_path,
+                "--use-local": None,
+                "--proxy": None,
+                "--pypi-server": None,
+                "--print": False,
+                "--diff": None,
+                "--clean": None,
+                "--mode": None,
+            }
+        )
+        assert os.path.exists(self.alt_requirement_path) == 1
+        with open(self.alt_requirement_path, "r") as f:
+            data = f.read().lower()
+            for item in self.modules[:-3]:
+                self.assertTrue(item.lower() in data)
+
+    def test_init_output_dash(self):
+        """
+        Test that --output - prints requirements to stdout
+        """
+        captured_output = StringIO()
+        original_stdout = sys.stdout
+        sys.stdout = captured_output
+        try:
+            pipreqs.init(
+                {
+                    "<path>": self.project,
+                    "--savepath": None,
+                    "--output": "-",
+                    "--print": False,
+                    "--use-local": None,
+                    "--force": None,
+                    "--proxy": None,
+                    "--pypi-server": None,
+                    "--diff": None,
+                    "--clean": None,
+                    "--mode": None,
+                }
+            )
+        finally:
+            sys.stdout = original_stdout
+
+        stdout_content = captured_output.getvalue().lower()
+        for item in self.modules[:-3]:
+            self.assertTrue(item.lower() in stdout_content)
+        self.assertFalse(os.path.exists(self.requirements_path))
+
     def test_init_overwrite(self):
         """
         Test that if requiremnts.txt exists, it will not be
