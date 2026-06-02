@@ -1129,6 +1129,7 @@ wheezy:wheezy.core
 wheezy:wheezy.http
 wikklytext:tiddlywebwiki
 winreg:future
+win32gui:pywin32
 winrm:pywinrm
 workflow:Alfred_Workflow
 wsmeext:WSME
