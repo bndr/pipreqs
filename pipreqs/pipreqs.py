@@ -613,6 +613,9 @@ def main():  # pragma: no cover
         init(args)
     except KeyboardInterrupt:
         sys.exit(0)
+    except NbconvertNotInstalled as error:
+        logging.error(str(error))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
