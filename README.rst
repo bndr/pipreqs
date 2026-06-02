@@ -25,13 +25,11 @@ Installation
 
     pip install pipreqs
 
-Obs.: if you don't want support for jupyter notebooks, you can install pipreqs without the dependencies that give support to it. 
-To do so, run:
+To scan Jupyter notebooks with ``--scan-notebooks``, install the notebook extra:
 
 .. code-block:: sh
 
-    pip install --no-deps pipreqs
-    pip install yarg==0.1.9 docopt==0.6.2
+    pip install "pipreqs[notebook]"
 
 Usage
 -----

@@ -60,7 +60,8 @@ scan_noteboooks = False
 
 class NbconvertNotInstalled(ImportError):
     default_message = (
-        "In order to scan jupyter notebooks, please install the nbconvert and ipython libraries"
+        "Notebook scanning requires optional dependencies. Install them with "
+        '`pip install "pipreqs[notebook]"`.'
     )
 
     def __init__(self, message=default_message):
@@ -612,6 +613,9 @@ def main():  # pragma: no cover
         init(args)
     except KeyboardInterrupt:
         sys.exit(0)
+    except NbconvertNotInstalled as error:
+        logging.error(str(error))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
