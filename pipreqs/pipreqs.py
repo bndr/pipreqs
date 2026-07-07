@@ -244,7 +244,7 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
                     data = json2package(response.content)
             elif response.status_code >= 300:
                 raise HTTPError(status_code=response.status_code, reason=response.reason)
-        except HTTPError:
+        except (HTTPError, requests.exceptions.SSLError, requests.exceptions.ConnectionError):
             logging.warning('Package "%s" does not exist or network problems', item)
             continue
         logging.warning(
