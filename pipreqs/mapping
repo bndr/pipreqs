@@ -7,6 +7,7 @@ Asterisk:py_Asterisk
 BB_jekyll_hook:bitbucket_jekyll_hook
 Banzai:Banzai_NGS
 BeautifulSoupTests:BeautifulSoup
+Bio:biopython
 BioSQL:biopython
 BuildbotStatusShields:BuildbotEightStatusShields
 ComputedAttribute:ExtensionClass
@@ -803,6 +804,7 @@ mongoalchemy:MongoAlchemy
 monthdelta:MonthDelta
 mopidy:Mopidy
 mopytools:MoPyTools
+mpl_toolkits:matplotlib
 mptt:django_mptt
 mpv:python-mpv
 mrbob:mr.bob
@@ -1034,6 +1036,7 @@ sika:ahonya_sika
 singleton:pysingleton
 sittercommon:cerebrod
 skbio:scikit_bio
+skimage:scikit-image
 sklearn:scikit_learn
 slack:slackclient
 slugify:unicode_slugify
