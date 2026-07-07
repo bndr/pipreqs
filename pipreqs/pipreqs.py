@@ -166,7 +166,7 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
     packages = imports - (set(candidates) & imports)
     logging.debug("Found packages: {0}".format(packages))
 
-    with open(join("stdlib"), "r") as f:
+    with open(join("stdlib"), "r", encoding="utf-8") as f:
         data = {x.strip() for x in f}
 
     return list(packages - data)
@@ -333,7 +333,7 @@ def get_pkg_names(pkgs):
 
     """
     result = set()
-    with open(join("mapping"), "r") as f:
+    with open(join("mapping"), "r", encoding="utf-8") as f:
         data = dict(x.strip().split(":") for x in f)
     for pkg in pkgs:
         # Look up the mapped requirement. If a mapping isn't found,
@@ -380,7 +380,7 @@ def parse_requirements(file_):
     delim = ["<", ">", "=", "!", "~"]
 
     try:
-        f = open(file_, "r")
+        f = open(file_, "r", encoding="utf-8")
     except FileNotFoundError:
         print(f"File {file_} was not found. Please, fix it and run again.")
         sys.exit(1)
