@@ -1642,6 +1642,7 @@ tkinter.tix
 tkinter.ttk
 token
 tokenize
+tomllib
 trace
 traceback
 _tracemalloc
