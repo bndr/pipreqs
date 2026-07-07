@@ -320,6 +320,7 @@ atreal:atreal.richfile.preview
 atreal:atreal.richfile.qualifier
 atreal:atreal.usersinout
 atsim:atsim.potentials
+attr:attrs
 attractsdk:attract_sdk
 audio:audio.bitstream
 audio:audio.coders
@@ -611,6 +612,7 @@ djorm_pgarray:djorm_ext_pgarray
 dns:dnspython
 docgen:ansible_docgenerator
 docker:docker_py
+docx:python-docx
 dogpile:dogpile.cache
 dogpile:dogpile.core
 dogshell:dogapi
@@ -1127,6 +1129,7 @@ werkzeug:Werkzeug
 wheezy:wheezy.caching
 wheezy:wheezy.core
 wheezy:wheezy.http
+whois:python-whois
 wikklytext:tiddlywebwiki
 winreg:future
 winrm:pywinrm
@@ -1136,6 +1139,7 @@ wtforms:WTForms
 wtfpeewee:wtf_peewee
 xdg:pyxdg
 xdist:pytest_xdist
+xlsxwriter:XlsxWriter
 xmldsig:pysaml2
 xmlenc:pysaml2
 xmlrpc:pies2overrides
