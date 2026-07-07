@@ -44,6 +44,7 @@ Testing:Zope2
 TopZooTools:topzootools
 TreeDisplay:DocumentTemplate
 WorkingWithDocumentConversion:aspose_pdf_java_for_python
+Xlib:python-xlib
 ZPublisher:Zope2
 ZServer:Zope2
 ZTUtils:Zope2
@@ -681,6 +682,7 @@ geraldo:Geraldo
 getenv:django_getenv
 geventwebsocket:gevent_websocket
 gflags:python_gflags
+gi:PyGObject
 git:GitPython
 github:PyGithub
 github3:github3.py
@@ -847,6 +849,7 @@ picasso:anderson.picasso
 picklefield:django-picklefield
 pilot:BigJob
 pivotal:pivotal_py
+pkg_resources:setuptools
 play_wav:PySynth
 playhouse:peewee
 plivoxml:plivo
@@ -1134,6 +1137,7 @@ workflow:Alfred_Workflow
 wsmeext:WSME
 wtforms:WTForms
 wtfpeewee:wtf_peewee
+wx:wxPython
 xdg:pyxdg
 xdist:pytest_xdist
 xmldsig:pysaml2
