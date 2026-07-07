@@ -654,8 +654,15 @@ five:five.localsitemanager
 five:five.pt
 flasher:android_flasher
 flask:Flask
+flask_cors:Flask-Cors
 flask_frozen:Frozen_Flask
+flask_login:Flask-Login
+flask_mail:Flask-Mail
+flask_migrate:Flask-Migrate
 flask_redis:Flask_And_Redis
+flask_restful:Flask-RESTful
+flask_sqlalchemy:Flask-SQLAlchemy
+flask_wtf:Flask-WTF
 flaskext:Flask_Bcrypt
 flvscreen:vnc2flv
 followit:django_followit
