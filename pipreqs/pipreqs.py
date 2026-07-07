@@ -89,7 +89,7 @@ def _open(filename=None, mode="r"):
         else:
             raise ValueError("Invalid mode for file: {}".format(mode))
     else:
-        file = open(filename, mode)
+        file = open(filename, mode, encoding="utf-8") if "b" not in mode else open(filename, mode)
 
     try:
         yield file
@@ -456,7 +456,7 @@ def clean(file_, imports):
     to_write = []
 
     try:
-        f = open(file_, "r+")
+        f = open(file_, "r+", encoding="utf-8")
     except OSError:
         logging.error("Failed on file: {}".format(file_))
         raise
