@@ -338,7 +338,7 @@ def get_pkg_names(pkgs):
     for pkg in pkgs:
         # Look up the mapped requirement. If a mapping isn't found,
         # simply use the package name.
-        result.add(data.get(pkg, pkg))
+        result.add(data.get(pkg, pkg).lower())
     # Return a sorted list for backward compatibility.
     return sorted(result, key=lambda s: s.lower())
 
