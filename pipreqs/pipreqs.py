@@ -126,8 +126,14 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
     for root, dirs, files in walk:
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
 
-        candidates.append(os.path.basename(root))
         py_files = [file for file in files if file_ext_is_allowed(file, DEFAULT_EXTENSIONS)]
+        if root != path and py_files:
+            # Only the first path segment is importable from the scan root;
+            # src-layout trees resolve one level deeper (PEP 621 convention).
+            parts = os.path.relpath(root, path).split(os.sep)
+            top_level = parts[1] if parts[0] == "src" and len(parts) > 1 else parts[0]
+            if top_level and top_level != os.curdir:
+                candidates.append(top_level)
         candidates.extend([os.path.splitext(filename)[0] for filename in py_files])
 
         files = [fn for fn in files if file_ext_is_allowed(fn, extensions)]

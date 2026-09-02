@@ -106,6 +106,7 @@ agora:Agora_Fragment
 agora:Agora_Planner
 agora:Agora_Service_Provider
 agoraplex:agoraplex.themes.sphinx
+ahocorasick:pyahocorasick
 agsci:agsci.blognewsletter
 agx:agx.core
 agx:agx.dev
@@ -610,7 +611,7 @@ djkombu:django_kombu
 djorm_pgarray:djorm_ext_pgarray
 dns:dnspython
 docgen:ansible_docgenerator
-docker:docker_py
+docker:docker
 dogpile:dogpile.cache
 dogpile:dogpile.core
 dogshell:dogapi
@@ -793,8 +794,6 @@ mkrst_themes:2lazy2rest
 mockredis:mockredispy
 modargs:python_modargs
 model_utils:django_model_utils
-models:asposebarcode
-models:asposestorage
 moksha:moksha.common
 moksha:moksha.hub
 moksha:moksha.wsgi
@@ -809,7 +808,7 @@ mrbob:mr.bob
 msgpack:msgpack_python
 mutations:aino_mutations
 mws:amazon_mws
-mysql:mysql_connector_repackaged
+mysql:mysql-connector-python
 native_tags:django_native_tags
 ndg:ndg_httpsclient
 nereid:trytond_nereid
@@ -964,6 +963,7 @@ pymagic:libmagic
 pymycraawler:Amalwebcrawler
 pynma:AbakaffeNotifier
 pyphen:Pyphen
+pyro:pyro-ppl
 pyrimaa:AEI
 pysideuic:PySide
 pysqlite2:adhocracy_pysqlite
@@ -1052,8 +1052,7 @@ sphinx:Sphinx
 sphinx_pypi_upload:ATD_document
 sphinxcontrib:sphinxcontrib_programoutput
 sqlalchemy:SQLAlchemy
-src:atlas
-src:auto_mix_prep
+st_aggrid:streamlit-aggrid
 stats_toolkit:bw_stats_toolkit
 statsd:dogstatsd_python
 stdnum:python_stdnum

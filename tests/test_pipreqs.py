@@ -11,6 +11,7 @@ Tests for `pipreqs` module.
 from io import StringIO
 import logging
 from unittest.mock import patch, Mock
+import tempfile
 import unittest
 import os
 import requests
@@ -102,6 +103,60 @@ class TestPipreqs(unittest.TestCase):
         self.assertFalse("django" in imports)
         self.assertFalse("models" in imports)
 
+    def test_get_all_imports_does_not_hide_imports_behind_plain_dirs(self):
+        with tempfile.TemporaryDirectory() as project:
+            with open(os.path.join(project, "app.py"), "w") as f:
+                f.write("import numpy\nimport localpkg\n")
+            os.mkdir(os.path.join(project, "numpy"))
+            os.mkdir(os.path.join(project, "localpkg"))
+            with open(os.path.join(project, "localpkg", "__init__.py"), "w"):
+                pass
+
+            imports = pipreqs.get_all_imports(project)
+
+        self.assertIn("numpy", imports)
+        self.assertNotIn("localpkg", imports)
+
+    def test_get_all_imports_filters_pep420_namespace_packages(self):
+        with tempfile.TemporaryDirectory() as project:
+            with open(os.path.join(project, "app.py"), "w") as f:
+                f.write("import localns\nimport numpy\n")
+            os.makedirs(os.path.join(project, "localns"))
+            with open(os.path.join(project, "localns", "module.py"), "w") as f:
+                f.write("VALUE = 1\n")
+            os.mkdir(os.path.join(project, "numpy"))
+
+            imports = pipreqs.get_all_imports(project)
+
+        self.assertIn("numpy", imports)
+        self.assertNotIn("localns", imports)
+
+    def test_get_all_imports_ignores_nested_dir_basenames(self):
+        with tempfile.TemporaryDirectory() as project:
+            with open(os.path.join(project, "app.py"), "w") as f:
+                f.write("import numpy\nimport tests\n")
+            os.makedirs(os.path.join(project, "tests", "numpy"))
+            with open(os.path.join(project, "tests", "numpy", "helper.py"), "w") as f:
+                f.write("VALUE = 1\n")
+
+            imports = pipreqs.get_all_imports(project)
+
+        self.assertIn("numpy", imports)
+        self.assertNotIn("tests", imports)
+
+    def test_get_all_imports_keeps_src_layout_packages_local(self):
+        with tempfile.TemporaryDirectory() as project:
+            with open(os.path.join(project, "app.py"), "w") as f:
+                f.write("import my_pkg\nimport numpy\n")
+            os.makedirs(os.path.join(project, "src", "my_pkg"))
+            with open(os.path.join(project, "src", "my_pkg", "__init__.py"), "w"):
+                pass
+
+            imports = pipreqs.get_all_imports(project)
+
+        self.assertIn("numpy", imports)
+        self.assertNotIn("my_pkg", imports)
+
     def test_deduplicate_dependencies(self):
         imports = pipreqs.get_all_imports(self.project_with_duplicated_deps)
         pkgs = pipreqs.get_pkg_names(imports)
@@ -141,6 +196,37 @@ class TestPipreqs(unittest.TestCase):
         actual_output = pipreqs.get_pkg_names(pkgs)
         expected_output = ["camel", "Caroline", "Japan", "jury"]
         self.assertEqual(actual_output, expected_output)
+
+    def test_get_pkg_names_maps_current_package_aliases(self):
+        pkgs = [
+            "ahocorasick",
+            "docker",
+            "models",
+            "mysql",
+            "pinecone",
+            "pyro",
+            "src",
+            "st_aggrid",
+        ]
+        actual_output = pipreqs.get_pkg_names(pkgs)
+        expected_output = sorted(
+            [
+                "docker",
+                "models",
+                "mysql-connector-python",
+                "pinecone",
+                "pyahocorasick",
+                "pyro-ppl",
+                "src",
+                "streamlit-aggrid",
+            ],
+            key=lambda s: s.lower(),
+        )
+        self.assertEqual(actual_output, expected_output)
+        self.assertNotIn("asposestorage", actual_output)
+        self.assertNotIn("auto_mix_prep", actual_output)
+        self.assertNotIn("docker_py", actual_output)
+        self.assertNotIn("mysql_connector_repackaged", actual_output)
 
     def test_get_use_local_only(self):
         """
