@@ -310,7 +310,9 @@ def get_import_local(imports, encoding="utf-8"):
             # if candidate import name matches export name
             # or candidate import name equals to the package name
             # append it to the result
-            if item in package["exports"] or item == package["name"]:
+            # if item in package["exports"] or item == package["name"]:
+            if (item.lower() in [x.lower() for x in package["exports"]]
+                or item.lower() == package["name"].lower()):
                 result.append(package)
 
     # removing duplicates of package/version
@@ -318,7 +320,7 @@ def get_import_local(imports, encoding="utf-8"):
     # because we have a list in the 'exports' field
     # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
     result_unique = [i for n, i in enumerate(result) if i not in result[n + 1:]]
-
+    # print(result_unique)
     return result_unique
 
 
@@ -338,7 +340,7 @@ def get_pkg_names(pkgs):
     for pkg in pkgs:
         # Look up the mapped requirement. If a mapping isn't found,
         # simply use the package name.
-        result.add(data.get(pkg, pkg).lower())
+        result.add(data.get(pkg, pkg))
     # Return a sorted list for backward compatibility.
     return sorted(result, key=lambda s: s.lower())
 
