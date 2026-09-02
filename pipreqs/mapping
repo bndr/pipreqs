@@ -125,6 +125,7 @@ aio:aio.app
 aio:aio.config
 aio:aio.core
 aio:aio.signals
+aiofiles:aiofiles
 aiohs2:aio_hs2
 aioroutes:aio_routes
 aios3:aio_s3
