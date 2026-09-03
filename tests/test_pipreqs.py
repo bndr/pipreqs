@@ -156,6 +156,28 @@ class TestPipreqs(unittest.TestCase):
         for item in imports_with_info:
             self.assertTrue(item["name"].lower() in self.local)
 
+    @patch("pipreqs.pipreqs.get_locally_installed_packages")
+    def test_get_import_local_case_insensitive(self,mock_local):
+        """
+        Test for #312: get_import_local() should match an import
+        to a locally installed package even when case differs in both
+        the package name and its exports list.
+        """
+        mock_local.return_value = [
+            {"name":"Flask", "version":"2.0.0", "exports":["Flask"]},
+            {"name":"PyYAML", "version":"6.0", "exports":["YAML"]}
+        ]
+
+        # import lowercase, package["name"] capitalized -> mismatched on name
+        result = pipreqs.get_import_local(["flask"])
+        self.assertEqual(len(result),1)
+        self.assertEqual(result[0]["name"], "Flask")
+
+        # import lowercase, package["exports"] entry capitalized -> mismatch on exports
+        result2 = pipreqs.get_import_local(["yaml"])
+        self.assertEqual(len(result2), 1)
+        self.assertEqual(result2[0]["name"], "PyYAML")
+
     def test_init(self):
         """
         Test that all modules we will test upon are in requirements file
