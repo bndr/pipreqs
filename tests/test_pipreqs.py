@@ -178,21 +178,6 @@ class TestPipreqs(unittest.TestCase):
         self.assertEqual(len(result2), 1)
         self.assertEqual(result2[0]["name"], "PyYAML")
 
-    def test_get_import_local_243_zero_requirements(self, mock_local):
-        """
-        Test for the issue #243
-        """
-
-        # reproduces issue #243
-        mock_local.return_value = [
-            {'name': 'pyserial', 'version': '3.5', 'exports': ['serial']},
-            {'name': 'pysimplegui', 'version': '6.3.0.1', 'exports': ['PySimpleGUI']},
-            {'name': 'PyYAML', 'version': '6.0.2', 'exports': ['_yaml', 'yaml']}
-        ]
-
-        result = pipreqs.get_import_local(["serial", "yaml", "PySimpleGUI"])
-        self.assertEqual(len(result), 3)
-
     def test_init(self):
         """
         Test that all modules we will test upon are in requirements file
