@@ -157,20 +157,20 @@ class TestPipreqs(unittest.TestCase):
             self.assertTrue(item["name"].lower() in self.local)
 
     @patch("pipreqs.pipreqs.get_locally_installed_packages")
-    def test_get_import_local_case_insensitive(self,mock_local):
+    def test_get_import_local_case_insensitive(self, mock_local):
         """
-        Test for #312: get_import_local() should match an import
+        Test for issue #312: get_import_local() should match an import
         to a locally installed package even when case differs in both
         the package name and its exports list.
         """
         mock_local.return_value = [
-            {"name":"Flask", "version":"2.0.0", "exports":["Flask"]},
-            {"name":"PyYAML", "version":"6.0", "exports":["YAML"]}
+            {"name": "Flask", "version": "2.0.0", "exports": []},
+            {"name": "PyYAML", "version": "6.0", "exports": ["YAML"]}
         ]
 
         # import lowercase, package["name"] capitalized -> mismatched on name
         result = pipreqs.get_import_local(["flask"])
-        self.assertEqual(len(result),1)
+        self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["name"], "Flask")
 
         # import lowercase, package["exports"] entry capitalized -> mismatch on exports
