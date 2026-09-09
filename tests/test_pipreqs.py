@@ -9,6 +9,7 @@ Tests for `pipreqs` module.
 """
 
 from io import StringIO
+from tempfile import TemporaryDirectory
 import logging
 from unittest.mock import patch, Mock
 import unittest
@@ -463,6 +464,21 @@ class TestPipreqs(unittest.TestCase):
         with open(self.requirements_path, "r") as f:
             data = f.read().lower()
             self.assertTrue(cleaned_module not in data)
+
+    def test_clean_keeps_requirement_with_unused_name_prefix(self):
+        with TemporaryDirectory() as temp_dir:
+            requirements_path = os.path.join(temp_dir, "requirements.txt")
+            with open(requirements_path, "w") as requirements:
+                requirements.write(
+                    "invoice-tools==4.8.2\ninvoice-tools-pro==7.4.0\n"
+                )
+
+            pipreqs.clean(requirements_path, [{"name": "invoice-tools-pro"}])
+
+            with open(requirements_path, "r") as requirements:
+                self.assertEqual(
+                    requirements.read(), "invoice-tools-pro==7.4.0\n"
+                )
 
     def test_compare_modules(self):
         test_cases = [
