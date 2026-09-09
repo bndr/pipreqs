@@ -389,7 +389,7 @@ def parse_requirements(file_):
         raise error
     else:
         try:
-            data = [x.strip() for x in f.readlines() if x != "\n"]
+            data = [x.strip() for x in f.readlines() if x.strip()]
         finally:
             f.close()
 

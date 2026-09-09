@@ -9,6 +9,7 @@ Tests for `pipreqs` module.
 """
 
 from io import StringIO
+from tempfile import TemporaryDirectory
 import logging
 from unittest.mock import patch, Mock
 import unittest
@@ -594,6 +595,20 @@ class TestPipreqs(unittest.TestCase):
                 parsed_requirements = pipreqs.parse_requirements(filename)
 
                 self.assertListEqual(parsed_requirements, expected_parsed_requirements)
+
+    def test_parse_requirements_ignores_whitespace_only_lines(self):
+        with TemporaryDirectory() as temp_dir:
+            requirements_path = os.path.join(temp_dir, "requirements.txt")
+            with open(requirements_path, "w") as requirements:
+                requirements.write("httpx==0.28.1\n   \n\t\nrich==13.9.4\n")
+
+            self.assertListEqual(
+                pipreqs.parse_requirements(requirements_path),
+                [
+                    {"name": "httpx", "version": "0.28.1"},
+                    {"name": "rich", "version": "13.9.4"},
+                ],
+            )
 
     @patch("sys.exit")
     def test_parse_requirements_handles_file_not_found(self, exit_mock):
