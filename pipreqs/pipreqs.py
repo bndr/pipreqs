@@ -452,7 +452,8 @@ def clean(file_, imports):
         logging.info("Nothing to clean in " + file_)
         return
 
-    re_remove = re.compile("|".join(modules_not_imported))
+    names = "|".join(re.escape(module) for module in modules_not_imported)
+    re_remove = re.compile(r"^(?:{})(?=[<>=!~\s]|$)".format(names))
     to_write = []
 
     try:
