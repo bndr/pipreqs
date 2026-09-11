@@ -268,49 +268,73 @@ def get_locally_installed_packages(encoding="utf-8"):
             for item in files:
                 if "top_level" in item:
                     item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
-                        package = root.split(os.sep)[-1].split("-")
-                        try:
-                            top_level_modules = f.read().strip().split("\n")
-                        except:  # NOQA
-                            # TODO: What errors do we intend to suppress here?
-                            continue
+                    try:
+                        with open(item, "r", encoding=encoding, errors="replace") as f:
+                            package = root.split(os.sep)[-1].split("-")
+                            try:
+                                top_level_modules = f.read().strip().split("\n")
+                            except Exception:
+                                continue
 
-                        # filter off explicitly ignored top-level modules
-                        # such as test, egg, etc.
-                        filtered_top_level_modules = list()
+                            # filter off explicitly ignored top-level modules
+                            # such as test, egg, etc.
+                            filtered_top_level_modules = list()
 
-                        for module in top_level_modules:
-                            if (module not in ignore) and (package[0] not in ignore):
-                                # append exported top level modules to the list
-                                filtered_top_level_modules.append(module)
+                            for module in top_level_modules:
+                                if (module not in ignore) and (package[0] not in ignore):
+                                    # append exported top level modules to the list
+                                    filtered_top_level_modules.append(module)
 
-                        version = None
-                        if len(package) > 1:
-                            version = package[1].replace(".dist", "").replace(".egg", "")
+                            version = None
+                            if len(package) > 1:
+                                version = package[1].replace(".dist", "").replace(".egg", "")
 
-                        # append package: top_level_modules pairs
-                        # instead of top_level_module: package pairs
-                        packages.append(
-                            {
-                                "name": package[0],
-                                "version": version,
-                                "exports": filtered_top_level_modules,
-                            }
-                        )
+                            pkg_name = package[0]
+                            for meta_file in ("METADATA", "PKG-INFO"):
+                                meta_path = os.path.join(root, meta_file)
+                                if os.path.isfile(meta_path):
+                                    try:
+                                        with open(meta_path, "r", encoding=encoding, errors="replace") as mf:
+                                            for line in mf:
+                                                if line.startswith("Name: "):
+                                                    pkg_name = line[6:].strip()
+                                                elif line.startswith("Version: "):
+                                                    version = line[9:].strip()
+                                                elif line == "\n":
+                                                    break
+                                    except Exception:
+                                        pass
+                                    break
+
+                            # append package: top_level_modules pairs
+                            # instead of top_level_module: package pairs
+                            packages.append(
+                                {
+                                    "name": pkg_name,
+                                    "version": version,
+                                    "exports": filtered_top_level_modules,
+                                }
+                            )
+                    except Exception:
+                        continue
     return packages
 
 
 def get_import_local(imports, encoding="utf-8"):
-    local = get_locally_installed_packages()
+    local = get_locally_installed_packages(encoding=encoding)
     result = []
     for item in imports:
         # search through local packages
+        item_norm = item.lower().replace("-", "_")
         for package in local:
             # if candidate import name matches export name
-            # or candidate import name equals to the package name
-            # append it to the result
-            if item in package["exports"] or item == package["name"]:
+            # or candidate import name equals to the package name (handling hyphens/underscores)
+            pkg_norm = package["name"].lower().replace("-", "_")
+            if (
+                item in package["exports"]
+                or item == package["name"]
+                or item_norm == pkg_norm
+            ):
                 result.append(package)
 
     # removing duplicates of package/version

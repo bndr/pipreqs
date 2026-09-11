@@ -1033,8 +1033,9 @@ shapely:Shapely
 sika:ahonya_sika
 singleton:pysingleton
 sittercommon:cerebrod
-skbio:scikit_bio
-sklearn:scikit_learn
+skbio:scikit-bio
+skimage:scikit-image
+sklearn:scikit-learn
 slack:slackclient
 slugify:unicode_slugify
 slugify:python-slugify

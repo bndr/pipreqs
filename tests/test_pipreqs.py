@@ -14,7 +14,9 @@ from unittest.mock import patch, Mock
 import unittest
 import os
 import requests
+import shutil
 import sys
+import tempfile
 import warnings
 
 from pipreqs import pipreqs
@@ -155,6 +157,42 @@ class TestPipreqs(unittest.TestCase):
         imports_with_info = pipreqs.get_import_local(self.modules)
         for item in imports_with_info:
             self.assertTrue(item["name"].lower() in self.local)
+
+    def test_get_pkg_names_scikit_hyphen_mappings(self):
+        pkgs = ["sklearn", "skimage", "skbio"]
+        names = pipreqs.get_pkg_names(pkgs)
+        self.assertEqual(names, ["scikit-bio", "scikit-image", "scikit-learn"])
+
+    def test_get_locally_installed_packages_canonical_metadata_name(self):
+        temp_dir = tempfile.mkdtemp()
+        try:
+            dist_info = os.path.join(temp_dir, "scikit_learn-1.5.0.dist-info")
+            os.makedirs(dist_info)
+            with open(os.path.join(dist_info, "top_level.txt"), "w") as f:
+                f.write("sklearn\n")
+            with open(os.path.join(dist_info, "METADATA"), "w") as f:
+                f.write("Metadata-Version: 2.1\nName: scikit-learn\nVersion: 1.5.0\n")
+
+            with patch("sys.path", [temp_dir]):
+                local = pipreqs.get_locally_installed_packages()
+                self.assertEqual(len(local), 1)
+                self.assertEqual(local[0]["name"], "scikit-learn")
+                self.assertEqual(local[0]["version"], "1.5.0")
+                self.assertEqual(local[0]["exports"], ["sklearn"])
+
+                matched_by_export = pipreqs.get_import_local(["sklearn"])
+                self.assertEqual(len(matched_by_export), 1)
+                self.assertEqual(matched_by_export[0]["name"], "scikit-learn")
+
+                matched_by_pkg_name = pipreqs.get_import_local(["scikit-learn"])
+                self.assertEqual(len(matched_by_pkg_name), 1)
+                self.assertEqual(matched_by_pkg_name[0]["name"], "scikit-learn")
+
+                matched_by_underscore = pipreqs.get_import_local(["scikit_learn"])
+                self.assertEqual(len(matched_by_underscore), 1)
+                self.assertEqual(matched_by_underscore[0]["name"], "scikit-learn")
+        finally:
+            shutil.rmtree(temp_dir)
 
     def test_init(self):
         """
