@@ -89,6 +89,7 @@ class TestPipreqs(unittest.TestCase):
 
         cls.python_path_same_imports = os.path.join(os.path.dirname(__file__), "_data/test.py")
         cls.notebook_path_same_imports = os.path.join(os.path.dirname(__file__), "_data_notebook/test.ipynb")
+        cls.project_with_encoding = os.path.join(os.path.dirname(__file__), "_data_encoding")
 
     def test_get_all_imports(self):
         imports = pipreqs.get_all_imports(self.project)
@@ -674,6 +675,24 @@ class TestPipreqs(unittest.TestCase):
                 )
 
         os.remove(requirements_path)
+
+    def test_pipreqs_non_utf8_and_pep263_encoding(self):
+        """
+        Test that scanning files with non-UTF-8 characters or PEP 263 headers
+        does not crash with UnicodeDecodeError and extracts imports correctly.
+        """
+        imports = pipreqs.get_all_imports(self.project_with_encoding)
+        self.assertIn("requests", imports)
+        self.assertIn("flask", imports)
+
+    def test_read_file_content_encoding_fallback(self):
+        """
+        Test that read_file_content safely handles files with encoding errors
+        even when an invalid or mismatching encoding is specified.
+        """
+        non_utf8_file = os.path.join(self.project_with_encoding, "non_utf8.py")
+        content = pipreqs.read_file_content(non_utf8_file, encoding="utf-8")
+        self.assertIn("requests", content)
 
     def mock_scan_notebooks(self):
         pipreqs.scan_noteboooks = Mock(return_value=True)

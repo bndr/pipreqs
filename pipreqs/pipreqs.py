@@ -44,6 +44,7 @@ import sys
 import re
 import logging
 import ast
+import tokenize
 import traceback
 from docopt import docopt
 import requests
@@ -177,9 +178,22 @@ def get_file_extensions():
 
 
 def read_file_content(file_name: str, encoding="utf-8"):
+    contents = ""
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
-        with open(file_name, "r", encoding=encoding) as f:
-            contents = f.read()
+        if encoding and encoding.lower() != "utf-8":
+            try:
+                with open(file_name, "r", encoding=encoding) as f:
+                    contents = f.read()
+            except UnicodeDecodeError:
+                with open(file_name, "r", encoding=encoding, errors="replace") as f:
+                    contents = f.read()
+        else:
+            try:
+                with tokenize.open(file_name) as f:
+                    contents = f.read()
+            except (UnicodeDecodeError, SyntaxError):
+                with open(file_name, "r", encoding="utf-8", errors="replace") as f:
+                    contents = f.read()
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
     return contents
@@ -203,7 +217,7 @@ def ipynb_2_py(file_name, encoding="utf-8"):
     exporter = PythonExporter()
     (body, _) = exporter.from_filename(file_name)
 
-    return body.encode(encoding)
+    return body.encode(encoding, errors="replace")
 
 
 def generate_requirements_file(path, imports, symbol):
