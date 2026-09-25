@@ -39,11 +39,13 @@ Options:
     --scan-notebooks      Look for imports in jupyter notebook files.
 """
 from contextlib import contextmanager
+import io
 import os
 import sys
 import re
 import logging
 import ast
+import tokenize
 import traceback
 from docopt import docopt
 import requests
@@ -178,11 +180,63 @@ def get_file_extensions():
 
 def read_file_content(file_name: str, encoding="utf-8"):
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
-        with open(file_name, "r", encoding=encoding) as f:
-            contents = f.read()
+        with open(file_name, "rb") as f:
+            raw = f.read()
+        contents = decode_source(raw, encoding=encoding, file_name=file_name)
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
     return contents
+
+
+def decode_source(raw, encoding=None, file_name=""):
+    """Decode raw file bytes, never raising on undecodable content.
+
+    The decoding candidates are tried in order: the encoding declared by
+    the file itself (PEP 263 cookie or byte order mark), the encoding
+    requested by the user, UTF-8 and finally Latin-1, which can decode
+    any byte sequence.
+
+    Args:
+        raw: The raw bytes of the file.
+        encoding: Encoding explicitly requested by the user, if any.
+        file_name: Name of the file, used for log messages.
+
+    Returns:
+        str: The decoded content of the file.
+    """
+    candidates = []
+    try:
+        declared, _ = tokenize.detect_encoding(io.BytesIO(raw).readline)
+        candidates.append(declared)
+    except SyntaxError:
+        # missing, invalid or non-ASCII encoding declaration
+        pass
+    if encoding:
+        candidates.append(encoding)
+    candidates.extend(["utf-8-sig", "utf-8", "latin-1"])
+
+    tried = set()
+    for position, candidate in enumerate(candidates):
+        lowered = candidate.lower()
+        if lowered in tried:
+            continue
+        tried.add(lowered)
+        try:
+            contents = raw.decode(candidate)
+        except LookupError:
+            logging.error("Unknown encoding '%s' for file: %s", candidate, file_name)
+            continue
+        except UnicodeDecodeError:
+            continue
+        if position > 0:
+            logging.warning(
+                "Decoded file %s with '%s' instead of '%s'",
+                file_name,
+                candidate,
+                candidates[0],
+            )
+        return contents
+    return raw.decode("latin-1")
 
 
 def file_ext_is_allowed(file_name, acceptable):
