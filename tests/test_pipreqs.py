@@ -151,10 +151,19 @@ class TestPipreqs(unittest.TestCase):
           It's added to locals since it is a development dependency
           for testing
         """
-        # should find only docopt and requests
+        # Every locally installed package that is reported back must
+        # correspond to one of the queried imports, no matter which
+        # other packages happen to be installed in the environment
+        # (see issue #388).
+        queried = {module.lower() for module in self.modules}
         imports_with_info = pipreqs.get_import_local(self.modules)
         for item in imports_with_info:
-            self.assertTrue(item["name"].lower() in self.local)
+            candidates = {item["name"].lower()}
+            candidates.update(export.lower() for export in item["exports"])
+            self.assertTrue(
+                candidates & queried,
+                "Local package does not match any queried import: " + item["name"],
+            )
 
     def test_init(self):
         """
@@ -203,11 +212,19 @@ class TestPipreqs(unittest.TestCase):
             }
         )
         assert os.path.exists(self.requirements_path) == 1
+        # every requirement must originate from an import of the project,
+        # regardless of which packages are installed locally (issue #388)
+        project_imports = {
+            name.lower() for name in pipreqs.get_pkg_names(pipreqs.get_all_imports(self.project))
+        }
         with open(self.requirements_path, "r") as f:
             data = f.readlines()
+            self.assertTrue(data, "requirements file must not be empty")
             for item in data:
                 item = item.strip().split("==")
-                self.assertTrue(item[0].lower() in self.local)
+                self.assertIn(item[0].lower(), project_imports)
+        # docopt is always available locally (dependency of pipreqs itself)
+        self.assertTrue(any(line.startswith("docopt") for line in data))
 
     def test_init_savepath(self):
         """
@@ -634,7 +651,10 @@ class TestPipreqs(unittest.TestCase):
             }
         )
         assert os.path.exists(notebook_requirement_path) == 1
-        assert os.path.getsize(notebook_requirement_path) == 1    # file only has a "\n", meaning it's empty
+        # the file must contain nothing but a newline; compare content
+        # instead of size so the check also works with CRLF line endings
+        with open(notebook_requirement_path, "r") as f:
+            assert f.read().strip() == ""
 
     def test_pipreqs_get_imports_from_pyw_file(self):
         pyw_test_dirpath = os.path.join(os.path.dirname(__file__), "_data_pyw")
@@ -683,14 +703,16 @@ class TestPipreqs(unittest.TestCase):
         """
         Remove requiremnts.txt files that were written
         """
-        try:
-            os.remove(self.requirements_path)
-        except OSError:
-            pass
-        try:
-            os.remove(self.alt_requirement_path)
-        except OSError:
-            pass
+        for path in (
+            self.requirements_path,
+            self.alt_requirement_path,
+            os.path.join(self.project_with_ignore_directory, "requirements.txt"),
+            os.path.join(self.project_with_notebooks, "requirements.txt"),
+        ):
+            try:
+                os.remove(path)
+            except OSError:
+                pass
 
 
 if __name__ == "__main__":
