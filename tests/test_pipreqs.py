@@ -15,6 +15,7 @@ import unittest
 import os
 import requests
 import sys
+import tempfile
 import warnings
 
 from pipreqs import pipreqs
@@ -120,6 +121,52 @@ class TestPipreqs(unittest.TestCase):
         """
         imports = pipreqs.get_all_imports(self.project_invalid, ignore_errors=True)
         self.assertEqual(len(imports), 0)
+
+    def _write_project_file(self, tmp, name, data, encoding=None):
+        path = os.path.join(tmp, name)
+        if isinstance(data, bytes):
+            with open(path, "wb") as f:
+                f.write(data)
+        else:
+            with open(path, "w", encoding=encoding) as f:
+                f.write(data)
+        return path
+
+    def test_subdirectory_without_init_py_does_not_hide_imports(self):
+        """
+        Test that a folder that is not an importable package (no
+        __init__.py) does not hide a PyPI package of the same name.
+        See issues #187, #233 and #290.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(tmp, "bug.py", "import numpy\nimport pandas\n")
+            os.makedirs(os.path.join(tmp, "numpy"))
+            self.assertEqual(sorted(pipreqs.get_all_imports(tmp)), ["numpy", "pandas"])
+
+    def test_subdirectory_with_init_py_hides_import(self):
+        """
+        Test that a real local package still shadows the import of the
+        same name, so it is not added to the requirements.
+        See issue #290.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(tmp, "bug.py", "import localpkg\n")
+            os.makedirs(os.path.join(tmp, "localpkg"))
+            self._write_project_file(os.path.join(tmp, "localpkg"), "__init__.py", "")
+            self.assertNotIn("localpkg", pipreqs.get_all_imports(tmp))
+
+    def test_hidden_directories_are_not_scanned(self):
+        """
+        Test that hidden folders such as .mypy_cache are skipped: they
+        must neither be scanned nor shadow real imports with their
+        directory names.
+        See issues #330, #403 and #420.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(tmp, "bug.py", "import numpy\n")
+            os.makedirs(os.path.join(tmp, ".mypy_cache", "numpy"))
+            self._write_project_file(os.path.join(tmp, ".mypy_cache"), "spy.py", "import hidden_mod\n")
+            self.assertEqual(pipreqs.get_all_imports(tmp), ["numpy"])
 
     def test_get_imports_info(self):
         """
@@ -295,22 +342,29 @@ class TestPipreqs(unittest.TestCase):
         """
         Test --ignore parameter
         """
-        pipreqs.init(
-            {
-                "<path>": self.project_with_ignore_directory,
-                "--savepath": None,
-                "--print": False,
-                "--use-local": None,
-                "--force": True,
-                "--proxy": None,
-                "--pypi-server": None,
-                "--ignore": ".ignored_dir,.ignore_second",
-                "--diff": None,
-                "--clean": None,
-                "--mode": None,
-            }
-        )
-        with open(os.path.join(self.project_with_ignore_directory, "requirements.txt"), "r") as f:
+        args = {
+            "<path>": self.project_with_ignore_directory,
+            "--savepath": None,
+            "--print": False,
+            "--use-local": None,
+            "--force": True,
+            "--proxy": None,
+            "--pypi-server": None,
+            "--diff": None,
+            "--clean": None,
+            "--mode": None,
+        }
+        requirements_path = os.path.join(self.project_with_ignore_directory, "requirements.txt")
+
+        # a directory that is not hidden is scanned by default
+        pipreqs.init(args)
+        with open(requirements_path, "r") as f:
+            self.assertIn("click", f.read().lower())
+
+        # ... and skipped as soon as it is listed in --ignore
+        args["--ignore"] = ".ignored_dir,.ignore_second,ignored_normal"
+        pipreqs.init(args)
+        with open(requirements_path, "r") as f:
             data = f.read().lower()
             for item in ["click", "getpass"]:
                 self.assertFalse(item.lower() in data)

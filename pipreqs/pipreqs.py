@@ -124,9 +124,14 @@ def get_all_imports(path, encoding="utf-8", extra_ignore_dirs=None, follow_links
 
     walk = os.walk(path, followlinks=follow_links)
     for root, dirs, files in walk:
-        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        # hidden folders such as .mypy_cache, .tox or .git are never
+        # part of the project source and must not shadow imports
+        dirs[:] = [d for d in dirs if d not in ignore_dirs and not d.startswith(".")]
 
-        candidates.append(os.path.basename(root))
+        # only folders that are importable packages (they contain an
+        # __init__.py) may shadow an import of the same name
+        if os.path.isfile(os.path.join(root, "__init__.py")):
+            candidates.append(os.path.basename(root))
         py_files = [file for file in files if file_ext_is_allowed(file, DEFAULT_EXTENSIONS)]
         candidates.extend([os.path.splitext(filename)[0] for filename in py_files])
 
