@@ -204,11 +204,11 @@ class TestPipreqs(unittest.TestCase):
         Test that --clean is not blocked by the overwrite protection.
         """
         with open(self.requirements_path, "w") as f:
-            f.write("requests==2.31.0\nnot_imported_pkg==1.0\n")
+            f.write("docopt==0.6.2\nnot_imported_pkg==1.0\n")
         pipreqs.init(self._base_init_args(**{"--clean": self.requirements_path, "--force": None}))
         with open(self.requirements_path, "r") as f:
             data = f.read()
-        self.assertIn("requests", data)
+        self.assertIn("docopt", data)
         self.assertNotIn("not_imported_pkg", data)
 
     def test_get_imports_info(self):
