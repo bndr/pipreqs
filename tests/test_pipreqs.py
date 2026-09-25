@@ -121,6 +121,96 @@ class TestPipreqs(unittest.TestCase):
         imports = pipreqs.get_all_imports(self.project_invalid, ignore_errors=True)
         self.assertEqual(len(imports), 0)
 
+    def _base_init_args(self, **overrides):
+        args = {
+            "<path>": self.project,
+            "--savepath": None,
+            "--print": False,
+            "--use-local": None,
+            "--force": True,
+            "--proxy": None,
+            "--pypi-server": None,
+            "--diff": None,
+            "--clean": None,
+            "--mode": None,
+        }
+        args.update(overrides)
+        return args
+
+    def test_deduplicate_imports(self):
+        """
+        Test that the same package is only reported once, even when it
+        appears under different spellings.
+        See issue #383.
+        """
+        imports = [
+            {"name": "PyYAML", "version": "6.0.1"},
+            {"name": "requests", "version": "2.31.0"},
+            {"name": "pyyaml", "version": "5.4.1"},
+            {"name": "Requests", "version": "2.30.0"},
+        ]
+        result = pipreqs.deduplicate_imports(imports)
+        names = [item["name"].lower() for item in result]
+        self.assertEqual(names, ["pyyaml", "requests"])
+        self.assertEqual(result[0]["version"], "6.0.1")
+
+    @patch("pipreqs.pipreqs.get_import_local")
+    def test_init_writes_each_package_once(self, mock_local):
+        """
+        Test that duplicate local entries do not end up as duplicate
+        lines in the requirements file.
+        See issue #383.
+        """
+        mock_local.return_value = [
+            {"name": "PyYAML", "version": "6.0.1"},
+            {"name": "pyyaml", "version": "6.0.1"},
+        ]
+        pipreqs.init(self._base_init_args(**{"--use-local": True}))
+        with open(self.requirements_path, "r") as f:
+            lines = [line for line in f.read().splitlines() if line.strip()]
+        self.assertEqual(lines, ["PyYAML==6.0.1"])
+
+    def test_init_savepath_requires_force_to_overwrite(self):
+        """
+        Test that a hand-written file passed via --savepath is not
+        overwritten without --force.
+        See issues #336 and #112.
+        """
+        with open(self.alt_requirement_path, "w") as f:
+            f.write("hand-edited==1.0.0\n")
+
+        pipreqs.init(self._base_init_args(**{"--savepath": self.alt_requirement_path, "--force": None}))
+        with open(self.alt_requirement_path, "r") as f:
+            self.assertEqual(f.read(), "hand-edited==1.0.0\n")
+
+        pipreqs.init(self._base_init_args(**{"--savepath": self.alt_requirement_path}))
+        with open(self.alt_requirement_path, "r") as f:
+            data = f.read()
+        self.assertNotIn("hand-edited", data)
+        self.assertIn("docopt", data)
+
+    @patch("pipreqs.pipreqs.diff")
+    def test_init_diff_runs_when_requirements_file_exists(self, mock_diff):
+        """
+        Test that --diff is not blocked by the overwrite protection.
+        """
+        with open(self.requirements_path, "w") as f:
+            f.write("requests==2.31.0\n")
+        pipreqs.init(self._base_init_args(**{"--diff": self.requirements_path, "--force": None}))
+        mock_diff.assert_called_once()
+
+    def test_init_clean_works_when_requirements_file_exists(self):
+        """
+        Test that --clean is not blocked by the overwrite protection.
+        """
+        with open(self.requirements_path, "w") as f:
+            f.write("requests==2.31.0\nnot_imported_pkg==1.0\n")
+        pipreqs.init(self._base_init_args(**{"--clean": self.requirements_path, "--force": None}))
+        with open(self.requirements_path, "r") as f:
+            data = f.read()
+        self.assertIn("requests", data)
+        self.assertNotIn("not_imported_pkg", data)
+
     def test_get_imports_info(self):
         """
         Test to see that the right number of packages were found on PyPI
