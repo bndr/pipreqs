@@ -15,6 +15,7 @@ import unittest
 import os
 import requests
 import sys
+import tempfile
 import warnings
 
 from pipreqs import pipreqs
@@ -120,6 +121,72 @@ class TestPipreqs(unittest.TestCase):
         """
         imports = pipreqs.get_all_imports(self.project_invalid, ignore_errors=True)
         self.assertEqual(len(imports), 0)
+
+    def _write_project_file(self, tmp, name, data, encoding=None):
+        path = os.path.join(tmp, name)
+        if isinstance(data, bytes):
+            with open(path, "wb") as f:
+                f.write(data)
+        else:
+            with open(path, "w", encoding=encoding) as f:
+                f.write(data)
+        return path
+
+    def test_get_all_imports_reads_non_utf8_file(self):
+        """
+        Test that a file that is not valid UTF-8 does not crash the scan.
+        See issues #551 and #340.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(
+                tmp, "app.py", "# latin-1 comment \xf6\xfc\xe4\nimport requests\n".encode("cp1252")
+            )
+            self.assertEqual(pipreqs.get_all_imports(tmp), ["requests"])
+
+    def test_get_all_imports_honors_source_encoding_cookie(self):
+        """
+        Test that a PEP 263 encoding declaration is respected.
+        See issue #461.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(
+                tmp,
+                "app.py",
+                "# -*- coding: latin-1 -*-\nimport requests\n# \xf6 comment\n".encode("latin-1"),
+            )
+            self.assertEqual(pipreqs.get_all_imports(tmp), ["requests"])
+
+    def test_get_all_imports_reads_utf8_bom_file(self):
+        """
+        Test that a UTF-8 file with a byte order mark is scanned.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(tmp, "app.py", b"\xef\xbb\xbfimport requests\n")
+            self.assertEqual(pipreqs.get_all_imports(tmp), ["requests"])
+
+    def test_get_all_imports_falls_back_when_given_encoding_does_not_match(self):
+        """
+        Test that a wrong --encoding value does not abort the scan.
+        See issue #340.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_project_file(
+                tmp, "app.py", "# comment \xf6\nimport requests\n".encode("cp1252")
+            )
+            imports = pipreqs.get_all_imports(tmp, encoding="utf-8")
+            self.assertEqual(imports, ["requests"])
+
+    def test_read_file_content_uses_requested_encoding(self):
+        """
+        Test that an explicitly requested encoding is used for decoding.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            path = self._write_project_file(
+                tmp, "app.py", "# comment \xf6\nimport requests\n".encode("cp1252")
+            )
+            contents = pipreqs.read_file_content(path, encoding="cp1252")
+            self.assertIn("import requests", contents)
+            self.assertIn("\xf6", contents)
 
     def test_get_imports_info(self):
         """
