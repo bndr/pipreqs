@@ -15,6 +15,7 @@ import unittest
 import os
 import requests
 import sys
+import tempfile
 import warnings
 
 from pipreqs import pipreqs
@@ -120,6 +121,105 @@ class TestPipreqs(unittest.TestCase):
         """
         imports = pipreqs.get_all_imports(self.project_invalid, ignore_errors=True)
         self.assertEqual(len(imports), 0)
+
+    def _make_fake_distribution(self, tmp, dist_dir_name, name, version, files=None):
+        dist_info = os.path.join(tmp, dist_dir_name)
+        os.makedirs(dist_info)
+        with open(os.path.join(dist_info, "METADATA"), "w", encoding="utf-8") as f:
+            f.write("Metadata-Version: 2.1\nName: {}\nVersion: {}\n".format(name, version))
+        if files is not None:
+            record_lines = []
+            for relative_path, content in files.items():
+                path = os.path.join(tmp, relative_path.replace("/", os.sep))
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(content)
+                record_lines.append("{},,".format(relative_path))
+            with open(os.path.join(dist_info, "RECORD"), "w", encoding="utf-8") as f:
+                f.write("\n".join(record_lines) + "\n")
+
+    def test_local_packages_without_top_level_txt(self):
+        """
+        Test that packages built with modern PEP-517 backends, which do
+        not ship a top_level.txt, are still detected locally.
+        See issue #553.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._make_fake_distribution(
+                tmp, "fakepkg_xyz-1.2.3.dist-info", "fakepkg-xyz", "1.2.3"
+            )
+            sys.path.insert(0, tmp)
+            try:
+                packages = pipreqs.get_locally_installed_packages()
+            finally:
+                sys.path.remove(tmp)
+            found = [p for p in packages if p["name"] == "fakepkg-xyz"]
+            self.assertEqual(len(found), 1)
+            self.assertEqual(found[0]["version"], "1.2.3")
+
+    def test_local_package_exports_derived_from_installed_files(self):
+        """
+        Test that top level modules are derived from the installed files
+        when the distribution does not ship a top_level.txt.
+        See issue #553.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._make_fake_distribution(
+                tmp,
+                "fakepkg_xyz-1.2.3.dist-info",
+                "fakepkg-xyz",
+                "1.2.3",
+                files={"fakepkg/__init__.py": ""},
+            )
+            sys.path.insert(0, tmp)
+            try:
+                packages = pipreqs.get_locally_installed_packages()
+            finally:
+                sys.path.remove(tmp)
+            found = [p for p in packages if p["name"] == "fakepkg-xyz"]
+            self.assertEqual(len(found), 1)
+            self.assertIn("fakepkg", found[0]["exports"])
+
+    def test_get_import_local_matches_package_name_case_insensitively(self):
+        """
+        Test that the capitalized names produced by the mapping file do
+        not prevent a local match.
+        See issues #381 and #500.
+        """
+        # requests is a dependency of pipreqs itself, so it is always local
+        result = pipreqs.get_import_local(["Requests"])
+        self.assertTrue(
+            any(pipreqs.normalize_package_name(p["name"]) == "requests" for p in result),
+            "locally installed requests must be detected for a 'Requests' import",
+        )
+
+    def test_get_import_local_normalizes_name_separators(self):
+        """
+        Test that -, _ and . are treated equivalently in package names.
+        See issue #491.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            self._make_fake_distribution(
+                tmp, "fakepkg_xyz-1.2.3.dist-info", "fakepkg-xyz", "1.2.3"
+            )
+            sys.path.insert(0, tmp)
+            try:
+                result = pipreqs.get_import_local(["fakepkg_xyz"])
+            finally:
+                sys.path.remove(tmp)
+            self.assertTrue(
+                any(p["name"] == "fakepkg-xyz" for p in result),
+                "fakepkg_xyz must match the installed fakepkg-xyz distribution",
+            )
+
+    def test_get_import_local_returns_unique_packages(self):
+        """
+        Test that a package is reported only once even when it is
+        installed in more than one location.
+        """
+        result = pipreqs.get_import_local(["requests", "Requests", "REQUESTS"])
+        names = [pipreqs.normalize_package_name(p["name"]) for p in result]
+        self.assertEqual(names.count("requests"), 1)
 
     def test_get_imports_info(self):
         """

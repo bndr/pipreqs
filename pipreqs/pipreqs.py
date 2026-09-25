@@ -39,6 +39,7 @@ Options:
     --scan-notebooks      Look for imports in jupyter notebook files.
 """
 from contextlib import contextmanager
+from importlib import metadata as importlib_metadata
 import os
 import sys
 import re
@@ -261,65 +262,92 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
 
 
 def get_locally_installed_packages(encoding="utf-8"):
+    """Collect the packages installed in the current environment.
+
+    Uses importlib.metadata, so distributions built with modern
+    PEP-517 backends (flit, hatchling, poetry-core), which do not
+    necessarily ship a top_level.txt, are detected as well.
+    """
     packages = []
-    ignore = ["tests", "_tests", "egg", "EGG", "info"]
-    for path in sys.path:
-        for root, dirs, files in os.walk(path):
-            for item in files:
-                if "top_level" in item:
-                    item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
-                        package = root.split(os.sep)[-1].split("-")
-                        try:
-                            top_level_modules = f.read().strip().split("\n")
-                        except:  # NOQA
-                            # TODO: What errors do we intend to suppress here?
-                            continue
-
-                        # filter off explicitly ignored top-level modules
-                        # such as test, egg, etc.
-                        filtered_top_level_modules = list()
-
-                        for module in top_level_modules:
-                            if (module not in ignore) and (package[0] not in ignore):
-                                # append exported top level modules to the list
-                                filtered_top_level_modules.append(module)
-
-                        version = None
-                        if len(package) > 1:
-                            version = package[1].replace(".dist", "").replace(".egg", "")
-
-                        # append package: top_level_modules pairs
-                        # instead of top_level_module: package pairs
-                        packages.append(
-                            {
-                                "name": package[0],
-                                "version": version,
-                                "exports": filtered_top_level_modules,
-                            }
-                        )
+    ignore = ("tests", "_tests", "egg", "EGG", "info")
+    for dist in importlib_metadata.distributions():
+        try:
+            name = (dist.metadata["Name"] or "").strip()
+            version = (dist.metadata["Version"] or "").strip() or None
+        except Exception:  # NOQA
+            # a broken distribution must not abort the whole scan
+            logging.debug("Skipping distribution with unreadable metadata")
+            continue
+        if not name or name in ignore:
+            continue
+        try:
+            exports = [module for module in _distribution_exports(dist) if module not in ignore]
+        except Exception:  # NOQA
+            exports = []
+        packages.append({"name": name, "version": version, "exports": exports})
     return packages
 
 
+def _distribution_exports(dist):
+    try:
+        top_level = dist.read_text("top_level.txt")
+    except Exception:  # NOQA
+        top_level = None
+    if top_level:
+        return [line.strip() for line in top_level.splitlines() if line.strip()]
+    return _exports_from_files(dist)
+
+
+def _exports_from_files(dist):
+    try:
+        files = dist.files
+    except Exception:  # NOQA
+        files = None
+    exports = set()
+    python_extensions = (".py", ".pyi", ".pyd", ".so")
+    for file_ in files or []:
+        parts = str(file_).replace("\\", "/").split("/")
+        if len(parts) == 1:
+            stem, extension = os.path.splitext(parts[0])
+            if extension in python_extensions and stem != "__init__":
+                exports.add(stem)
+            continue
+        top_level = parts[0]
+        if top_level.endswith(("-dist-info", ".egg-info")) or top_level.upper() == "EGG-INFO":
+            continue
+        if str(file_).endswith(python_extensions):
+            exports.add(top_level)
+    return sorted(exports)
+
+
+def normalize_package_name(name):
+    """Normalize a package name for comparison, as described in PEP 503."""
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _is_local_match(import_name, package):
+    if normalize_package_name(import_name) == normalize_package_name(package["name"]):
+        return True
+    lowered = import_name.lower()
+    return any(lowered == export.lower() for export in package["exports"])
+
+
 def get_import_local(imports, encoding="utf-8"):
-    local = get_locally_installed_packages()
+    local = get_locally_installed_packages(encoding=encoding)
     result = []
+    seen = set()
     for item in imports:
-        # search through local packages
+        # search through local packages: a package matches when the
+        # import name equals the package name (compared without regard
+        # to case, -, _ and . differences) or equals one of its
+        # exported top level modules
         for package in local:
-            # if candidate import name matches export name
-            # or candidate import name equals to the package name
-            # append it to the result
-            if item in package["exports"] or item == package["name"]:
-                result.append(package)
-
-    # removing duplicates of package/version
-    # had to use second method instead of the previous one,
-    # because we have a list in the 'exports' field
-    # https://stackoverflow.com/questions/9427163/remove-duplicate-dict-in-list-in-python
-    result_unique = [i for n, i in enumerate(result) if i not in result[n + 1:]]
-
-    return result_unique
+            if _is_local_match(item, package):
+                key = normalize_package_name(package["name"])
+                if key not in seen:
+                    seen.add(key)
+                    result.append(package)
+    return result
 
 
 def get_pkg_names(pkgs):
@@ -561,15 +589,9 @@ def init(args):
         # and the package name is not in the list of local module names
         # it add to difference
         difference = [
-            x
-            for x in candidates
-            if
-            # aggregate all export lists into one
-            # flatten the list
-            # check if candidate is in exports
-            x.lower() not in [y for x in local for y in x["exports"]] and
-            # check if candidate is package names
-            x.lower() not in [x["name"] for x in local]
+            item
+            for item in candidates
+            if not any(_is_local_match(item, package) for package in local)
         ]
 
         imports = local + get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
