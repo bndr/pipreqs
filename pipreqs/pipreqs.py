@@ -24,6 +24,7 @@ Options:
     --no-follow-links     Do not follow symbolic links in the project
     --encoding <charset>  Use encoding parameter for file open
     --savepath <file>     Save the list of requirements in the given file
+                           (an existing file is only overwritten with --force)
     --print               Output the list of requirements in the standard
                           output
     --force               Overwrite existing requirements.txt
@@ -322,6 +323,29 @@ def get_import_local(imports, encoding="utf-8"):
     return result_unique
 
 
+def deduplicate_imports(imports):
+    """Sort imports by package name and drop repeated packages.
+
+    Args:
+        imports (List[Dict]): Imports as returned by the lookup
+            functions, each with a "name" and a "version" key.
+
+    Returns:
+        List[Dict]: Sorted list with one entry per package name.
+
+    """
+    result = []
+    seen = set()
+    for item in sorted(imports, key=lambda x: x["name"].lower()):
+        # compare names ignoring case and -, _ and . differences,
+        # as described in PEP 503
+        key = re.sub(r"[-_.]+", "-", item["name"]).lower()
+        if key not in seen:
+            seen.add(key)
+            result.append(item)
+    return result
+
+
 def get_pkg_names(pkgs):
     """Get PyPI package names from a list of imports.
 
@@ -523,13 +547,12 @@ def init(args):
     path = (
         args["--savepath"] if args["--savepath"] else os.path.join(input_path, "requirements.txt")
     )
-    if (
-        not args["--print"]
-        and not args["--savepath"]
-        and not args["--force"]
-        and os.path.exists(path)
-    ):
-        logging.warning("requirements.txt already exists, " "use --force to overwrite it")
+    # only a run that writes a requirements file needs overwrite
+    # protection: --print produces no file and --diff/--clean expect
+    # the existing file as their input
+    writes_file = not args.get("--print") and not args.get("--diff") and not args.get("--clean")
+    if writes_file and not args.get("--force") and os.path.exists(path):
+        logging.warning("%s already exists, use --force to overwrite it", path)
         return
 
     candidates = get_all_imports(
@@ -573,8 +596,9 @@ def init(args):
         ]
 
         imports = local + get_imports_info(difference, proxy=proxy, pypi_server=pypi_server)
-    # sort imports based on lowercase name of package, similar to `pip freeze`.
-    imports = sorted(imports, key=lambda x: x["name"].lower())
+    # sort imports based on lowercase name of package, similar to
+    # `pip freeze`, and keep a single entry per package
+    imports = deduplicate_imports(imports)
 
     if args["--diff"]:
         diff(args["--diff"], imports)
