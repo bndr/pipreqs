@@ -178,8 +178,12 @@ def get_file_extensions():
 
 def read_file_content(file_name: str, encoding="utf-8"):
     if file_ext_is_allowed(file_name, DEFAULT_EXTENSIONS):
-        with open(file_name, "r", encoding=encoding) as f:
-            contents = f.read()
+        try:
+            with open(file_name, "r", encoding=encoding) as f:
+                contents = f.read()
+        except (UnicodeDecodeError, UnicodeError):
+            with open(file_name, "r", encoding=encoding, errors="replace") as f:
+                contents = f.read()
     elif file_ext_is_allowed(file_name, [".ipynb"]) and scan_noteboooks:
         contents = ipynb_2_py(file_name, encoding=encoding)
     return contents
@@ -262,42 +266,64 @@ def get_imports_info(imports, pypi_server="https://pypi.python.org/pypi/", proxy
 
 def get_locally_installed_packages(encoding="utf-8"):
     packages = []
+    seen = set()
+
+    # Modern importlib.metadata approach (Python 3.8+, supports PEP-517, flit, hatchling, poetry)
+    try:
+        from importlib.metadata import distributions, packages_distributions
+        pkg_dists = packages_distributions()
+        dist_to_exports = {}
+        for mod, dists in pkg_dists.items():
+            for dist in dists:
+                dist_to_exports.setdefault(dist.lower(), []).append(mod)
+
+        for dist in distributions():
+            raw_name = dist.metadata["Name"] if "Name" in dist.metadata else dist.name
+            if raw_name:
+                name_key = raw_name.lower()
+                if name_key not in seen:
+                    seen.add(name_key)
+                    packages.append(
+                        {
+                            "name": raw_name,
+                            "version": dist.version,
+                            "exports": dist_to_exports.get(name_key, [raw_name]),
+                        }
+                    )
+    except Exception:
+        pass
+
+    # Legacy fallback for backwards compatibility
     ignore = ["tests", "_tests", "egg", "EGG", "info"]
     for path in sys.path:
+        if not os.path.exists(path):
+            continue
         for root, dirs, files in os.walk(path):
             for item in files:
                 if "top_level" in item:
                     item = os.path.join(root, item)
-                    with open(item, "r", encoding=encoding) as f:
-                        package = root.split(os.sep)[-1].split("-")
-                        try:
+                    try:
+                        with open(item, "r", encoding=encoding, errors="replace") as f:
+                            package = root.split(os.sep)[-1].split("-")
+                            if package[0].lower() in seen:
+                                continue
                             top_level_modules = f.read().strip().split("\n")
-                        except:  # NOQA
-                            # TODO: What errors do we intend to suppress here?
-                            continue
-
-                        # filter off explicitly ignored top-level modules
-                        # such as test, egg, etc.
-                        filtered_top_level_modules = list()
-
-                        for module in top_level_modules:
-                            if (module not in ignore) and (package[0] not in ignore):
-                                # append exported top level modules to the list
-                                filtered_top_level_modules.append(module)
-
-                        version = None
-                        if len(package) > 1:
-                            version = package[1].replace(".dist", "").replace(".egg", "")
-
-                        # append package: top_level_modules pairs
-                        # instead of top_level_module: package pairs
-                        packages.append(
-                            {
-                                "name": package[0],
-                                "version": version,
-                                "exports": filtered_top_level_modules,
-                            }
-                        )
+                            filtered_top_level_modules = [
+                                m for m in top_level_modules if (m not in ignore) and (package[0] not in ignore)
+                            ]
+                            version = None
+                            if len(package) > 1:
+                                version = package[1].replace(".dist", "").replace(".egg", "")
+                            seen.add(package[0].lower())
+                            packages.append(
+                                {
+                                    "name": package[0],
+                                    "version": version,
+                                    "exports": filtered_top_level_modules,
+                                }
+                            )
+                    except Exception:
+                        continue
     return packages
 
 
