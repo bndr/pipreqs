@@ -290,7 +290,7 @@ def get_locally_installed_packages(encoding="utf-8"):
                             "exports": dist_to_exports.get(name_key, [raw_name]),
                         }
                     )
-    except Exception:
+    except (ImportError, OSError, ValueError):
         pass
 
     # Legacy fallback for backwards compatibility
@@ -322,7 +322,7 @@ def get_locally_installed_packages(encoding="utf-8"):
                                     "exports": filtered_top_level_modules,
                                 }
                             )
-                    except Exception:
+                    except (OSError, UnicodeError):
                         continue
     return packages
 
