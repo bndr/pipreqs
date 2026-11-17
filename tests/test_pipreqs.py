@@ -48,7 +48,17 @@ class TestPipreqs(unittest.TestCase):
             "after_method_is_valid_even_if_not_pep8",
         ]
         cls.modules2 = ["beautifulsoup4"]
-        cls.local = ["docopt", "requests", "nose", "pyflakes", "ipython"]
+        cls.local = [
+            "docopt",
+            "requests",
+            "nose",
+            "pyflakes",
+            "ipython",
+            "sqlalchemy",
+            "peewee",
+            "ujson",
+            "beautifulsoup4",
+        ]
         cls.project = os.path.join(os.path.dirname(__file__), "_data")
         cls.empty_filepath = os.path.join(cls.project, "empty.txt")
         cls.imports_filepath = os.path.join(cls.project, "imports.txt")
