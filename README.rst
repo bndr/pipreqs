@@ -47,6 +47,7 @@ Usage
 
     Options:
         --use-local           Use ONLY local package info instead of querying PyPI
+        --mapping-file <file>  Add or override import-to-package mappings from a file
         --pypi-server <url>   Use custom PyPi server
         --proxy <url>         Use Proxy, parameter will be passed to requests library. You can also just set the
                               environments parameter in your terminal:
@@ -83,6 +84,19 @@ Contents of requirements.txt
     wheel==0.23.0
     Yarg==0.1.9
     docopt==0.6.2
+
+Custom package mappings
+-----------------------
+
+Use ``--mapping-file`` when an import name maps to a different distribution in
+your project. The UTF-8 file uses one ``import-name:package-name`` pair per line.
+It can add new entries and override individual bundled mappings.
+
+::
+
+    $ cat package-mapping.txt
+    acme_widgets:acme-widgets
+    $ pipreqs --mapping-file package-mapping.txt /home/project/location
 
 Why not pip freeze?
 -------------------

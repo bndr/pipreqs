@@ -12,6 +12,7 @@ Arguments:
 
 Options:
     --use-local           Use ONLY local package info instead of querying PyPI.
+    --mapping-file <file>  Add or override import-to-package mappings from a file.
     --pypi-server <url>   Use custom PyPi server.
     --proxy <url>         Use Proxy, parameter will be passed to requests
                           library. You can also just set the environments
@@ -322,19 +323,37 @@ def get_import_local(imports, encoding="utf-8"):
     return result_unique
 
 
-def get_pkg_names(pkgs):
+def _read_mapping(filename):
+    """Read import-name:package-name pairs from a UTF-8 mapping file."""
+    mapping = {}
+    with open(filename, encoding="utf-8") as file:
+        for lineno, line in enumerate(file, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            fields = [field.strip() for field in line.split(":")]
+            if len(fields) != 2 or not all(fields):
+                raise ValueError(f"line {lineno}: expected import-name:package-name")
+            import_name, package_name = fields
+            mapping[import_name] = package_name
+    return mapping
+
+
+def get_pkg_names(pkgs, mapping_overrides=None):
     """Get PyPI package names from a list of imports.
 
     Args:
         pkgs (List[str]): List of import names.
+        mapping_overrides (dict): Additional or replacement mappings by import name.
 
     Returns:
         List[str]: The corresponding PyPI package names.
 
     """
     result = set()
-    with open(join("mapping"), "r") as f:
-        data = dict(x.strip().split(":") for x in f)
+    data = _read_mapping(join("mapping"))
+    if mapping_overrides:
+        data.update(mapping_overrides)
     for pkg in pkgs:
         # Look up the mapped requirement. If a mapping isn't found,
         # simply use the package name.
@@ -532,6 +551,14 @@ def init(args):
         logging.warning("requirements.txt already exists, " "use --force to overwrite it")
         return
 
+    mapping_overrides = None
+    mapping_file = args.get("--mapping-file")
+    if mapping_file is not None:
+        try:
+            mapping_overrides = _read_mapping(mapping_file)
+        except (OSError, ValueError) as exc:
+            sys.exit(f"Cannot read --mapping-file {mapping_file!r}: {exc}")
+
     candidates = get_all_imports(
         input_path,
         encoding=encoding,
@@ -539,7 +566,7 @@ def init(args):
         follow_links=follow_links,
         ignore_errors=ignore_errors,
     )
-    candidates = get_pkg_names(candidates)
+    candidates = get_pkg_names(candidates, mapping_overrides)
     logging.debug("Found imports: " + ", ".join(candidates))
     pypi_server = "https://pypi.python.org/pypi/"
     proxy = None

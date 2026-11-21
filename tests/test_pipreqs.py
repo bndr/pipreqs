@@ -10,6 +10,9 @@ Tests for `pipreqs` module.
 
 from io import StringIO
 import logging
+from pathlib import Path
+import subprocess
+from tempfile import TemporaryDirectory
 from unittest.mock import patch, Mock
 import unittest
 import os
@@ -18,6 +21,76 @@ import sys
 import warnings
 
 from pipreqs import pipreqs
+
+
+class TestMappingFile(unittest.TestCase):
+
+    def test_cli_applies_mapping_file_and_keeps_other_builtins(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            project = root / "project"
+            project.mkdir()
+            (project / "example.py").write_text(
+                "import bs4\nimport example_widget\nimport yaml\n", encoding="utf-8"
+            )
+            mapping = root / "mapping.txt"
+            mapping.write_text(
+                "bs4:custom_soup\n\nexample_widget:example_widgets\n", encoding="utf-8"
+            )
+
+            installed = root / "installed"
+            for name in ("custom_soup", "example_widgets", "PyYAML"):
+                metadata = installed / f"{name}-1.0.dist-info"
+                metadata.mkdir(parents=True)
+                (metadata / "top_level.txt").write_text(f"{name}\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pipreqs.pipreqs",
+                    "--use-local",
+                    "--mapping-file",
+                    str(mapping),
+                    "--print",
+                    str(project),
+                ],
+                env={**os.environ, "PYTHONPATH": str(installed)},
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(
+                result.stdout.splitlines(), ["custom_soup==1.0", "example_widgets==1.0", "PyYAML==1.0"]
+            )
+
+    def test_cli_reports_invalid_mapping_files(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            invalid_mapping = root / "invalid.txt"
+            invalid_mapping.write_text("bs4:custom_soup\nmissing-delimiter\n", encoding="utf-8")
+
+            for mapping in (root / "missing.txt", invalid_mapping):
+                with self.subTest(mapping=mapping.name):
+                    result = subprocess.run(
+                        [
+                            sys.executable,
+                            "-m",
+                            "pipreqs.pipreqs",
+                            "--use-local",
+                            "--mapping-file",
+                            str(mapping),
+                            str(root),
+                        ],
+                        capture_output=True,
+                        text=True,
+                    )
+                    self.assertEqual(result.returncode, 1, result.stderr)
+                    self.assertIn(str(mapping), result.stderr)
+                    if mapping == invalid_mapping:
+                        self.assertIn("line 2", result.stderr)
+                    self.assertNotIn("Traceback", result.stderr)
+                    self.assertFalse((root / "requirements.txt").exists())
 
 
 class TestPipreqs(unittest.TestCase):
